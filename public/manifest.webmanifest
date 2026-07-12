@@ -1,0 +1,17 @@
+{
+  "name": "CarpiBiga Pro",
+  "short_name": "CarpiBiga",
+  "description": "Precision dough engineering for professional pizza-makers",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#221912",
+  "theme_color": "#221912",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

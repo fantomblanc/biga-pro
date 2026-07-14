@@ -288,6 +288,23 @@ const fr: Dict = {
   bakes_at: "Cuisson",
   overview: "Aperçu",
   seo_desc: "Calculateur de pâte pro et chronologie de fermentation pour pizzaïolos avancés. Moteurs Biga et Direct 72h.",
+  biga_pct: "Pourcentage de Biga",
+  biga_pct_help: "Part de la farine totale mise en Biga (20–100%). Défaut 80%.",
+  biga_flour_dyn: "Farine Biga",
+  refresh_flour_dyn: "Farine restante",
+  room_temp_label: "Température cuisine / pièce (°C)",
+  room_temp_warning: "⚠ Pour le protocole Direct 72h, cette valeur ne règle que la pousse en bloc et l'apprêt final. La levure est fixée pour un stockage à froid.",
+  step_knead: "Pétrissage",
+  step_bulk: "Pousse en bloc",
+  bulk_ferment: "Pousse en bloc",
+  bulk_desc: "Laissez reposer la pâte à température ambiante avant le bloc froid.",
+  bulk_hot_warning: "Température ambiante élevée. Raccourcissez la pousse en bloc pour éviter une sur-activation de la levure avant le froid.",
+  bake_temps: "Températures de cuisson",
+  bake_voute: "Voûte",
+  bake_sole: "Sole",
+  bake_tip_biga_low: "Idéal pour un développement rapide et un alvéolage marqué.",
+  bake_tip_biga_high: "Sole plus basse nécessaire pour évaporer l'humidité de la haute hydratation sans brûler le dessous.",
+  bake_tip_direct: "Cuisson légèrement plus longue pour maximiser le croustillant et la caramélisation.",
 };
 
 const it: Dict = {

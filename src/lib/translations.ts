@@ -523,6 +523,23 @@ const es: Dict = {
   yeast_fresh_note: "Valores en levadura fresca. Seca = fresca ÷ 3.",
   total_time: "Duración total", starts_at: "Inicio", bakes_at: "Hornear", overview: "Resumen",
   seo_desc: "Calculadora profesional de masa y cronología de fermentación para pizzeros avanzados.",
+  biga_pct: "Porcentaje de Biga",
+  biga_pct_help: "Parte de la harina total en la Biga (20–100%). Por defecto 80%.",
+  biga_flour_dyn: "Harina Biga",
+  refresh_flour_dyn: "Harina restante",
+  room_temp_label: "Temperatura cocina / sala (°C)",
+  room_temp_warning: "⚠ Para el protocolo Directo 72h, solo ajusta la puntada y la fermentación final. La levadura está fijada para el frío.",
+  step_knead: "Amasado",
+  step_bulk: "Fermentación en bloque (Pousse en bloc)",
+  bulk_ferment: "Fermentación en bloque",
+  bulk_desc: "Deje reposar la masa a temperatura ambiente antes del bloque frío.",
+  bulk_hot_warning: "Temperatura ambiente alta. Acorte la fermentación en bloque para evitar sobre-activar la levadura antes del frío.",
+  bake_temps: "Temperaturas de cocción",
+  bake_voute: "Bóveda",
+  bake_sole: "Suela",
+  bake_tip_biga_low: "Ideal para expansión rápida y miga alveolada.",
+  bake_tip_biga_high: "Suela más baja para evaporar la humedad de alta hidratación sin quemar la base.",
+  bake_tip_direct: "Cocción algo más larga para maximizar el crujiente y la caramelización.",
 };
 
 const pt: Dict = {

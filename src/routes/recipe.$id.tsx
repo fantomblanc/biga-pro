@@ -380,10 +380,11 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
   const g = t("grams");
 
   if (recipe.inputs.engine === "biga") {
-    rows.push(["biga", t("biga_flour"), `${recipe.calc.bigaFlour.toFixed(1)} ${g}`]);
+    const bigaPct = recipe.calc.bigaPct ?? recipe.inputs.bigaPct ?? 80;
+    rows.push(["biga", `${t("biga_flour_dyn")} (${bigaPct}%)`, `${recipe.calc.bigaFlour.toFixed(1)} ${g}`]);
     rows.push(["biga", t("biga_water"), `${recipe.calc.bigaWater.toFixed(1)} ${g}`]);
     rows.push(["biga", t("biga_yeast"), `${yeastShown.toFixed(3)} ${g}`]);
-    rows.push(["refresh", t("refresh_flour"), `${recipe.calc.refreshFlour.toFixed(1)} ${g}`]);
+    rows.push(["refresh", `${t("refresh_flour_dyn")} (${100 - bigaPct}%)`, `${recipe.calc.refreshFlour.toFixed(1)} ${g}`]);
     rows.push(["refresh", t("refresh_water"), `${recipe.calc.refreshWater.toFixed(1)} ${g}`]);
     rows.push(["refresh", t("refresh_salt"), `${recipe.calc.totalSalt.toFixed(1)} ${g}`]);
     if (recipe.inputs.useMalt) rows.push(["refresh", t("refresh_malt"), `${recipe.calc.totalMalt.toFixed(2)} ${g}`]);
@@ -395,7 +396,9 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
     rows.push(["mix", t("biga_yeast"), `${yeastShown.toFixed(3)} ${g}`]);
     if (recipe.inputs.useMalt) rows.push(["mix", t("refresh_malt"), `${recipe.calc.totalMalt.toFixed(2)} ${g}`]);
     if (recipe.inputs.useOil) rows.push(["mix", t("refresh_oil"), `${recipe.calc.totalOil.toFixed(1)} ${g}`]);
+    rows.push(["bulk", t("bulk_ferment"), `${recipe.calc.bulkFermentMin ?? 30} ${t("minutes")} @ ${recipe.inputs.cellarTemp}°C`]);
   }
+
 
   const phaseLabel: Record<string, string> = {
     biga: t("biga_phase"),

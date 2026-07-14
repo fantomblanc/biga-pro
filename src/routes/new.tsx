@@ -246,11 +246,13 @@ function NewRecipePage() {
               <MiniHeader>{t("engine_direct")}</MiniHeader>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <Stat label={t("biga_yeast")} value={`${yeastShown.toFixed(3)}${t("grams")}`} highlight />
+                <Stat label={t("bulk_ferment")} value={`${calc.bulkFermentMin} ${t("minutes")}`} />
                 {useMalt && <Stat label={t("refresh_malt")} value={`${calc.totalMalt.toFixed(2)}${t("grams")}`} />}
                 {useOil && <Stat label={t("refresh_oil")} value={`${calc.totalOil.toFixed(1)}${t("grams")}`} />}
               </div>
             </>
           )}
+
           <p className="text-[10px] text-muted-foreground italic pt-1">
             {t("yeast_fresh_note")} · {yeastType === "fresh" ? t("yeast_fresh") : t("yeast_dry")} = {yeastShown.toFixed(3)}g
             {" "}(fresh eq. {yeastFresh.toFixed(3)}g)

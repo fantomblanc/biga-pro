@@ -188,9 +188,15 @@ function NewRecipePage() {
 
         {/* Environment */}
         <Card className="p-4 space-y-4">
-          <SectionTitle icon={<Flame />} title={t("cellar_temp")} />
-          <NumField label={t("cellar_temp")} value={cellarTemp} onChange={setCellar} min={10} max={30} step={0.5} suffix="°C" />
-          {calc.cellarWarning && <Warning>{t("cellar_temp_warning")}</Warning>}
+          <SectionTitle icon={<Flame />} title={engine === "biga" ? t("cellar_temp") : t("room_temp_label")} />
+          <NumField
+            label={engine === "biga" ? t("cellar_temp") : t("room_temp_label")}
+            value={cellarTemp} onChange={setCellar}
+            min={10} max={30} step={0.5} suffix="°C"
+          />
+          {engine === "biga" && calc.cellarWarning && <Warning>{t("cellar_temp_warning")}</Warning>}
+          {engine === "direct" && <p className="text-[11px] text-muted-foreground leading-relaxed">{t("room_temp_warning")}</p>}
+          {engine === "direct" && calc.bulkTooHot && <Warning>{t("bulk_hot_warning")}</Warning>}
 
           <div>
             <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("target_bake")}</Label>
@@ -202,6 +208,7 @@ function NewRecipePage() {
             />
           </div>
         </Card>
+
 
         {/* Water temp calc */}
         <WaterTempCalculator defaultRoom={cellarTemp} />

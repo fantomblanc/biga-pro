@@ -118,7 +118,35 @@ function NewRecipePage() {
               onClick={() => setEngine("direct")}
             />
           </div>
+          {engine === "biga" && (
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("biga_pct")}</Label>
+                <span className="tabular text-sm font-semibold text-primary">{bigaPct}%</span>
+              </div>
+              <Slider
+                value={[bigaPct]}
+                min={20}
+                max={100}
+                step={1}
+                onValueChange={(v) => setBigaPct(v[0])}
+              />
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  value={bigaPct}
+                  min={20}
+                  max={100}
+                  step={1}
+                  onChange={(e) => setBigaPct(Math.min(100, Math.max(20, Number(e.target.value) || 0)))}
+                  className="tabular h-9 w-24"
+                />
+                <p className="text-[11px] text-muted-foreground leading-tight">{t("biga_pct_help")}</p>
+              </div>
+            </div>
+          )}
         </Card>
+
 
         {/* Reverse ingredient converter */}
         <Card className="p-4 space-y-4">

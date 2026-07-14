@@ -449,3 +449,52 @@ function TotalRow({ label, value, strong }: { label: string; value: string; stro
     </div>
   );
 }
+
+function BakingTempsCard({ recipe }: { recipe: SavedRecipe }) {
+  const { t } = useI18n();
+  // Fallback compute for older saved recipes without bake temps
+  const voute = recipe.calc.bakeVoute ?? (
+    recipe.inputs.engine === "direct" ? [400, 420] :
+      recipe.inputs.hydration < 67 ? [430, 450] : [420, 440]
+  );
+  const sole = recipe.calc.bakeSole ?? (
+    recipe.inputs.engine === "direct" ? [360, 380] :
+      recipe.inputs.hydration < 67 ? [380, 400] : [350, 370]
+  );
+  const tipKey = recipe.calc.bakeTipKey ?? (
+    recipe.inputs.engine === "direct" ? "bake_tip_direct" :
+      recipe.inputs.hydration < 67 ? "bake_tip_biga_low" : "bake_tip_biga_high"
+  );
+
+  return (
+    <Card className="p-4 border-[color:var(--bake)]/40 bg-[color:var(--bake)]/5">
+      <h3 className="font-display font-semibold text-sm flex items-center gap-2">
+        🔥 {t("bake_temps")}
+      </h3>
+      <div className="grid grid-cols-2 gap-3 mt-3">
+        <TempGauge label={t("bake_voute")} range={voute} accent="var(--bake)" />
+        <TempGauge label={t("bake_sole")} range={sole} accent="var(--final)" />
+      </div>
+      <p className="text-[11px] text-muted-foreground mt-3 italic leading-relaxed">{t(tipKey)}</p>
+    </Card>
+  );
+}
+
+function TempGauge({ label, range, accent }: { label: string; range: readonly [number, number] | number[]; accent: string }) {
+  return (
+    <div
+      className="rounded-lg border p-3"
+      style={{
+        borderColor: `color-mix(in oklab, ${accent} 45%, transparent)`,
+        backgroundColor: `color-mix(in oklab, ${accent} 10%, transparent)`,
+      }}
+    >
+      <div className="text-[10px] uppercase tracking-widest font-bold" style={{ color: accent }}>{label}</div>
+      <div className="tabular font-display text-2xl font-bold mt-1" style={{ color: accent }}>
+        {range[0]}–{range[1]}
+        <span className="text-xs text-muted-foreground font-normal ml-1">°C</span>
+      </div>
+    </div>
+  );
+}
+

@@ -436,6 +436,23 @@ const it: Dict = {
   bakes_at: "Cottura",
   overview: "Panoramica",
   seo_desc: "Calcolatore impasto professionale e timeline di fermentazione per pizzaioli avanzati.",
+  biga_pct: "Percentuale Biga",
+  biga_pct_help: "Quota di farina totale nella Biga (20–100%). Default 80%.",
+  biga_flour_dyn: "Farina Biga",
+  refresh_flour_dyn: "Farina restante",
+  room_temp_label: "Temperatura cucina / stanza (°C)",
+  room_temp_warning: "⚠ Per il protocollo Diretto 72h, regola solo la puntata e l'appretto. Il lievito è fissato per il freddo.",
+  step_knead: "Impastamento",
+  step_bulk: "Puntata (Pousse en bloc)",
+  bulk_ferment: "Puntata",
+  bulk_desc: "Lascia riposare l'impasto a temperatura ambiente prima del blocco freddo.",
+  bulk_hot_warning: "Temperatura ambiente elevata. Riduci la puntata per evitare la sovra-attivazione del lievito prima del freddo.",
+  bake_temps: "Temperature di cottura",
+  bake_voute: "Cielo",
+  bake_sole: "Platea",
+  bake_tip_biga_low: "Ideale per sviluppo rapido e alveolatura ampia.",
+  bake_tip_biga_high: "Platea più bassa per evaporare l'umidità delle alte idratazioni senza bruciare il fondo.",
+  bake_tip_direct: "Cottura leggermente più lunga per massimizzare croccantezza e caramellizzazione.",
 };
 
 // Spanish, Portuguese, German - shorter, key strings; fallback to English if missing

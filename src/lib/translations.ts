@@ -609,6 +609,23 @@ const pt: Dict = {
   yeast_fresh_note: "Valores em fermento fresco. Seco = fresco ÷ 3.",
   total_time: "Duração total", starts_at: "Início", bakes_at: "Assar", overview: "Resumo",
   seo_desc: "Calculadora profissional de massa e cronologia de fermentação para pizzaiolos avançados.",
+  biga_pct: "Porcentagem de Biga",
+  biga_pct_help: "Fração da farinha total na Biga (20–100%). Padrão 80%.",
+  biga_flour_dyn: "Farinha Biga",
+  refresh_flour_dyn: "Farinha restante",
+  room_temp_label: "Temperatura cozinha / sala (°C)",
+  room_temp_warning: "⚠ No protocolo Direto 72h, isto ajusta apenas a fermentação em bloco e a final. O fermento é fixo para o frio.",
+  step_knead: "Sova",
+  step_bulk: "Fermentação em bloco (Pousse en bloc)",
+  bulk_ferment: "Fermentação em bloco",
+  bulk_desc: "Deixe a massa repousar em temperatura ambiente antes do bloco frio.",
+  bulk_hot_warning: "Temperatura ambiente alta. Reduza a fermentação em bloco para evitar super-ativar o fermento antes do frio.",
+  bake_temps: "Temperaturas de forno",
+  bake_voute: "Abóbada",
+  bake_sole: "Lastro",
+  bake_tip_biga_low: "Ideal para expansão rápida e miolo alveolado.",
+  bake_tip_biga_high: "Lastro mais baixo para evaporar a umidade da alta hidratação sem queimar a base.",
+  bake_tip_direct: "Cozimento um pouco mais longo para maximizar crocância e caramelização.",
 };
 
 const de: Dict = {

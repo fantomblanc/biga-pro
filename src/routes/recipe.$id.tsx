@@ -205,6 +205,25 @@ function RecipePage() {
         <TabsContent value="protocol" className="space-y-4 pt-4">
           <Timeline steps={recipe.timeline} />
 
+          <BakingTempsCard recipe={recipe} />
+
+          {recipe.inputs.engine === "direct" && (
+            <Card className="p-4 border-[color:var(--cellar)]/40 bg-[color:var(--cellar)]/5">
+              <h3 className="font-display font-semibold text-sm">⏱ {t("bulk_ferment")}</h3>
+              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{t("bulk_desc")}</p>
+              <div className="mt-3 tabular text-2xl font-bold" style={{ color: "var(--cellar)" }}>
+                {recipe.calc.bulkFermentMin ?? 30}
+                <span className="text-sm text-muted-foreground ml-1">{t("minutes")}</span>
+                <span className="text-xs text-muted-foreground ml-3">@ {recipe.inputs.cellarTemp}°C</span>
+              </div>
+              {recipe.calc.bulkTooHot && (
+                <p className="mt-2 text-xs text-warning-foreground/90 bg-warning/10 border border-warning/40 rounded-md p-2">
+                  {t("bulk_hot_warning")}
+                </p>
+              )}
+            </Card>
+          )}
+
           {recipe.inputs.engine === "biga" && (
             <Card className="p-4 border-primary/30 bg-primary/5">
               <h3 className="font-display font-semibold text-sm flex items-center gap-2">
@@ -248,6 +267,7 @@ function RecipePage() {
             </Button>
           )}
         </TabsContent>
+
 
         {/* INGREDIENTS */}
         <TabsContent value="ingredients" className="pt-4">

@@ -695,6 +695,23 @@ const de: Dict = {
   yeast_fresh_note: "Werte in Frischhefe. Trocken = Frisch ÷ 3.",
   total_time: "Gesamtdauer", starts_at: "Start", bakes_at: "Backen", overview: "Übersicht",
   seo_desc: "Professioneller Teigrechner und Fermentations-Timeline für fortgeschrittene Pizzaioli.",
+  biga_pct: "Biga-Anteil",
+  biga_pct_help: "Anteil des Gesamtmehls in der Biga (20–100%). Standard 80%.",
+  biga_flour_dyn: "Biga-Mehl",
+  refresh_flour_dyn: "Restmehl",
+  room_temp_label: "Küchen- / Raumtemperatur (°C)",
+  room_temp_warning: "⚠ Für das Direkt-72h-Protokoll steuert dies nur Stockgare und Endgare. Die Hefe ist auf Kühlführung fixiert.",
+  step_knead: "Kneten",
+  step_bulk: "Stockgare (Pousse en bloc)",
+  bulk_ferment: "Stockgare",
+  bulk_desc: "Teig vor dem Kühlblock bei Raumtemperatur ruhen lassen.",
+  bulk_hot_warning: "Raumtemperatur hoch. Stockgare verkürzen, um die Hefe vor der Kühlung nicht zu überaktivieren.",
+  bake_temps: "Backtemperaturen",
+  bake_voute: "Oberhitze",
+  bake_sole: "Unterhitze",
+  bake_tip_biga_low: "Ideal für schnelle Ofentrieb-Entwicklung und offene Porung.",
+  bake_tip_biga_high: "Niedrigere Unterhitze, damit die Feuchtigkeit hoher Hydratation verdampft, ohne den Boden zu verbrennen.",
+  bake_tip_direct: "Etwas längere Backzeit für maximale Knusprigkeit und Karamellisierung.",
 };
 
 export const TRANSLATIONS: Record<Lang, Dict> = { en, fr, it, es, pt, de };

@@ -404,8 +404,10 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
     biga: t("biga_phase"),
     refresh: t("refresh_phase"),
     mix: t("engine_direct"),
+    bulk: t("bulk_ferment"),
   };
   const phases = [...new Set(rows.map((r) => r[0]))];
+
 
   return (
     <div className="space-y-4">

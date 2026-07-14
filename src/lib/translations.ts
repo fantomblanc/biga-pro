@@ -140,6 +140,23 @@ const en: Dict = {
   bakes_at: "Bakes",
   overview: "Overview",
   seo_desc: "Professional dough calculator and fermentation timeline for advanced pizza-makers. Biga and Direct 72h engines, water temp calculator, wake-lock timer.",
+  biga_pct: "Biga Percentage",
+  biga_pct_help: "Share of total flour going into the Biga (20–100%). Default 80%.",
+  biga_flour_dyn: "Biga Flour",
+  refresh_flour_dyn: "Remaining Flour",
+  room_temp_label: "Kitchen / Room Temperature (°C)",
+  room_temp_warning: "⚠ For the 72h Direct protocol, this only tunes bulk and final proofing. Yeast is fixed for cold storage.",
+  step_knead: "Kneading",
+  step_bulk: "Bulk Fermentation (Pousse en bloc)",
+  bulk_ferment: "Bulk Fermentation",
+  bulk_desc: "Rest the dough at room temperature before moving to the cold block.",
+  bulk_hot_warning: "Room temperature is high. Shorten bulk rest to avoid over-activating yeast before cold storage.",
+  bake_temps: "Baking Temperatures",
+  bake_voute: "Voûte / Ceiling",
+  bake_sole: "Sole / Floor",
+  bake_tip_biga_low: "Ideal for fast expansion and large crumb structure.",
+  bake_tip_biga_high: "Lower floor temp required to evaporate high-hydration moisture without burning the bottom.",
+  bake_tip_direct: "Slightly longer bake to maximize crispness and complex sugar caramelization.",
 };
 
 const fr: Dict = {

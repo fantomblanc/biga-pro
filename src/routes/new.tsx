@@ -225,20 +225,21 @@ function NewRecipePage() {
 
           {engine === "biga" ? (
             <>
-              <MiniHeader>{t("biga_phase")}</MiniHeader>
+              <MiniHeader>{t("biga_phase")} · {bigaPct}%</MiniHeader>
               <div className="grid grid-cols-3 gap-2 text-sm">
-                <Stat label={t("biga_flour")} value={`${calc.bigaFlour.toFixed(1)}${t("grams")}`} />
+                <Stat label={`${t("biga_flour_dyn")} (${bigaPct}%)`} value={`${calc.bigaFlour.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("biga_water")} value={`${calc.bigaWater.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("biga_yeast")} value={`${yeastShown.toFixed(2)}${t("grams")}`} highlight />
               </div>
               <MiniHeader>{t("refresh_phase")}</MiniHeader>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <Stat label={t("refresh_flour")} value={`${calc.refreshFlour.toFixed(1)}${t("grams")}`} />
+                <Stat label={`${t("refresh_flour_dyn")} (${(100 - bigaPct)}%)`} value={`${calc.refreshFlour.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("refresh_water")} value={`${calc.refreshWater.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("refresh_salt")} value={`${calc.totalSalt.toFixed(1)}${t("grams")}`} />
                 {useMalt && <Stat label={t("refresh_malt")} value={`${calc.totalMalt.toFixed(2)}${t("grams")}`} />}
                 {useOil && <Stat label={t("refresh_oil")} value={`${calc.totalOil.toFixed(1)}${t("grams")}`} />}
               </div>
+
             </>
           ) : (
             <>

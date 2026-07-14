@@ -58,13 +58,15 @@ function NewRecipePage() {
   const [useOil, setUseOil] = useState(false);
   const [oilPct, setOil] = useState(2);
   const [cellarTemp, setCellar] = useState(18);
+  const [bigaPct, setBigaPct] = useState(80);
   const [targetBake, setTargetBake] = useState(defaultBakeISO());
 
   const inputs: RecipeInputs = useMemo(() => ({
     engine, ballsCount, ballWeight, hydration, saltPct, yeastType, flourW,
-    useMalt, maltPct, useOil, oilPct, cellarTemp,
+    useMalt, maltPct, useOil, oilPct, cellarTemp, bigaPct,
     targetBakeISO: new Date(targetBake).toISOString(),
-  }), [engine, ballsCount, ballWeight, hydration, saltPct, yeastType, flourW, useMalt, maltPct, useOil, oilPct, cellarTemp, targetBake]);
+  }), [engine, ballsCount, ballWeight, hydration, saltPct, yeastType, flourW, useMalt, maltPct, useOil, oilPct, cellarTemp, bigaPct, targetBake]);
+
 
   const calc = useMemo(() => calculateRecipe(inputs), [inputs]);
   const finalProofH = 3.5; // baseline until recalibrated live

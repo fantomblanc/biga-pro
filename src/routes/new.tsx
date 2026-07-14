@@ -58,13 +58,15 @@ function NewRecipePage() {
   const [useOil, setUseOil] = useState(false);
   const [oilPct, setOil] = useState(2);
   const [cellarTemp, setCellar] = useState(18);
+  const [bigaPct, setBigaPct] = useState(80);
   const [targetBake, setTargetBake] = useState(defaultBakeISO());
 
   const inputs: RecipeInputs = useMemo(() => ({
     engine, ballsCount, ballWeight, hydration, saltPct, yeastType, flourW,
-    useMalt, maltPct, useOil, oilPct, cellarTemp,
+    useMalt, maltPct, useOil, oilPct, cellarTemp, bigaPct,
     targetBakeISO: new Date(targetBake).toISOString(),
-  }), [engine, ballsCount, ballWeight, hydration, saltPct, yeastType, flourW, useMalt, maltPct, useOil, oilPct, cellarTemp, targetBake]);
+  }), [engine, ballsCount, ballWeight, hydration, saltPct, yeastType, flourW, useMalt, maltPct, useOil, oilPct, cellarTemp, bigaPct, targetBake]);
+
 
   const calc = useMemo(() => calculateRecipe(inputs), [inputs]);
   const finalProofH = 3.5; // baseline until recalibrated live
@@ -116,7 +118,35 @@ function NewRecipePage() {
               onClick={() => setEngine("direct")}
             />
           </div>
+          {engine === "biga" && (
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("biga_pct")}</Label>
+                <span className="tabular text-sm font-semibold text-primary">{bigaPct}%</span>
+              </div>
+              <Slider
+                value={[bigaPct]}
+                min={20}
+                max={100}
+                step={1}
+                onValueChange={(v) => setBigaPct(v[0])}
+              />
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  value={bigaPct}
+                  min={20}
+                  max={100}
+                  step={1}
+                  onChange={(e) => setBigaPct(Math.min(100, Math.max(20, Number(e.target.value) || 0)))}
+                  className="tabular h-9 w-24"
+                />
+                <p className="text-[11px] text-muted-foreground leading-tight">{t("biga_pct_help")}</p>
+              </div>
+            </div>
+          )}
         </Card>
+
 
         {/* Reverse ingredient converter */}
         <Card className="p-4 space-y-4">
@@ -158,9 +188,15 @@ function NewRecipePage() {
 
         {/* Environment */}
         <Card className="p-4 space-y-4">
-          <SectionTitle icon={<Flame />} title={t("cellar_temp")} />
-          <NumField label={t("cellar_temp")} value={cellarTemp} onChange={setCellar} min={10} max={30} step={0.5} suffix="°C" />
-          {calc.cellarWarning && <Warning>{t("cellar_temp_warning")}</Warning>}
+          <SectionTitle icon={<Flame />} title={engine === "biga" ? t("cellar_temp") : t("room_temp_label")} />
+          <NumField
+            label={engine === "biga" ? t("cellar_temp") : t("room_temp_label")}
+            value={cellarTemp} onChange={setCellar}
+            min={10} max={30} step={0.5} suffix="°C"
+          />
+          {engine === "biga" && calc.cellarWarning && <Warning>{t("cellar_temp_warning")}</Warning>}
+          {engine === "direct" && <p className="text-[11px] text-muted-foreground leading-relaxed">{t("room_temp_warning")}</p>}
+          {engine === "direct" && calc.bulkTooHot && <Warning>{t("bulk_hot_warning")}</Warning>}
 
           <div>
             <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("target_bake")}</Label>
@@ -172,6 +208,7 @@ function NewRecipePage() {
             />
           </div>
         </Card>
+
 
         {/* Water temp calc */}
         <WaterTempCalculator defaultRoom={cellarTemp} />
@@ -188,31 +225,34 @@ function NewRecipePage() {
 
           {engine === "biga" ? (
             <>
-              <MiniHeader>{t("biga_phase")}</MiniHeader>
+              <MiniHeader>{t("biga_phase")} · {bigaPct}%</MiniHeader>
               <div className="grid grid-cols-3 gap-2 text-sm">
-                <Stat label={t("biga_flour")} value={`${calc.bigaFlour.toFixed(1)}${t("grams")}`} />
+                <Stat label={`${t("biga_flour_dyn")} (${bigaPct}%)`} value={`${calc.bigaFlour.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("biga_water")} value={`${calc.bigaWater.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("biga_yeast")} value={`${yeastShown.toFixed(2)}${t("grams")}`} highlight />
               </div>
               <MiniHeader>{t("refresh_phase")}</MiniHeader>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <Stat label={t("refresh_flour")} value={`${calc.refreshFlour.toFixed(1)}${t("grams")}`} />
+                <Stat label={`${t("refresh_flour_dyn")} (${(100 - bigaPct)}%)`} value={`${calc.refreshFlour.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("refresh_water")} value={`${calc.refreshWater.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("refresh_salt")} value={`${calc.totalSalt.toFixed(1)}${t("grams")}`} />
                 {useMalt && <Stat label={t("refresh_malt")} value={`${calc.totalMalt.toFixed(2)}${t("grams")}`} />}
                 {useOil && <Stat label={t("refresh_oil")} value={`${calc.totalOil.toFixed(1)}${t("grams")}`} />}
               </div>
+
             </>
           ) : (
             <>
               <MiniHeader>{t("engine_direct")}</MiniHeader>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <Stat label={t("biga_yeast")} value={`${yeastShown.toFixed(3)}${t("grams")}`} highlight />
+                <Stat label={t("bulk_ferment")} value={`${calc.bulkFermentMin} ${t("minutes")}`} />
                 {useMalt && <Stat label={t("refresh_malt")} value={`${calc.totalMalt.toFixed(2)}${t("grams")}`} />}
                 {useOil && <Stat label={t("refresh_oil")} value={`${calc.totalOil.toFixed(1)}${t("grams")}`} />}
               </div>
             </>
           )}
+
           <p className="text-[10px] text-muted-foreground italic pt-1">
             {t("yeast_fresh_note")} · {yeastType === "fresh" ? t("yeast_fresh") : t("yeast_dry")} = {yeastShown.toFixed(3)}g
             {" "}(fresh eq. {yeastFresh.toFixed(3)}g)

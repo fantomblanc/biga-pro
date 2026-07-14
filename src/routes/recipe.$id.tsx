@@ -205,6 +205,25 @@ function RecipePage() {
         <TabsContent value="protocol" className="space-y-4 pt-4">
           <Timeline steps={recipe.timeline} />
 
+          <BakingTempsCard recipe={recipe} />
+
+          {recipe.inputs.engine === "direct" && (
+            <Card className="p-4 border-[color:var(--cellar)]/40 bg-[color:var(--cellar)]/5">
+              <h3 className="font-display font-semibold text-sm">⏱ {t("bulk_ferment")}</h3>
+              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{t("bulk_desc")}</p>
+              <div className="mt-3 tabular text-2xl font-bold" style={{ color: "var(--cellar)" }}>
+                {recipe.calc.bulkFermentMin ?? 30}
+                <span className="text-sm text-muted-foreground ml-1">{t("minutes")}</span>
+                <span className="text-xs text-muted-foreground ml-3">@ {recipe.inputs.cellarTemp}°C</span>
+              </div>
+              {recipe.calc.bulkTooHot && (
+                <p className="mt-2 text-xs text-warning-foreground/90 bg-warning/10 border border-warning/40 rounded-md p-2">
+                  {t("bulk_hot_warning")}
+                </p>
+              )}
+            </Card>
+          )}
+
           {recipe.inputs.engine === "biga" && (
             <Card className="p-4 border-primary/30 bg-primary/5">
               <h3 className="font-display font-semibold text-sm flex items-center gap-2">
@@ -248,6 +267,7 @@ function RecipePage() {
             </Button>
           )}
         </TabsContent>
+
 
         {/* INGREDIENTS */}
         <TabsContent value="ingredients" className="pt-4">
@@ -360,10 +380,11 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
   const g = t("grams");
 
   if (recipe.inputs.engine === "biga") {
-    rows.push(["biga", t("biga_flour"), `${recipe.calc.bigaFlour.toFixed(1)} ${g}`]);
+    const bigaPct = recipe.calc.bigaPct ?? recipe.inputs.bigaPct ?? 80;
+    rows.push(["biga", `${t("biga_flour_dyn")} (${bigaPct}%)`, `${recipe.calc.bigaFlour.toFixed(1)} ${g}`]);
     rows.push(["biga", t("biga_water"), `${recipe.calc.bigaWater.toFixed(1)} ${g}`]);
     rows.push(["biga", t("biga_yeast"), `${yeastShown.toFixed(3)} ${g}`]);
-    rows.push(["refresh", t("refresh_flour"), `${recipe.calc.refreshFlour.toFixed(1)} ${g}`]);
+    rows.push(["refresh", `${t("refresh_flour_dyn")} (${100 - bigaPct}%)`, `${recipe.calc.refreshFlour.toFixed(1)} ${g}`]);
     rows.push(["refresh", t("refresh_water"), `${recipe.calc.refreshWater.toFixed(1)} ${g}`]);
     rows.push(["refresh", t("refresh_salt"), `${recipe.calc.totalSalt.toFixed(1)} ${g}`]);
     if (recipe.inputs.useMalt) rows.push(["refresh", t("refresh_malt"), `${recipe.calc.totalMalt.toFixed(2)} ${g}`]);
@@ -375,14 +396,18 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
     rows.push(["mix", t("biga_yeast"), `${yeastShown.toFixed(3)} ${g}`]);
     if (recipe.inputs.useMalt) rows.push(["mix", t("refresh_malt"), `${recipe.calc.totalMalt.toFixed(2)} ${g}`]);
     if (recipe.inputs.useOil) rows.push(["mix", t("refresh_oil"), `${recipe.calc.totalOil.toFixed(1)} ${g}`]);
+    rows.push(["bulk", t("bulk_ferment"), `${recipe.calc.bulkFermentMin ?? 30} ${t("minutes")} @ ${recipe.inputs.cellarTemp}°C`]);
   }
+
 
   const phaseLabel: Record<string, string> = {
     biga: t("biga_phase"),
     refresh: t("refresh_phase"),
     mix: t("engine_direct"),
+    bulk: t("bulk_ferment"),
   };
   const phases = [...new Set(rows.map((r) => r[0]))];
+
 
   return (
     <div className="space-y-4">
@@ -424,3 +449,52 @@ function TotalRow({ label, value, strong }: { label: string; value: string; stro
     </div>
   );
 }
+
+function BakingTempsCard({ recipe }: { recipe: SavedRecipe }) {
+  const { t } = useI18n();
+  // Fallback compute for older saved recipes without bake temps
+  const voute = recipe.calc.bakeVoute ?? (
+    recipe.inputs.engine === "direct" ? [400, 420] :
+      recipe.inputs.hydration < 67 ? [430, 450] : [420, 440]
+  );
+  const sole = recipe.calc.bakeSole ?? (
+    recipe.inputs.engine === "direct" ? [360, 380] :
+      recipe.inputs.hydration < 67 ? [380, 400] : [350, 370]
+  );
+  const tipKey = recipe.calc.bakeTipKey ?? (
+    recipe.inputs.engine === "direct" ? "bake_tip_direct" :
+      recipe.inputs.hydration < 67 ? "bake_tip_biga_low" : "bake_tip_biga_high"
+  );
+
+  return (
+    <Card className="p-4 border-[color:var(--bake)]/40 bg-[color:var(--bake)]/5">
+      <h3 className="font-display font-semibold text-sm flex items-center gap-2">
+        🔥 {t("bake_temps")}
+      </h3>
+      <div className="grid grid-cols-2 gap-3 mt-3">
+        <TempGauge label={t("bake_voute")} range={voute} accent="var(--bake)" />
+        <TempGauge label={t("bake_sole")} range={sole} accent="var(--final)" />
+      </div>
+      <p className="text-[11px] text-muted-foreground mt-3 italic leading-relaxed">{t(tipKey)}</p>
+    </Card>
+  );
+}
+
+function TempGauge({ label, range, accent }: { label: string; range: readonly [number, number] | number[]; accent: string }) {
+  return (
+    <div
+      className="rounded-lg border p-3"
+      style={{
+        borderColor: `color-mix(in oklab, ${accent} 45%, transparent)`,
+        backgroundColor: `color-mix(in oklab, ${accent} 10%, transparent)`,
+      }}
+    >
+      <div className="text-[10px] uppercase tracking-widest font-bold" style={{ color: accent }}>{label}</div>
+      <div className="tabular font-display text-2xl font-bold mt-1" style={{ color: accent }}>
+        {range[0]}–{range[1]}
+        <span className="text-xs text-muted-foreground font-normal ml-1">°C</span>
+      </div>
+    </div>
+  );
+}
+

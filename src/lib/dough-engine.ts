@@ -117,6 +117,26 @@ function bigaYeastPctByTemp(tempC: number): number {
   return 1.0;
 }
 
+/**
+ * Poolish yeast curve for ~12–16h maturity.
+ * Approx % fresh yeast relative to POOLISH FLOUR by room temperature.
+ */
+function poolishYeastPctByTemp(tempC: number): number {
+  const t = Math.max(12, Math.min(26, tempC));
+  const anchors: [number, number][] = [
+    [12, 2.5], [15, 1.2], [18, 0.5], [20, 0.3], [22, 0.2], [24, 0.15], [26, 0.1],
+  ];
+  for (let i = 0; i < anchors.length - 1; i++) {
+    const [t1, p1] = anchors[i];
+    const [t2, p2] = anchors[i + 1];
+    if (t >= t1 && t <= t2) {
+      const ratio = (t - t1) / (t2 - t1);
+      return p1 + (p2 - p1) * ratio;
+    }
+  }
+  return 0.3;
+}
+
 /** Room-temp bulk ferment (minutes) for the Direct 72h engine. */
 export function calcBulkFermentMin(roomTempC: number): number {
   if (roomTempC < 20) return 45;
@@ -152,13 +172,17 @@ export function calculateRecipe(inp: RecipeInputs): RecipeCalc {
   const totalMalt = totalFlour * maltRatio;
   const totalOil = totalFlour * oilRatio;
 
-  // Biga phase: N% of flour at 50% hydration
+  // Pre-ferment: biga (50% hydration) or poolish (100% hydration)
+  const preFerment: PreFermentType = inp.preFerment ?? "biga";
+  const preHydrRatio = preFerment === "poolish" ? 1.0 : 0.5;
   const bigaPct = Math.min(100, Math.max(20, inp.bigaPct ?? 80));
   const bigaFlour = totalFlour * (bigaPct / 100);
-  const bigaWater = bigaFlour * 0.5;
+  const bigaWater = bigaFlour * preHydrRatio;
 
-  const bigaYeastPct = bigaYeastPctByTemp(inp.cellarTemp);
-  const bigaYeastFresh = bigaFlour * (bigaYeastPct / 100);
+  const preYeastPct = preFerment === "poolish"
+    ? poolishYeastPctByTemp(inp.cellarTemp)
+    : bigaYeastPctByTemp(inp.cellarTemp);
+  const bigaYeastFresh = bigaFlour * (preYeastPct / 100);
   const bigaYeastShown = inp.yeastType === "dry" ? bigaYeastFresh / 3 : bigaYeastFresh;
 
   // Refreshment (Day 2)
@@ -182,8 +206,10 @@ export function calculateRecipe(inp: RecipeInputs): RecipeCalc {
     totalSalt,
     totalMalt,
     totalOil,
+    preFerment,
     bigaPct,
     bigaFlour,
+
     bigaWater,
     bigaYeastFresh,
     bigaYeastShown,

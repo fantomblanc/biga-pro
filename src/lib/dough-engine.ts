@@ -1,9 +1,48 @@
 // Dough calculation engine.
 // Biga: user-selectable % of total flour (20–100) at 50% hydration, yeast via cellar-temp curve (Giorilli-inspired).
+// Poolish: user-selectable % of total flour (20–100) at 100% hydration, yeast via room-temp curve.
 // Direct 72h: 0.15% fresh yeast equivalent, cold-blocked at 4°C; room temp only drives bulk & final proof.
 
 export type EngineType = "biga" | "direct";
 export type YeastType = "fresh" | "dry";
+export type PreFermentType = "biga" | "poolish";
+export type PizzaStyle =
+  | "napoletana"
+  | "contemporanea"
+  | "canotto"
+  | "focaccia"
+  | "romana"
+  | "teglia";
+
+export interface StyleConfig {
+  hydrMin: number;
+  hydrMax: number;
+  allowIndirect: boolean;
+  labelKey: string;
+  descKey: string;
+}
+
+export const STYLE_CONFIG: Record<PizzaStyle, StyleConfig> = {
+  napoletana:    { hydrMin: 55, hydrMax: 62, allowIndirect: false, labelKey: "style_napoletana",    descKey: "style_napoletana_desc" },
+  contemporanea: { hydrMin: 63, hydrMax: 70, allowIndirect: true,  labelKey: "style_contemporanea", descKey: "style_contemporanea_desc" },
+  canotto:       { hydrMin: 70, hydrMax: 75, allowIndirect: true,  labelKey: "style_canotto",       descKey: "style_canotto_desc" },
+  focaccia:      { hydrMin: 75, hydrMax: 85, allowIndirect: true,  labelKey: "style_focaccia",      descKey: "style_focaccia_desc" },
+  romana:        { hydrMin: 55, hydrMax: 60, allowIndirect: false, labelKey: "style_romana",        descKey: "style_romana_desc" },
+  teglia:        { hydrMin: 75, hydrMax: 85, allowIndirect: true,  labelKey: "style_teglia",        descKey: "style_teglia_desc" },
+};
+
+export const PIZZA_STYLES: PizzaStyle[] = ["napoletana", "contemporanea", "canotto", "focaccia", "romana", "teglia"];
+
+export function styleMidpoint(s: PizzaStyle): number {
+  const c = STYLE_CONFIG[s];
+  return Math.round((c.hydrMin + c.hydrMax) / 2);
+}
+
+export function clampHydrationToStyle(h: number, s?: PizzaStyle): number {
+  if (!s) return h;
+  const c = STYLE_CONFIG[s];
+  return Math.min(c.hydrMax, Math.max(c.hydrMin, h));
+}
 
 export interface RecipeInputs {
   engine: EngineType;
@@ -19,8 +58,11 @@ export interface RecipeInputs {
   oilPct: number; // % of total flour (1-3)
   cellarTemp: number; // °C — cellar (biga) or kitchen/room (direct)
   targetBakeISO: string; // datetime string
-  bigaPct?: number; // % of total flour that goes into the Biga (20-100). Default 80.
+  bigaPct?: number; // % of total flour that goes into the pre-ferment (20-100). Default 80.
+  style?: PizzaStyle; // selected pizza style
+  preFerment?: PreFermentType; // "biga" (default) or "poolish" — used only when engine === "biga"
 }
+
 
 export interface RecipeCalc {
   totalDough: number;
@@ -29,11 +71,12 @@ export interface RecipeCalc {
   totalSalt: number;
   totalMalt: number;
   totalOil: number;
-  // Biga breakdown
-  bigaPct: number; // 20-100
-  bigaFlour: number;
-  bigaWater: number;
-  bigaYeastFresh: number; // grams fresh yeast
+  // Pre-ferment breakdown (biga or poolish)
+  preFerment: PreFermentType; // which kind of pre-ferment was used
+  bigaPct: number; // 20-100 — share of total flour in the pre-ferment
+  bigaFlour: number; // pre-ferment flour weight
+  bigaWater: number; // pre-ferment water weight (50% for biga, 100% for poolish)
+  bigaYeastFresh: number; // grams fresh yeast in pre-ferment
   bigaYeastShown: number; // grams shown (fresh or dry)
   refreshFlour: number;
   refreshWater: number;
@@ -51,6 +94,7 @@ export interface RecipeCalc {
   flourWarning: boolean;
   cellarWarning: boolean;
 }
+
 
 /**
  * Giorilli-inspired yeast curve for Biga (16-18h maturity).

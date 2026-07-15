@@ -378,12 +378,16 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
   const { t } = useI18n();
   const rows: Array<[string, string, string]> = [];
   const g = t("grams");
+  const isPoolish = recipe.inputs.engine === "biga" && (recipe.calc.preFerment ?? recipe.inputs.preFerment) === "poolish";
 
   if (recipe.inputs.engine === "biga") {
     const bigaPct = recipe.calc.bigaPct ?? recipe.inputs.bigaPct ?? 80;
-    rows.push(["biga", `${t("biga_flour_dyn")} (${bigaPct}%)`, `${recipe.calc.bigaFlour.toFixed(1)} ${g}`]);
-    rows.push(["biga", t("biga_water"), `${recipe.calc.bigaWater.toFixed(1)} ${g}`]);
-    rows.push(["biga", t("biga_yeast"), `${yeastShown.toFixed(3)} ${g}`]);
+    const flourLabel = isPoolish ? t("poolish_flour_dyn") : t("biga_flour_dyn");
+    const waterLabel = isPoolish ? t("poolish_water") : t("biga_water");
+    const yeastLabel = isPoolish ? t("poolish_yeast") : t("biga_yeast");
+    rows.push(["biga", `${flourLabel} (${bigaPct}%)`, `${recipe.calc.bigaFlour.toFixed(1)} ${g}`]);
+    rows.push(["biga", waterLabel, `${recipe.calc.bigaWater.toFixed(1)} ${g}`]);
+    rows.push(["biga", yeastLabel, `${yeastShown.toFixed(3)} ${g}`]);
     rows.push(["refresh", `${t("refresh_flour_dyn")} (${100 - bigaPct}%)`, `${recipe.calc.refreshFlour.toFixed(1)} ${g}`]);
     rows.push(["refresh", t("refresh_water"), `${recipe.calc.refreshWater.toFixed(1)} ${g}`]);
     rows.push(["refresh", t("refresh_salt"), `${recipe.calc.totalSalt.toFixed(1)} ${g}`]);
@@ -401,12 +405,13 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
 
 
   const phaseLabel: Record<string, string> = {
-    biga: t("biga_phase"),
+    biga: isPoolish ? t("poolish_phase") : t("biga_phase"),
     refresh: t("refresh_phase"),
     mix: t("engine_direct"),
     bulk: t("bulk_ferment"),
   };
   const phases = [...new Set(rows.map((r) => r[0]))];
+
 
 
   return (

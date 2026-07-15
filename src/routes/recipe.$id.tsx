@@ -175,9 +175,12 @@ function RecipePage() {
         <div className="absolute -top-16 -right-16 size-40 rounded-full ember-gradient opacity-20 blur-2xl" />
         <div className="relative">
           <div className="text-[10px] uppercase tracking-widest text-primary font-bold">
-            {t(recipe.inputs.engine === "biga" ? "engine_biga" : "engine_direct")}
+            {recipe.inputs.engine === "biga"
+              ? ((recipe.calc.preFerment ?? recipe.inputs.preFerment) === "poolish" ? t("preferment_poolish") : t("engine_biga"))
+              : t("engine_direct")}
             {isActive && <span className="ml-2 px-1.5 py-0.5 rounded bg-success/20 text-[color:var(--success)]">• {t("active")}</span>}
           </div>
+
           <h1 className="font-display text-2xl font-bold mt-1">{recipe.name}</h1>
           <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-muted-foreground tabular">
             <span>{recipe.inputs.ballsCount} × {recipe.inputs.ballWeight}g</span>

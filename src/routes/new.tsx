@@ -278,7 +278,10 @@ function NewRecipePage() {
           </div>
 
           <NumField label={t("flour_w")} value={flourW} onChange={setFlourW} min={100} max={500} step={10} prefix="W" />
+          <FlourRecoBlock flourW={flourW} />
           {calc.flourWarning && <Warning>{t("flour_w_warning")}</Warning>}
+          {flourW < 220 && <Warning>{t("flour_long_ferm_warning")}</Warning>}
+
 
           <div className="space-y-3 pt-2 border-t border-border/50">
             <OptionalRow

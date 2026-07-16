@@ -864,7 +864,29 @@ const pt: Dict = {
   poolish_yeast: "Fermento Poolish",
   poolish_pct: "Porcentagem Poolish",
   poolish_pct_help: "Fração da farinha total no Poolish (20–100%). Padrão 30%.",
+  flour_recos: "Farinhas comerciais recomendadas",
+  flour_cat_weak: "Fraca (W < 220)",
+  flour_cat_medium: "Média (W 220–280)",
+  flour_cat_strong: "Forte (W 280–350)",
+  flour_cat_very_strong: "Muito forte / Manitoba (W > 350)",
+  flour_long_ferm_warning: "⚠ Atenção: sua farinha pode não ter força para uma fermentação tão longa. Risco de massa caída.",
+  biga_water_calc: "Temperatura da água para a Biga",
+  biga_water_calc_desc: "Regra dos 55 − (Ambiente + Farinha). Alvo Biga após sova: 18–20°C (máx absoluto 23°C).",
+  biga_water_ambient: "T° Ambiente",
+  biga_water_flour: "T° Farinha",
+  biga_water_suggested: "T° água sugerida",
+  biga_water_hot_warning: "⚠ Ambiente > 25°C: use água gelada ou refrigere a farinha para manter a Biga ≤ 23°C.",
+  phase1_title: "Fase 1 — Preparação da Biga",
+  phase2_title: "Fase 2 — Refresco e Sova Final",
+  phase1_steps: "1. Pese com precisão farinha, água e fermento da Biga.\n2. Dissolva o fermento fresco na água fria.\n3. Adicione a farinha e misture grosseiramente à mão (2–3 min) — NÃO sovar. A Biga deve ficar grumosa, com partes não hidratadas.\n4. Verifique a temperatura: alvo 18–20°C (máx 23°C).\n5. Cubra sem selar e deixe fermentar na temperatura de adega calculada pelo tempo calculado.",
+  phase1_steps_poolish: "1. Pese farinha e água do Poolish (1:1). Dissolva o fermento na água.\n2. Adicione a farinha e bata até obter uma massa lisa e espessa (sem grumos).\n3. Cubra e fermente à temperatura ambiente até estar abaulado e com bolhas na superfície.",
+  phase2_title_poolish: "Fase 2 — Sova Final com Poolish",
+  phase2_steps: "1. Dissolva o sal na água restante (bassinage).\n2. Corte a Biga madura em pedaços e adicione à batedeira com 70% da água restante.\n3. Sove em baixa velocidade até a Biga se desfazer.\n4. Adicione a água salgada gradualmente (bassinage).\n5. Adicione malte / óleo no fim.\n6. Sove até obter massa lisa e brilhante (teste do véu). T° massa final: 24–26°C.\n7. Descanso em bloco, divisão e boleamento no peso alvo, depois fermentação final.",
+  phase2_steps_poolish: "1. Adicione o Poolish maduro à batedeira com a farinha restante e 70% da água restante.\n2. Sove em baixa velocidade; adicione o sal.\n3. Bassinage: adicione o resto da água gradualmente.\n4. Adicione malte / óleo no fim.\n5. Sove até o véu. T° massa final: 24–26°C.\n6. Descanso, divisão, boleamento e fermentação final.",
+  direct_phase_title: "Método Direto — Passo a passo",
+  direct_steps: "1. Dissolva o fermento em água fria. Adicione ~90% da farinha e misture.\n2. Adicione o sal e a farinha restante. Sove até desenvolver o glúten.\n3. Adicione malte / óleo no fim. Bassinage com a água restante gradualmente.\n4. Fermentação em bloco à temperatura ambiente pelo tempo calculado.\n5. Divida, pré-molde, bloco frio a 4°C pelas horas restantes.\n6. Retire da geladeira, boleie, fermentação final à temperatura da cozinha.",
 };
+
 
 
 const de: Dict = {

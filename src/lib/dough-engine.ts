@@ -233,6 +233,24 @@ export function calculateWaterTemp(room: number, flour: number, friction: number
   return 55 - (room + flour + friction);
 }
 
+// Biga water temp (target dough 18–20°C after mixing): ambient + flour only
+export function calculateBigaWaterTemp(ambient: number, flour: number): number {
+  return 55 - (ambient + flour);
+}
+
+export interface FlourCategory {
+  key: "flour_cat_weak" | "flour_cat_medium" | "flour_cat_strong" | "flour_cat_very_strong";
+  recos: string[];
+}
+
+export function flourCategory(w: number): FlourCategory {
+  if (w < 220) return { key: "flour_cat_weak", recos: ["T45/T55 standard", "All-purpose"] };
+  if (w <= 280) return { key: "flour_cat_medium", recos: ["Caputo Pizzeria", "Caputo Classica", "5 Stagioni Napoletana"] };
+  if (w <= 350) return { key: "flour_cat_strong", recos: ["Caputo Cuoco / Saccorosso", "Caputo Nuvola", "Dallagiovanna Napoletana"] };
+  return { key: "flour_cat_very_strong", recos: ["Caputo Nuvola Super", "Manitoba", "Petra 1"] };
+}
+
+
 // Final proof recalibration based on kitchen temp
 export function calcFinalProofHours(kitchenTempC: number): number {
   const t = Math.max(16, Math.min(30, kitchenTempC));

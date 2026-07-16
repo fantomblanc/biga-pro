@@ -408,14 +408,18 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
 
 
   const phaseLabel: Record<string, string> = {
-    biga: isPoolish ? t("poolish_phase") : t("biga_phase"),
-    refresh: t("refresh_phase"),
-    mix: t("engine_direct"),
+    biga: isPoolish ? t("phase1_title") : t("phase1_title"),
+    refresh: isPoolish ? t("phase2_title_poolish") : t("phase2_title"),
+    mix: t("direct_phase_title"),
     bulk: t("bulk_ferment"),
   };
+  const phaseSteps: Record<string, string> = {
+    biga: isPoolish ? t("phase1_steps_poolish") : t("phase1_steps"),
+    refresh: isPoolish ? t("phase2_steps_poolish") : t("phase2_steps"),
+    mix: t("direct_steps"),
+    bulk: "",
+  };
   const phases = [...new Set(rows.map((r) => r[0]))];
-
-
 
   return (
     <div className="space-y-4">
@@ -443,11 +447,22 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
               ))}
             </tbody>
           </table>
+          {phaseSteps[p] && (
+            <div className="border-t border-border/60 bg-muted/20 px-4 py-3">
+              <div className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-2">
+                {t("protocol")}
+              </div>
+              <pre className="whitespace-pre-wrap text-[13px] leading-relaxed font-sans text-foreground/90">
+                {phaseSteps[p]}
+              </pre>
+            </div>
+          )}
         </Card>
       ))}
     </div>
   );
 }
+
 
 function TotalRow({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (

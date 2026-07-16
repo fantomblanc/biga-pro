@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { WaterTempCalculator } from "@/components/WaterTempCalculator";
+import { BigaWaterTempCalculator } from "@/components/BigaWaterTempCalculator";
 import {
   calculateRecipe,
   buildTimeline,
@@ -16,6 +17,7 @@ import {
   styleMidpoint,
   STYLE_CONFIG,
   PIZZA_STYLES,
+  flourCategory,
   type RecipeInputs,
   type EngineType,
   type YeastType,
@@ -24,7 +26,8 @@ import {
 } from "@/lib/dough-engine";
 import { newId, upsertRecipe, setActiveId } from "@/lib/storage";
 import { toast } from "sonner";
-import { AlertTriangle, Save, Flame, Pizza } from "lucide-react";
+import { AlertTriangle, Save, Flame, Pizza, Wheat } from "lucide-react";
+
 
 export const Route = createFileRoute("/new")({
   head: () => ({
@@ -275,7 +278,10 @@ function NewRecipePage() {
           </div>
 
           <NumField label={t("flour_w")} value={flourW} onChange={setFlourW} min={100} max={500} step={10} prefix="W" />
+          <FlourRecoBlock flourW={flourW} />
           {calc.flourWarning && <Warning>{t("flour_w_warning")}</Warning>}
+          {flourW < 220 && <Warning>{t("flour_long_ferm_warning")}</Warning>}
+
 
           <div className="space-y-3 pt-2 border-t border-border/50">
             <OptionalRow
@@ -314,7 +320,11 @@ function NewRecipePage() {
           </div>
         </Card>
 
+        {engine === "biga" && (preFerment ?? "biga") === "biga" && (
+          <BigaWaterTempCalculator defaultAmbient={cellarTemp} />
+        )}
         <WaterTempCalculator defaultRoom={cellarTemp} />
+
 
         {/* Live preview */}
         <Card className="p-4 space-y-3">
@@ -496,3 +506,25 @@ function MiniHeader({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+function FlourRecoBlock({ flourW }: { flourW: number }) {
+  const { t } = useI18n();
+  const cat = flourCategory(flourW);
+  return (
+    <div className="rounded-lg border border-border/60 bg-secondary/20 p-3 space-y-1.5">
+      <div className="flex items-center gap-2">
+        <Wheat className="size-3.5 text-primary" />
+        <span className="text-[10px] uppercase tracking-wider font-bold text-primary">{t(cat.key)}</span>
+      </div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("flour_recos")}</div>
+      <div className="flex flex-wrap gap-1.5">
+        {cat.recos.map((r) => (
+          <span key={r} className="text-[11px] px-2 py-0.5 rounded border border-border/60 bg-card tabular">
+            {r}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+

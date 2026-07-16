@@ -320,7 +320,11 @@ function NewRecipePage() {
           </div>
         </Card>
 
+        {engine === "biga" && (preFerment ?? "biga") === "biga" && (
+          <BigaWaterTempCalculator defaultAmbient={cellarTemp} />
+        )}
         <WaterTempCalculator defaultRoom={cellarTemp} />
+
 
         {/* Live preview */}
         <Card className="p-4 space-y-3">

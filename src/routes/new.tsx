@@ -506,3 +506,25 @@ function MiniHeader({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+function FlourRecoBlock({ flourW }: { flourW: number }) {
+  const { t } = useI18n();
+  const cat = flourCategory(flourW);
+  return (
+    <div className="rounded-lg border border-border/60 bg-secondary/20 p-3 space-y-1.5">
+      <div className="flex items-center gap-2">
+        <Wheat className="size-3.5 text-primary" />
+        <span className="text-[10px] uppercase tracking-wider font-bold text-primary">{t(cat.key)}</span>
+      </div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("flour_recos")}</div>
+      <div className="flex flex-wrap gap-1.5">
+        {cat.recos.map((r) => (
+          <span key={r} className="text-[11px] px-2 py-0.5 rounded border border-border/60 bg-card tabular">
+            {r}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+

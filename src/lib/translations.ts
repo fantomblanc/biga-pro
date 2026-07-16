@@ -1002,7 +1002,29 @@ const de: Dict = {
   poolish_yeast: "Poolish-Hefe",
   poolish_pct: "Poolish-Anteil",
   poolish_pct_help: "Anteil des Gesamtmehls im Poolish (20–100%). Standard 30%.",
+  flour_recos: "Empfohlene Mehle im Handel",
+  flour_cat_weak: "Schwach (W < 220)",
+  flour_cat_medium: "Mittel (W 220–280)",
+  flour_cat_strong: "Stark (W 280–350)",
+  flour_cat_very_strong: "Sehr stark / Manitoba (W > 350)",
+  flour_long_ferm_warning: "⚠ Achtung: Ihr Mehl könnte für so lange Gärung zu schwach sein. Risiko eines schlaffen, zusammengefallenen Teigs.",
+  biga_water_calc: "Wassertemperatur für die Biga",
+  biga_water_calc_desc: "55-Regel − (Raum + Mehl). Ziel Biga nach dem Mischen: 18–20°C (absolutes Max. 23°C).",
+  biga_water_ambient: "Raum T°",
+  biga_water_flour: "Mehl T°",
+  biga_water_suggested: "Empfohlene Wasser-T°",
+  biga_water_hot_warning: "⚠ Raum > 25°C: Eiswasser verwenden oder Mehl vorher kühlen, damit die Biga ≤ 23°C bleibt.",
+  phase1_title: "Phase 1 — Biga herstellen",
+  phase2_title: "Phase 2 — Auffrischung & Endteig",
+  phase1_steps: "1. Mehl, Wasser und Hefe der Biga präzise abwiegen.\n2. Frische Hefe im kalten Wasser auflösen.\n3. Mehl zugeben und grob von Hand mischen (2–3 Min) — NICHT kneten. Die Biga muss klumpig und stellenweise unhydratisiert bleiben.\n4. Teigtemperatur prüfen: Ziel 18–20°C (max 23°C).\n5. Locker abdecken und bei der berechneten Kellertemperatur die berechnete Zeit gären lassen.",
+  phase1_steps_poolish: "1. Mehl und Wasser des Poolish abwiegen (1:1). Hefe im Wasser auflösen.\n2. Mehl zugeben und zu einem glatten, dicken Teig schlagen (keine Klumpen).\n3. Abdecken und bei Raumtemperatur gären lassen, bis er gewölbt ist und Blasen an der Oberfläche zeigt.",
+  phase2_title_poolish: "Phase 2 — Endteig mit Poolish",
+  phase2_steps: "1. Salz im restlichen Wasser (Bassinage) auflösen.\n2. Reife Biga in kleine Stücke schneiden und mit 70% des restlichen Wassers in die Maschine geben.\n3. Bei niedriger Stufe kneten, bis sich die Biga auflöst.\n4. Salzwasser nach und nach zugeben (Bassinage).\n5. Malz / Öl am Ende zugeben.\n6. Bis zum Fenstertest kneten. Endteigtemperatur: 24–26°C.\n7. Stockgare, Teilen, Wirken auf Zielgewicht und Stückgare.",
+  phase2_steps_poolish: "1. Reifen Poolish mit restlichem Mehl und 70% des restlichen Wassers in die Maschine geben.\n2. Bei niedriger Stufe kneten; Salz zugeben.\n3. Bassinage: restliches Wasser nach und nach zugeben.\n4. Malz / Öl am Ende zugeben.\n5. Bis zum Fenster kneten. Endteigtemperatur: 24–26°C.\n6. Stockgare, Teilen, Wirken und Stückgare.",
+  direct_phase_title: "Direkte Methode — Schritt für Schritt",
+  direct_steps: "1. Hefe in kaltem Wasser auflösen. ~90% des Mehls zugeben und mischen.\n2. Salz und restliches Mehl zugeben. Bis zur Glutenentwicklung kneten.\n3. Malz / Öl am Ende. Restwasser per Bassinage nach und nach zugeben.\n4. Stockgare bei Raumtemperatur für die berechnete Zeit.\n5. Teilen, vorformen, kalter Block bei 4°C für die restlichen Stunden.\n6. Aus dem Kühlschrank, wirken, Endgare bei Küchentemperatur.",
 };
+
 
 
 export const TRANSLATIONS: Record<Lang, Dict> = { en, fr, it, es, pt, de };

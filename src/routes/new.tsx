@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { WaterTempCalculator } from "@/components/WaterTempCalculator";
+import { BigaWaterTempCalculator } from "@/components/BigaWaterTempCalculator";
 import {
   calculateRecipe,
   buildTimeline,
@@ -16,6 +17,7 @@ import {
   styleMidpoint,
   STYLE_CONFIG,
   PIZZA_STYLES,
+  flourCategory,
   type RecipeInputs,
   type EngineType,
   type YeastType,
@@ -24,7 +26,8 @@ import {
 } from "@/lib/dough-engine";
 import { newId, upsertRecipe, setActiveId } from "@/lib/storage";
 import { toast } from "sonner";
-import { AlertTriangle, Save, Flame, Pizza } from "lucide-react";
+import { AlertTriangle, Save, Flame, Pizza, Wheat } from "lucide-react";
+
 
 export const Route = createFileRoute("/new")({
   head: () => ({

@@ -187,7 +187,29 @@ const en: Dict = {
   poolish_yeast: "Poolish Yeast",
   poolish_pct: "Poolish Percentage",
   poolish_pct_help: "Share of total flour going into the Poolish (20–100%). Default 30%.",
+  flour_recos: "Recommended commercial flours",
+  flour_cat_weak: "Weak (W < 220)",
+  flour_cat_medium: "Medium (W 220–280)",
+  flour_cat_strong: "Strong (W 280–350)",
+  flour_cat_very_strong: "Very Strong / Manitoba (W > 350)",
+  flour_long_ferm_warning: "⚠ Warning: your flour may lack strength for such a long fermentation. Risk of slack, collapsed dough.",
+  biga_water_calc: "Biga Water Temperature",
+  biga_water_calc_desc: "Rule of 55 − (Ambient + Flour). Target Biga after mixing: 18–20°C (absolute max 23°C).",
+  biga_water_ambient: "Ambient T°",
+  biga_water_flour: "Flour T°",
+  biga_water_suggested: "Suggested water T°",
+  biga_water_hot_warning: "⚠ Ambient > 25°C: use iced water or refrigerate the flour beforehand to keep the Biga ≤ 23°C.",
+  phase1_title: "Phase 1 — Make the Biga",
+  phase2_title: "Phase 2 — Refreshment & Final Mix",
+  phase1_steps: "1. Weigh Biga flour, water and yeast precisely.\n2. Dissolve the fresh yeast in the cool water.\n3. Add the flour and mix roughly by hand (2–3 min) — do NOT knead. The Biga must remain shaggy, lumpy, unhydrated in spots.\n4. Check dough temperature: target 18–20°C (max 23°C).\n5. Cover loosely and ferment at the calculated cellar temperature for the calculated time.",
+  phase1_steps_poolish: "1. Weigh Poolish flour and water (1:1). Dissolve the yeast in the water.\n2. Add the flour and whisk to a smooth, thick batter (no lumps).\n3. Cover and ferment at room temperature until domed and bubbly on the surface, edges just starting to recede.",
+  phase2_title_poolish: "Phase 2 — Final Mix with Poolish",
+  phase2_steps: "1. Dissolve salt in the remaining (bassinage) water.\n2. Cut the matured Biga into small pieces and add to the mixer with 70% of the remaining water.\n3. Mix on low until the Biga breaks down and the mass comes together.\n4. Add the salted water gradually (bassinage) — wait for each addition to absorb before the next.\n5. Add malt / oil if used, near the end.\n6. Knead until smooth, glossy, and passing the windowpane test. Final dough temperature target: 24–26°C.\n7. Bulk rest, then divide into balls of the target weight and proof.",
+  phase2_steps_poolish: "1. Add the mature Poolish to the mixer with the remaining flour and 70% of the remaining water.\n2. Mix on low until the mass forms; add salt.\n3. Bassinage: add the rest of the water gradually.\n4. Add malt / oil if used, near the end.\n5. Knead to windowpane. Final dough temperature target: 24–26°C.\n6. Bulk rest, divide, ball and proof.",
+  direct_phase_title: "Direct Method — Step by Step",
+  direct_steps: "1. Dissolve yeast in cool water. Add ~90% of the flour and mix until shaggy.\n2. Add salt and the remaining flour. Knead until developed.\n3. Add malt / oil if used, near the end. Bassinage the remaining water gradually.\n4. Bulk ferment at room temperature for the calculated time.\n5. Divide, pre-shape, cold-block at 4°C for the remaining hours.\n6. Remove from fridge, ball, and final proof at kitchen temperature.",
 };
+
 
 
 const fr: Dict = {

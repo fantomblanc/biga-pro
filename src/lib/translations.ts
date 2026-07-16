@@ -387,7 +387,29 @@ const fr: Dict = {
   poolish_yeast: "Levure Poolish",
   poolish_pct: "Pourcentage de Poolish",
   poolish_pct_help: "Part de la farine totale mise en Poolish (20–100%). Défaut 30%.",
+  flour_recos: "Farines commerciales recommandées",
+  flour_cat_weak: "Faible (W < 220)",
+  flour_cat_medium: "Moyenne (W 220–280)",
+  flour_cat_strong: "Forte (W 280–350)",
+  flour_cat_very_strong: "Très forte / Manitoba (W > 350)",
+  flour_long_ferm_warning: "⚠ Attention : votre farine risque de manquer de force pour une fermentation aussi longue. Risque de pâte affaissée.",
+  biga_water_calc: "Température d'eau pour la Biga",
+  biga_water_calc_desc: "Règle des 55 − (Ambiante + Farine). Cible de la Biga après pétrissage : 18–20°C (max absolu 23°C).",
+  biga_water_ambient: "T° Ambiante",
+  biga_water_flour: "T° Farine",
+  biga_water_suggested: "T° d'eau suggérée",
+  biga_water_hot_warning: "⚠ Ambiante > 25°C : utilisez de l'eau glacée ou réfrigérez la farine au préalable pour maintenir la Biga ≤ 23°C.",
+  phase1_title: "Phase 1 — Réalisation de la Biga",
+  phase2_title: "Phase 2 — Rafraîchi & Pétrissage Final",
+  phase1_steps: "1. Pesez précisément farine, eau et levure de la Biga.\n2. Dissolvez la levure fraîche dans l'eau fraîche.\n3. Ajoutez la farine et mélangez grossièrement à la main (2–3 min) — NE PAS pétrir. La Biga doit rester grumeleuse, non hydratée par endroits.\n4. Vérifiez la température : cible 18–20°C (max 23°C).\n5. Couvrez sans serrer et laissez fermenter à la température de cave calculée pendant la durée calculée.",
+  phase1_steps_poolish: "1. Pesez farine et eau du Poolish (1:1). Dissolvez la levure dans l'eau.\n2. Ajoutez la farine et fouettez en pâte lisse et épaisse (sans grumeaux).\n3. Couvrez et laissez fermenter à température ambiante jusqu'à bombement et bulles en surface.",
+  phase2_title_poolish: "Phase 2 — Pétrissage Final avec Poolish",
+  phase2_steps: "1. Dissolvez le sel dans l'eau restante (bassinage).\n2. Coupez la Biga mature en petits morceaux et ajoutez-la au pétrin avec 70% de l'eau restante.\n3. Pétrissez à vitesse lente jusqu'à ce que la Biga se défasse.\n4. Ajoutez l'eau salée progressivement (bassinage) — attendez l'absorption entre chaque ajout.\n5. Ajoutez malt / huile en fin de pétrissage.\n6. Pétrissez jusqu'à obtenir une pâte lisse et brillante (test de la fenêtre). T° pâte finale : 24–26°C.\n7. Pointage, division et boulage au poids cible, puis apprêt.",
+  phase2_steps_poolish: "1. Ajoutez le Poolish mature au pétrin avec la farine restante et 70% de l'eau restante.\n2. Pétrissez à vitesse lente ; ajoutez le sel.\n3. Bassinage : ajoutez le reste de l'eau progressivement.\n4. Ajoutez malt / huile en fin de pétrissage.\n5. Pétrissez jusqu'à la fenêtre. T° pâte finale : 24–26°C.\n6. Pointage, division, boulage et apprêt.",
+  direct_phase_title: "Méthode Directe — Étape par étape",
+  direct_steps: "1. Dissolvez la levure dans l'eau fraîche. Ajoutez ~90% de la farine et mélangez.\n2. Ajoutez le sel et la farine restante. Pétrissez jusqu'au développement du gluten.\n3. Ajoutez malt / huile en fin. Bassinez l'eau restante progressivement.\n4. Pointage à température ambiante pendant la durée calculée.\n5. Divisez, pré-façonnez, bloc froid à 4°C pour les heures restantes.\n6. Sortez du frais, boulez, apprêt final à température de cuisine.",
 };
+
 
 
 const it: Dict = {

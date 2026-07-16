@@ -726,7 +726,29 @@ const es: Dict = {
   poolish_yeast: "Levadura Poolish",
   poolish_pct: "Porcentaje Poolish",
   poolish_pct_help: "Parte de la harina total en el Poolish (20–100%). Por defecto 30%.",
+  flour_recos: "Harinas comerciales recomendadas",
+  flour_cat_weak: "Débil (W < 220)",
+  flour_cat_medium: "Media (W 220–280)",
+  flour_cat_strong: "Fuerte (W 280–350)",
+  flour_cat_very_strong: "Muy fuerte / Manitoba (W > 350)",
+  flour_long_ferm_warning: "⚠ Atención: su harina puede carecer de fuerza para una fermentación tan larga. Riesgo de masa caída.",
+  biga_water_calc: "Temperatura del agua para la Biga",
+  biga_water_calc_desc: "Regla del 55 − (Ambiente + Harina). Objetivo Biga tras amasar: 18–20°C (máx absoluto 23°C).",
+  biga_water_ambient: "T° Ambiente",
+  biga_water_flour: "T° Harina",
+  biga_water_suggested: "T° agua sugerida",
+  biga_water_hot_warning: "⚠ Ambiente > 25°C: use agua helada o refrigere la harina para mantener la Biga ≤ 23°C.",
+  phase1_title: "Fase 1 — Preparación de la Biga",
+  phase2_title: "Fase 2 — Refresco y Amasado Final",
+  phase1_steps: "1. Pese con precisión harina, agua y levadura de la Biga.\n2. Disuelva la levadura fresca en el agua fría.\n3. Añada la harina y mezcle groseramente a mano (2–3 min) — NO amasar. La Biga debe quedar grumosa, con zonas sin hidratar.\n4. Verifique la temperatura: objetivo 18–20°C (máx 23°C).\n5. Cubra sin sellar y deje fermentar a la temperatura de bodega calculada durante el tiempo calculado.",
+  phase1_steps_poolish: "1. Pese harina y agua del Poolish (1:1). Disuelva la levadura en el agua.\n2. Añada la harina y bata hasta obtener una masa lisa y espesa (sin grumos).\n3. Cubra y fermente a temperatura ambiente hasta que esté abombado y con burbujas en superficie.",
+  phase2_title_poolish: "Fase 2 — Amasado Final con Poolish",
+  phase2_steps: "1. Disuelva la sal en el agua restante (bassinage).\n2. Corte la Biga madura en trozos y añádala a la amasadora con el 70% del agua restante.\n3. Amase a baja velocidad hasta que la Biga se deshaga.\n4. Añada el agua salada gradualmente (bassinage).\n5. Añada malta / aceite al final.\n6. Amase hasta obtener una masa lisa y brillante (prueba de la ventana). T° masa final: 24–26°C.\n7. Reposo en bloque, división y boleado al peso objetivo, y luego fermentación final.",
+  phase2_steps_poolish: "1. Añada el Poolish maduro a la amasadora con la harina restante y el 70% del agua restante.\n2. Amase a baja velocidad; añada la sal.\n3. Bassinage: añada el resto del agua gradualmente.\n4. Añada malta / aceite al final.\n5. Amase hasta la ventana. T° masa final: 24–26°C.\n6. Reposo, división, boleado y fermentación final.",
+  direct_phase_title: "Método Directo — Paso a paso",
+  direct_steps: "1. Disuelva la levadura en agua fría. Añada ~90% de la harina y mezcle.\n2. Añada la sal y la harina restante. Amase hasta desarrollar el gluten.\n3. Añada malta / aceite al final. Bassinage con el agua restante gradualmente.\n4. Fermentación en bloque a temperatura ambiente durante el tiempo calculado.\n5. Divida, pre-forme, bloque frío a 4°C durante las horas restantes.\n6. Saque del frigorífico, bolee, fermentación final a temperatura de cocina.",
 };
+
 
 
 const pt: Dict = {

@@ -587,7 +587,29 @@ const it: Dict = {
   poolish_yeast: "Lievito Poolish",
   poolish_pct: "Percentuale Poolish",
   poolish_pct_help: "Quota di farina totale nel Poolish (20–100%). Default 30%.",
+  flour_recos: "Farine commerciali consigliate",
+  flour_cat_weak: "Debole (W < 220)",
+  flour_cat_medium: "Media (W 220–280)",
+  flour_cat_strong: "Forte (W 280–350)",
+  flour_cat_very_strong: "Molto forte / Manitoba (W > 350)",
+  flour_long_ferm_warning: "⚠ Attenzione: la farina rischia di non avere abbastanza forza per una fermentazione così lunga. Rischio di impasto afflosciato.",
+  biga_water_calc: "Temperatura acqua per la Biga",
+  biga_water_calc_desc: "Regola del 55 − (Ambiente + Farina). Target Biga dopo l'impasto: 18–20°C (max assoluto 23°C).",
+  biga_water_ambient: "T° Ambiente",
+  biga_water_flour: "T° Farina",
+  biga_water_suggested: "T° acqua suggerita",
+  biga_water_hot_warning: "⚠ Ambiente > 25°C: usa acqua ghiacciata o raffredda la farina in anticipo per tenere la Biga ≤ 23°C.",
+  phase1_title: "Fase 1 — Preparazione della Biga",
+  phase2_title: "Fase 2 — Rinfresco & Impasto Finale",
+  phase1_steps: "1. Pesa con precisione farina, acqua e lievito della Biga.\n2. Sciogli il lievito fresco nell'acqua fredda.\n3. Aggiungi la farina e mescola grossolanamente a mano (2–3 min) — NON impastare. La Biga deve restare grumosa, con parti non idratate.\n4. Verifica la temperatura: target 18–20°C (max 23°C).\n5. Copri senza sigillare e lascia fermentare alla temperatura di cantina calcolata per il tempo calcolato.",
+  phase1_steps_poolish: "1. Pesa farina e acqua del Poolish (1:1). Sciogli il lievito nell'acqua.\n2. Aggiungi la farina e frusta fino ad avere una pastella liscia e densa (senza grumi).\n3. Copri e lascia fermentare a temperatura ambiente fino a cupola bombata e bolle in superficie.",
+  phase2_title_poolish: "Fase 2 — Impasto Finale con Poolish",
+  phase2_steps: "1. Sciogli il sale nell'acqua rimanente (bassinage).\n2. Taglia la Biga matura a pezzetti e aggiungila all'impastatrice con il 70% dell'acqua rimanente.\n3. Impasta a bassa velocità finché la Biga si scioglie.\n4. Aggiungi l'acqua salata gradualmente (bassinage) — attendi l'assorbimento tra un'aggiunta e l'altra.\n5. Aggiungi malto / olio a fine impasto.\n6. Impasta fino a incordatura e prova del velo. T° impasto finale: 24–26°C.\n7. Puntata, staglio e formatura al peso desiderato, poi appretto.",
+  phase2_steps_poolish: "1. Aggiungi il Poolish maturo all'impastatrice con la farina rimanente e il 70% dell'acqua rimanente.\n2. Impasta a bassa velocità; aggiungi il sale.\n3. Bassinage: aggiungi il resto dell'acqua gradualmente.\n4. Aggiungi malto / olio a fine impasto.\n5. Impasta fino al velo. T° impasto finale: 24–26°C.\n6. Puntata, staglio, formatura e appretto.",
+  direct_phase_title: "Metodo Diretto — Passo dopo passo",
+  direct_steps: "1. Sciogli il lievito nell'acqua fredda. Aggiungi ~90% della farina e mescola.\n2. Aggiungi il sale e la farina rimanente. Impasta fino allo sviluppo del glutine.\n3. Aggiungi malto / olio a fine. Bassinage con l'acqua rimanente gradualmente.\n4. Puntata a temperatura ambiente per il tempo calcolato.\n5. Staglia, pre-forma, blocco freddo a 4°C per le ore rimanenti.\n6. Togli dal frigo, forma le palline, appretto finale a temperatura cucina.",
 };
+
 
 
 // Spanish, Portuguese, German - shorter, key strings; fallback to English if missing

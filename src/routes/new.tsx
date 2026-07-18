@@ -283,10 +283,27 @@ function NewRecipePage() {
             </div>
           </div>
 
-          <NumField label={t("flour_w")} value={flourW} onChange={setFlourW} min={100} max={500} step={10} prefix="W" />
+          <FlourSelect
+            value={flourId}
+            onChange={(id, f) => { setFlourId(id); if (f) setFlourW(f.w); }}
+          />
+          <NumField label={t("flour_w")} value={flourW} onChange={(v) => { setFlourW(v); setFlourId(""); }} min={100} max={500} step={10} prefix="W" />
           <FlourRecoBlock flourW={flourW} />
+          {(() => {
+            const f = FLOURS.find((x) => x.id === flourId);
+            if (!f) return null;
+            const off = clampedHydration < f.hydrMin - 2 || clampedHydration > f.hydrMax + 2;
+            return off ? (
+              <Warning>
+                {t("flour_hydration_warn")
+                  .replace("{min}", String(f.hydrMin))
+                  .replace("{max}", String(f.hydrMax))}
+              </Warning>
+            ) : null;
+          })()}
           {calc.flourWarning && <Warning>{t("flour_w_warning")}</Warning>}
           {flourW < 220 && <Warning>{t("flour_long_ferm_warning")}</Warning>}
+
 
 
           <div className="space-y-3 pt-2 border-t border-border/50">

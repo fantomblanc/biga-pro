@@ -343,6 +343,9 @@ function NewRecipePage() {
           </div>
         </Card>
 
+        <MaturationAdvisor flourW={flourW} />
+
+
         {engine === "biga" && (preFerment ?? "biga") === "biga" && (
           <BigaWaterTempCalculator defaultAmbient={cellarTemp} />
         )}

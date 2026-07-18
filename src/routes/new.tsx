@@ -10,6 +10,9 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { WaterTempCalculator } from "@/components/WaterTempCalculator";
 import { BigaWaterTempCalculator } from "@/components/BigaWaterTempCalculator";
+import { FlourSelect } from "@/components/FlourSelect";
+import { MaturationAdvisor } from "@/components/MaturationAdvisor";
+import { FLOURS } from "@/lib/flours";
 import {
   calculateRecipe,
   buildTimeline,
@@ -27,6 +30,7 @@ import {
 import { newId, upsertRecipe, setActiveId } from "@/lib/storage";
 import { toast } from "sonner";
 import { AlertTriangle, Save, Flame, Pizza, Wheat } from "lucide-react";
+
 
 
 export const Route = createFileRoute("/new")({
@@ -64,6 +68,8 @@ function NewRecipePage() {
   const [saltPct, setSalt] = useState(2.5);
   const [yeastType, setYeast] = useState<YeastType>("fresh");
   const [flourW, setFlourW] = useState(340);
+  const [flourId, setFlourId] = useState<string>("");
+
   const [useMalt, setUseMalt] = useState(false);
   const [maltPct, setMalt] = useState(1);
   const [useOil, setUseOil] = useState(false);
@@ -277,10 +283,27 @@ function NewRecipePage() {
             </div>
           </div>
 
-          <NumField label={t("flour_w")} value={flourW} onChange={setFlourW} min={100} max={500} step={10} prefix="W" />
+          <FlourSelect
+            value={flourId}
+            onChange={(id, f) => { setFlourId(id); if (f) setFlourW(f.w); }}
+          />
+          <NumField label={t("flour_w")} value={flourW} onChange={(v) => { setFlourW(v); setFlourId(""); }} min={100} max={500} step={10} prefix="W" />
           <FlourRecoBlock flourW={flourW} />
+          {(() => {
+            const f = FLOURS.find((x) => x.id === flourId);
+            if (!f) return null;
+            const off = clampedHydration < f.hydrMin - 2 || clampedHydration > f.hydrMax + 2;
+            return off ? (
+              <Warning>
+                {t("flour_hydration_warn")
+                  .replace("{min}", String(f.hydrMin))
+                  .replace("{max}", String(f.hydrMax))}
+              </Warning>
+            ) : null;
+          })()}
           {calc.flourWarning && <Warning>{t("flour_w_warning")}</Warning>}
           {flourW < 220 && <Warning>{t("flour_long_ferm_warning")}</Warning>}
+
 
 
           <div className="space-y-3 pt-2 border-t border-border/50">
@@ -319,6 +342,9 @@ function NewRecipePage() {
             />
           </div>
         </Card>
+
+        <MaturationAdvisor flourW={flourW} />
+
 
         {engine === "biga" && (preFerment ?? "biga") === "biga" && (
           <BigaWaterTempCalculator defaultAmbient={cellarTemp} />

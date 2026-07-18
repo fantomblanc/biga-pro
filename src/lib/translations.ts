@@ -208,6 +208,21 @@ const en: Dict = {
   phase2_steps_poolish: "1. Add the mature Poolish to the mixer with the remaining flour and 70% of the remaining water.\n2. Mix on low until the mass forms; add salt.\n3. Bassinage: add the rest of the water gradually.\n4. Add malt / oil if used, near the end.\n5. Knead to windowpane. Final dough temperature target: 24–26°C.\n6. Bulk rest, divide, ball and proof.",
   direct_phase_title: "Direct Method — Step by Step",
   direct_steps: "1. Dissolve yeast in cool water. Add ~90% of the flour and mix until shaggy.\n2. Add salt and the remaining flour. Knead until developed.\n3. Add malt / oil if used, near the end. Bassinage the remaining water gradually.\n4. Bulk ferment at room temperature for the calculated time.\n5. Divide, pre-shape, cold-block at 4°C for the remaining hours.\n6. Remove from fridge, ball, and final proof at kitchen temperature.",
+  flour_select: "Flour",
+  flour_manual: "Other / Manual entry",
+  flour_hydration_hint: "Recommended hydration: {min}–{max}%",
+  flour_hydration_warn: "Your hydration is outside the recommended range for this flour ({min}–{max}%). Adjust with care.",
+  maturation_title: "Hybrid Maturation (Fridge + Room)",
+  maturation_desc: "Split your fermentation between fridge (≈4°C) and room temperature. Total time is analyzed against the flour W.",
+  maturation_fridge: "Fridge (4°C)",
+  maturation_room: "Room Temp",
+  maturation_hours: "h",
+  maturation_total: "Total maturation",
+  maturation_optimal: "Optimal maturation for this flour.",
+  maturation_under: "Under-maturation risk — extend the rest or pick a weaker flour.",
+  maturation_over: "Over-maturation risk — reduce time or choose a stronger flour.",
+  maturation_range: "Recommended for W{w}: {min}–{max}h",
+
 };
 
 
@@ -408,6 +423,21 @@ const fr: Dict = {
   phase2_steps_poolish: "1. Ajoutez le Poolish mature au pétrin avec la farine restante et 70% de l'eau restante.\n2. Pétrissez à vitesse lente ; ajoutez le sel.\n3. Bassinage : ajoutez le reste de l'eau progressivement.\n4. Ajoutez malt / huile en fin de pétrissage.\n5. Pétrissez jusqu'à la fenêtre. T° pâte finale : 24–26°C.\n6. Pointage, division, boulage et apprêt.",
   direct_phase_title: "Méthode Directe — Étape par étape",
   direct_steps: "1. Dissolvez la levure dans l'eau fraîche. Ajoutez ~90% de la farine et mélangez.\n2. Ajoutez le sel et la farine restante. Pétrissez jusqu'au développement du gluten.\n3. Ajoutez malt / huile en fin. Bassinez l'eau restante progressivement.\n4. Pointage à température ambiante pendant la durée calculée.\n5. Divisez, pré-façonnez, bloc froid à 4°C pour les heures restantes.\n6. Sortez du frais, boulez, apprêt final à température de cuisine.",
+  flour_select: "Farine",
+  flour_manual: "Autre / Saisie manuelle",
+  flour_hydration_hint: "Hydratation conseillée : {min}–{max}%",
+  flour_hydration_warn: "Votre hydratation est hors de la plage recommandée pour cette farine ({min}–{max}%). Ajustez avec prudence.",
+  maturation_title: "Maturation Hybride (Frigo + T.A.)",
+  maturation_desc: "Répartissez la fermentation entre frigo (≈4°C) et température ambiante. Le total est analysé selon le W de la farine.",
+  maturation_fridge: "Frigo (4°C)",
+  maturation_room: "T. Ambiante",
+  maturation_hours: "h",
+  maturation_total: "Maturation totale",
+  maturation_optimal: "Maturation optimale pour cette farine.",
+  maturation_under: "Risque de sous-maturation — prolongez le repos ou prenez une farine plus faible.",
+  maturation_over: "Risque de sur-maturation — réduisez le temps ou choisissez une farine plus forte.",
+  maturation_range: "Recommandé pour W{w} : {min}–{max}h",
+
 };
 
 
@@ -608,6 +638,21 @@ const it: Dict = {
   phase2_steps_poolish: "1. Aggiungi il Poolish maturo all'impastatrice con la farina rimanente e il 70% dell'acqua rimanente.\n2. Impasta a bassa velocità; aggiungi il sale.\n3. Bassinage: aggiungi il resto dell'acqua gradualmente.\n4. Aggiungi malto / olio a fine impasto.\n5. Impasta fino al velo. T° impasto finale: 24–26°C.\n6. Puntata, staglio, formatura e appretto.",
   direct_phase_title: "Metodo Diretto — Passo dopo passo",
   direct_steps: "1. Sciogli il lievito nell'acqua fredda. Aggiungi ~90% della farina e mescola.\n2. Aggiungi il sale e la farina rimanente. Impasta fino allo sviluppo del glutine.\n3. Aggiungi malto / olio a fine. Bassinage con l'acqua rimanente gradualmente.\n4. Puntata a temperatura ambiente per il tempo calcolato.\n5. Staglia, pre-forma, blocco freddo a 4°C per le ore rimanenti.\n6. Togli dal frigo, forma le palline, appretto finale a temperatura cucina.",
+  flour_select: "Farina",
+  flour_manual: "Altro / Inserimento manuale",
+  flour_hydration_hint: "Idratazione consigliata: {min}–{max}%",
+  flour_hydration_warn: "L'idratazione è fuori dal range consigliato per questa farina ({min}–{max}%). Regola con attenzione.",
+  maturation_title: "Maturazione Ibrida (Frigo + T. Amb.)",
+  maturation_desc: "Suddividi la fermentazione tra frigo (≈4°C) e temperatura ambiente. Il totale viene valutato in base al W della farina.",
+  maturation_fridge: "Frigo (4°C)",
+  maturation_room: "T. Ambiente",
+  maturation_hours: "h",
+  maturation_total: "Maturazione totale",
+  maturation_optimal: "Maturazione ottimale per questa farina.",
+  maturation_under: "Rischio di sotto-maturazione — prolunga il riposo o usa una farina più debole.",
+  maturation_over: "Rischio di sovra-maturazione — riduci il tempo o scegli una farina più forte.",
+  maturation_range: "Consigliato per W{w}: {min}–{max}h",
+
 };
 
 
@@ -747,6 +792,21 @@ const es: Dict = {
   phase2_steps_poolish: "1. Añada el Poolish maduro a la amasadora con la harina restante y el 70% del agua restante.\n2. Amase a baja velocidad; añada la sal.\n3. Bassinage: añada el resto del agua gradualmente.\n4. Añada malta / aceite al final.\n5. Amase hasta la ventana. T° masa final: 24–26°C.\n6. Reposo, división, boleado y fermentación final.",
   direct_phase_title: "Método Directo — Paso a paso",
   direct_steps: "1. Disuelva la levadura en agua fría. Añada ~90% de la harina y mezcle.\n2. Añada la sal y la harina restante. Amase hasta desarrollar el gluten.\n3. Añada malta / aceite al final. Bassinage con el agua restante gradualmente.\n4. Fermentación en bloque a temperatura ambiente durante el tiempo calculado.\n5. Divida, pre-forme, bloque frío a 4°C durante las horas restantes.\n6. Saque del frigorífico, bolee, fermentación final a temperatura de cocina.",
+  flour_select: "Harina",
+  flour_manual: "Otra / Entrada manual",
+  flour_hydration_hint: "Hidratación recomendada: {min}–{max}%",
+  flour_hydration_warn: "Tu hidratación está fuera del rango recomendado para esta harina ({min}–{max}%). Ajusta con cuidado.",
+  maturation_title: "Maduración Híbrida (Nevera + T. Amb.)",
+  maturation_desc: "Divide la fermentación entre nevera (≈4°C) y temperatura ambiente. El total se evalúa según el W de la harina.",
+  maturation_fridge: "Nevera (4°C)",
+  maturation_room: "T. Ambiente",
+  maturation_hours: "h",
+  maturation_total: "Maduración total",
+  maturation_optimal: "Maduración óptima para esta harina.",
+  maturation_under: "Riesgo de sub-maduración — prolonga el reposo o usa una harina más débil.",
+  maturation_over: "Riesgo de sobre-maduración — reduce el tiempo o elige una harina más fuerte.",
+  maturation_range: "Recomendado para W{w}: {min}–{max}h",
+
 };
 
 
@@ -885,6 +945,21 @@ const pt: Dict = {
   phase2_steps_poolish: "1. Adicione o Poolish maduro à batedeira com a farinha restante e 70% da água restante.\n2. Sove em baixa velocidade; adicione o sal.\n3. Bassinage: adicione o resto da água gradualmente.\n4. Adicione malte / óleo no fim.\n5. Sove até o véu. T° massa final: 24–26°C.\n6. Descanso, divisão, boleamento e fermentação final.",
   direct_phase_title: "Método Direto — Passo a passo",
   direct_steps: "1. Dissolva o fermento em água fria. Adicione ~90% da farinha e misture.\n2. Adicione o sal e a farinha restante. Sove até desenvolver o glúten.\n3. Adicione malte / óleo no fim. Bassinage com a água restante gradualmente.\n4. Fermentação em bloco à temperatura ambiente pelo tempo calculado.\n5. Divida, pré-molde, bloco frio a 4°C pelas horas restantes.\n6. Retire da geladeira, boleie, fermentação final à temperatura da cozinha.",
+  flour_select: "Farinha",
+  flour_manual: "Outra / Entrada manual",
+  flour_hydration_hint: "Hidratação recomendada: {min}–{max}%",
+  flour_hydration_warn: "A sua hidratação está fora do intervalo recomendado para esta farinha ({min}–{max}%). Ajuste com cuidado.",
+  maturation_title: "Maturação Híbrida (Frigorífico + T. Amb.)",
+  maturation_desc: "Divida a fermentação entre frigorífico (≈4°C) e temperatura ambiente. O total é avaliado com base no W da farinha.",
+  maturation_fridge: "Frigorífico (4°C)",
+  maturation_room: "T. Ambiente",
+  maturation_hours: "h",
+  maturation_total: "Maturação total",
+  maturation_optimal: "Maturação ideal para esta farinha.",
+  maturation_under: "Risco de sub-maturação — prolongue o descanso ou use uma farinha mais fraca.",
+  maturation_over: "Risco de sobre-maturação — reduza o tempo ou escolha uma farinha mais forte.",
+  maturation_range: "Recomendado para W{w}: {min}–{max}h",
+
 };
 
 
@@ -1023,6 +1098,21 @@ const de: Dict = {
   phase2_steps_poolish: "1. Reifen Poolish mit restlichem Mehl und 70% des restlichen Wassers in die Maschine geben.\n2. Bei niedriger Stufe kneten; Salz zugeben.\n3. Bassinage: restliches Wasser nach und nach zugeben.\n4. Malz / Öl am Ende zugeben.\n5. Bis zum Fenster kneten. Endteigtemperatur: 24–26°C.\n6. Stockgare, Teilen, Wirken und Stückgare.",
   direct_phase_title: "Direkte Methode — Schritt für Schritt",
   direct_steps: "1. Hefe in kaltem Wasser auflösen. ~90% des Mehls zugeben und mischen.\n2. Salz und restliches Mehl zugeben. Bis zur Glutenentwicklung kneten.\n3. Malz / Öl am Ende. Restwasser per Bassinage nach und nach zugeben.\n4. Stockgare bei Raumtemperatur für die berechnete Zeit.\n5. Teilen, vorformen, kalter Block bei 4°C für die restlichen Stunden.\n6. Aus dem Kühlschrank, wirken, Endgare bei Küchentemperatur.",
+  flour_select: "Mehl",
+  flour_manual: "Anderes / Manuelle Eingabe",
+  flour_hydration_hint: "Empfohlene Hydration: {min}–{max}%",
+  flour_hydration_warn: "Ihre Hydration liegt außerhalb des empfohlenen Bereichs für dieses Mehl ({min}–{max}%). Vorsichtig anpassen.",
+  maturation_title: "Hybride Reifung (Kühlschrank + Raum)",
+  maturation_desc: "Teilen Sie die Gärung zwischen Kühlschrank (≈4°C) und Raumtemperatur. Die Gesamtzeit wird anhand des Mehl-W bewertet.",
+  maturation_fridge: "Kühlschrank (4°C)",
+  maturation_room: "Raumtemp.",
+  maturation_hours: "Std",
+  maturation_total: "Gesamtreifung",
+  maturation_optimal: "Optimale Reifung für dieses Mehl.",
+  maturation_under: "Untergare-Risiko — Reifezeit verlängern oder schwächeres Mehl wählen.",
+  maturation_over: "Übergare-Risiko — Zeit reduzieren oder stärkeres Mehl wählen.",
+  maturation_range: "Empfohlen für W{w}: {min}–{max}h",
+
 };
 
 

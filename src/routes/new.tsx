@@ -10,6 +10,9 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { WaterTempCalculator } from "@/components/WaterTempCalculator";
 import { BigaWaterTempCalculator } from "@/components/BigaWaterTempCalculator";
+import { FlourSelect } from "@/components/FlourSelect";
+import { MaturationAdvisor } from "@/components/MaturationAdvisor";
+import { FLOURS } from "@/lib/flours";
 import {
   calculateRecipe,
   buildTimeline,
@@ -27,6 +30,7 @@ import {
 import { newId, upsertRecipe, setActiveId } from "@/lib/storage";
 import { toast } from "sonner";
 import { AlertTriangle, Save, Flame, Pizza, Wheat } from "lucide-react";
+
 
 
 export const Route = createFileRoute("/new")({

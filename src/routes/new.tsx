@@ -68,6 +68,8 @@ function NewRecipePage() {
   const [saltPct, setSalt] = useState(2.5);
   const [yeastType, setYeast] = useState<YeastType>("fresh");
   const [flourW, setFlourW] = useState(340);
+  const [flourId, setFlourId] = useState<string>("");
+
   const [useMalt, setUseMalt] = useState(false);
   const [maltPct, setMalt] = useState(1);
   const [useOil, setUseOil] = useState(false);

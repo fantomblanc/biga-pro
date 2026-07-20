@@ -54,6 +54,8 @@ function RecipePage() {
   const [kitchenTemp, setKitchenTemp] = useState(22);
   const [kitchenPromptOpen, setKitchenPromptOpen] = useState(false);
   const [rigeneroOpen, setRigeneroOpen] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const printableRef = useRef<HTMLDivElement>(null);
   const kitchenAskedRef = useRef(false);
 
   useWakeLock(wakeOn);
@@ -165,8 +167,8 @@ function RecipePage() {
           >
             {wakeOn ? <MonitorUp className="size-4" /> : <MonitorOff className="size-4" />}
           </Button>
-          <Button variant="outline" size="sm" onClick={() => window.print()}>
-            <Printer className="size-4 mr-1" /> {t("print")}
+          <Button variant="outline" size="sm" onClick={downloadPdf} disabled={pdfBusy}>
+            <FileDown className="size-4 mr-1" /> {pdfBusy ? t("pdf_generating") : t("download_pdf")}
           </Button>
         </div>
       </div>

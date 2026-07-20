@@ -182,7 +182,7 @@ function RecipePage() {
           html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
           jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ["css", "legacy"] },
-        })
+        } as any)
         .from(printableRef.current)
         .save();
     } catch (e) {
@@ -433,6 +433,17 @@ function RecipePage() {
           </pre>
         </DialogContent>
       </Dialog>
+
+      {/* Off-screen printable layout (rendered but hidden) for PDF export */}
+      <div style={{ position: "fixed", left: -10000, top: 0, width: 760, pointerEvents: "none", opacity: 0 }} aria-hidden>
+        <PrintableRecipe
+          ref={printableRef}
+          recipe={recipe}
+          voute={activeVoute}
+          sole={activeSole}
+          isPoolish={isPoolish}
+        />
+      </div>
     </AppShell>
   );
 }

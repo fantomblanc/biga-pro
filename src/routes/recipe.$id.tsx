@@ -10,6 +10,7 @@ import { calcFinalProofHours, buildTimeline } from "@/lib/dough-engine";
 import { Timeline } from "@/components/Timeline";
 import { CookTimer } from "@/components/CookTimer";
 import { WaterTempCalculator } from "@/components/WaterTempCalculator";
+import { PrintableRecipe } from "@/components/PrintableRecipe";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,7 +26,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  RotateCcw, Printer, Camera, Trash2, Wrench, Play, ChevronLeft, Eye, MonitorUp,
+  RotateCcw, FileDown, Camera, Trash2, Wrench, Play, ChevronLeft, Eye, MonitorUp,
   MonitorOff, Save, LifeBuoy,
 } from "lucide-react";
 import { useWakeLock } from "@/lib/wake-lock";
@@ -53,6 +54,8 @@ function RecipePage() {
   const [kitchenTemp, setKitchenTemp] = useState(22);
   const [kitchenPromptOpen, setKitchenPromptOpen] = useState(false);
   const [rigeneroOpen, setRigeneroOpen] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const printableRef = useRef<HTMLDivElement>(null);
   const kitchenAskedRef = useRef(false);
 
   useWakeLock(wakeOn);
@@ -147,7 +150,58 @@ function RecipePage() {
     setRecipe(updated);
   }
 
+  function suggestedBake(r: SavedRecipe): { voute: [number, number]; sole: [number, number] } {
+    const voute = (r.calc.bakeVoute ?? (
+      r.inputs.engine === "direct" ? [400, 420] :
+        r.inputs.hydration < 67 ? [430, 450] : [420, 440]
+    )) as [number, number];
+    const sole = (r.calc.bakeSole ?? (
+      r.inputs.engine === "direct" ? [360, 380] :
+        r.inputs.hydration < 67 ? [380, 400] : [350, 370]
+    )) as [number, number];
+    return { voute, sole };
+  }
+
+  function updateCustomBake(voute: [number, number] | undefined, sole: [number, number] | undefined) {
+    const updated: SavedRecipe = { ...recipe!, customBakeVoute: voute, customBakeSole: sole };
+    upsertRecipe(updated);
+    setRecipe(updated);
+  }
+
+  async function downloadPdf() {
+    if (!printableRef.current) return;
+    setPdfBusy(true);
+    try {
+      const html2pdf = (await import("html2pdf.js")).default;
+      const filename = `${recipe!.name.replace(/[^a-z0-9-_]+/gi, "_")}.pdf`;
+      await html2pdf()
+        .set({
+          margin: [10, 10, 12, 10],
+          filename,
+          image: { type: "jpeg", quality: 0.95 },
+          html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["css", "legacy"] },
+        } as any)
+        .from(printableRef.current)
+        .save();
+    } catch (e) {
+      console.error(e);
+      toast.error("PDF error");
+    } finally {
+      setPdfBusy(false);
+    }
+  }
+
   const yeastShown = recipe.inputs.engine === "biga" ? recipe.calc.bigaYeastShown : recipe.calc.directYeastShown;
+  const suggested = suggestedBake(recipe);
+  const activeVoute: [number, number] = recipe.customBakeVoute ?? suggested.voute;
+  const activeSole: [number, number] = recipe.customBakeSole ?? suggested.sole;
+  const isPoolish = recipe.inputs.engine === "biga" && (recipe.calc.preFerment ?? recipe.inputs.preFerment) === "poolish";
+  const bakeStepExtra = t("step_bake_at")
+    .replace("{voute}", `${activeVoute[0]}–${activeVoute[1]}`)
+    .replace("{sole}", `${activeSole[0]}–${activeSole[1]}`);
+  const timelineExtras = { bake: bakeStepExtra };
 
   return (
     <AppShell>
@@ -164,8 +218,8 @@ function RecipePage() {
           >
             {wakeOn ? <MonitorUp className="size-4" /> : <MonitorOff className="size-4" />}
           </Button>
-          <Button variant="outline" size="sm" onClick={() => window.print()}>
-            <Printer className="size-4 mr-1" /> {t("print")}
+          <Button variant="outline" size="sm" onClick={downloadPdf} disabled={pdfBusy}>
+            <FileDown className="size-4 mr-1" /> {pdfBusy ? t("pdf_generating") : t("download_pdf")}
           </Button>
         </div>
       </div>
@@ -206,9 +260,16 @@ function RecipePage() {
 
         {/* PROTOCOL */}
         <TabsContent value="protocol" className="space-y-4 pt-4">
-          <Timeline steps={recipe.timeline} />
+          <Timeline steps={recipe.timeline} extras={timelineExtras} />
 
-          <BakingTempsCard recipe={recipe} />
+          <BakingTempsCard
+            recipe={recipe}
+            suggestedVoute={suggested.voute}
+            suggestedSole={suggested.sole}
+            customVoute={recipe.customBakeVoute}
+            customSole={recipe.customBakeSole}
+            onChange={updateCustomBake}
+          />
 
           {recipe.inputs.engine === "direct" && (
             <Card className="p-4 border-[color:var(--cellar)]/40 bg-[color:var(--cellar)]/5">
@@ -305,7 +366,6 @@ function RecipePage() {
                 <input
                   type="file"
                   accept="image/*"
-                  capture="environment"
                   className="hidden"
                   onChange={(e) => { const f = e.target.files?.[0]; if (f) addPhoto(f); e.target.value = ""; }}
                 />
@@ -373,6 +433,17 @@ function RecipePage() {
           </pre>
         </DialogContent>
       </Dialog>
+
+      {/* Off-screen printable layout (rendered but hidden) for PDF export */}
+      <div style={{ position: "fixed", left: -10000, top: 0, width: 760, pointerEvents: "none", opacity: 0 }} aria-hidden>
+        <PrintableRecipe
+          ref={printableRef}
+          recipe={recipe}
+          voute={activeVoute}
+          sole={activeSole}
+          isPoolish={isPoolish}
+        />
+      </div>
     </AppShell>
   );
 }
@@ -473,33 +544,128 @@ function TotalRow({ label, value, strong }: { label: string; value: string; stro
   );
 }
 
-function BakingTempsCard({ recipe }: { recipe: SavedRecipe }) {
+function BakingTempsCard({
+  recipe,
+  suggestedVoute,
+  suggestedSole,
+  customVoute,
+  customSole,
+  onChange,
+}: {
+  recipe: SavedRecipe;
+  suggestedVoute: [number, number];
+  suggestedSole: [number, number];
+  customVoute?: [number, number];
+  customSole?: [number, number];
+  onChange: (voute: [number, number] | undefined, sole: [number, number] | undefined) => void;
+}) {
   const { t } = useI18n();
-  // Fallback compute for older saved recipes without bake temps
-  const voute = recipe.calc.bakeVoute ?? (
-    recipe.inputs.engine === "direct" ? [400, 420] :
-      recipe.inputs.hydration < 67 ? [430, 450] : [420, 440]
-  );
-  const sole = recipe.calc.bakeSole ?? (
-    recipe.inputs.engine === "direct" ? [360, 380] :
-      recipe.inputs.hydration < 67 ? [380, 400] : [350, 370]
-  );
   const tipKey = recipe.calc.bakeTipKey ?? (
     recipe.inputs.engine === "direct" ? "bake_tip_direct" :
       recipe.inputs.hydration < 67 ? "bake_tip_biga_low" : "bake_tip_biga_high"
   );
+  const activeVoute = customVoute ?? suggestedVoute;
+  const activeSole = customSole ?? suggestedSole;
+  const isCustom = !!(customVoute || customSole);
+
+  function setVoute(idx: 0 | 1, val: number) {
+    const base: [number, number] = [...activeVoute] as [number, number];
+    base[idx] = val;
+    onChange(base, customSole);
+  }
+  function setSole(idx: 0 | 1, val: number) {
+    const base: [number, number] = [...activeSole] as [number, number];
+    base[idx] = val;
+    onChange(customVoute, base);
+  }
 
   return (
     <Card className="p-4 border-[color:var(--bake)]/40 bg-[color:var(--bake)]/5">
-      <h3 className="font-display font-semibold text-sm flex items-center gap-2">
-        🔥 {t("bake_temps")}
-      </h3>
+      <div className="flex items-center justify-between">
+        <h3 className="font-display font-semibold text-sm flex items-center gap-2">
+          🔥 {t("bake_temps")}
+        </h3>
+        {isCustom && (
+          <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => onChange(undefined, undefined)}>
+            <RotateCcw className="size-3 mr-1" /> {t("bake_reset")}
+          </Button>
+        )}
+      </div>
+      <p className="text-[11px] text-muted-foreground mt-1">{t("bake_custom_desc")}</p>
+
       <div className="grid grid-cols-2 gap-3 mt-3">
-        <TempGauge label={t("bake_voute")} range={voute} accent="var(--bake)" />
-        <TempGauge label={t("bake_sole")} range={sole} accent="var(--final)" />
+        <TempEditor
+          label={t("bake_voute")}
+          accent="var(--bake)"
+          suggested={suggestedVoute}
+          active={activeVoute}
+          suggestedLabel={t("bake_suggested")}
+          customLabel={t("bake_custom")}
+          onChangeMin={(v) => setVoute(0, v)}
+          onChangeMax={(v) => setVoute(1, v)}
+        />
+        <TempEditor
+          label={t("bake_sole")}
+          accent="var(--final)"
+          suggested={suggestedSole}
+          active={activeSole}
+          suggestedLabel={t("bake_suggested")}
+          customLabel={t("bake_custom")}
+          onChangeMin={(v) => setSole(0, v)}
+          onChangeMax={(v) => setSole(1, v)}
+        />
       </div>
       <p className="text-[11px] text-muted-foreground mt-3 italic leading-relaxed">{t(tipKey)}</p>
     </Card>
+  );
+}
+
+function TempEditor({
+  label, accent, suggested, active, suggestedLabel, customLabel, onChangeMin, onChangeMax,
+}: {
+  label: string;
+  accent: string;
+  suggested: [number, number];
+  active: [number, number];
+  suggestedLabel: string;
+  customLabel: string;
+  onChangeMin: (v: number) => void;
+  onChangeMax: (v: number) => void;
+}) {
+  return (
+    <div
+      className="rounded-lg border p-3 space-y-2"
+      style={{
+        borderColor: `color-mix(in oklab, ${accent} 45%, transparent)`,
+        backgroundColor: `color-mix(in oklab, ${accent} 10%, transparent)`,
+      }}
+    >
+      <div className="text-[10px] uppercase tracking-widest font-bold" style={{ color: accent }}>{label}</div>
+      <div className="text-[10px] text-muted-foreground tabular">
+        {suggestedLabel}: <span className="font-semibold">{suggested[0]}–{suggested[1]}°C</span>
+      </div>
+      <div>
+        <div className="text-[9px] uppercase tracking-wider text-muted-foreground mb-1">{customLabel}</div>
+        <div className="flex items-center gap-1">
+          <Input
+            type="number"
+            value={active[0]}
+            onChange={(e) => onChangeMin(Number(e.target.value))}
+            className="tabular h-9 text-center px-1"
+            style={{ color: accent }}
+          />
+          <span className="text-muted-foreground">–</span>
+          <Input
+            type="number"
+            value={active[1]}
+            onChange={(e) => onChangeMax(Number(e.target.value))}
+            className="tabular h-9 text-center px-1"
+            style={{ color: accent }}
+          />
+          <span className="text-[10px] text-muted-foreground ml-1">°C</span>
+        </div>
+      </div>
+    </div>
   );
 }
 

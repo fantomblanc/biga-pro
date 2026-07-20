@@ -24,7 +24,7 @@ function formatDelta(t: (k: string) => string, ms: number): string {
   return past ? `${t("step_ago")} ${rel}` : `${t("step_in")} ${rel}`;
 }
 
-export function Timeline({ steps }: { steps: TimelineStep[] }) {
+export function Timeline({ steps, extras }: { steps: TimelineStep[]; extras?: Record<string, string> }) {
   const { t } = useI18n();
   const [now, setNow] = useState(Date.now());
 
@@ -84,6 +84,11 @@ export function Timeline({ steps }: { steps: TimelineStep[] }) {
                     {formatDelta(t, delta)}
                   </div>
                 </div>
+                {extras?.[step.id] && (
+                  <div className="mt-2 text-[12px] text-[color:var(--bake)] font-semibold tabular">
+                    {extras[step.id]}
+                  </div>
+                )}
               </div>
             </div>
           </li>

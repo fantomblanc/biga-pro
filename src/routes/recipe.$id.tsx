@@ -10,6 +10,7 @@ import { calcFinalProofHours, buildTimeline } from "@/lib/dough-engine";
 import { Timeline } from "@/components/Timeline";
 import { CookTimer } from "@/components/CookTimer";
 import { WaterTempCalculator } from "@/components/WaterTempCalculator";
+import { PrintableRecipe } from "@/components/PrintableRecipe";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,7 +26,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  RotateCcw, Printer, Camera, Trash2, Wrench, Play, ChevronLeft, Eye, MonitorUp,
+  RotateCcw, FileDown, Camera, Trash2, Wrench, Play, ChevronLeft, Eye, MonitorUp,
   MonitorOff, Save, LifeBuoy,
 } from "lucide-react";
 import { useWakeLock } from "@/lib/wake-lock";

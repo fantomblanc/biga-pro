@@ -408,7 +408,7 @@ const en: Dict = {
   journal_delete: "Delete entry",
   journal_photos: "Final pizza photos",
   // --- Notifications ---
-  notif_denied: "Notifications are blocked by your browser. Click the padlock icon next to the web address to allow them manually.",
+  notif_denied_help: "Notifications are blocked by your browser. Click the padlock icon next to the web address to allow them manually.",
 
 };
 

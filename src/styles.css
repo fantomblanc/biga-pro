@@ -139,7 +139,80 @@
   background: linear-gradient(135deg, oklch(0.78 0.16 55), oklch(0.62 0.20 30));
 }
 
+/* ------------------------------------------------------------------ */
+/* Print / PDF — native window.print() output                          */
+/* ------------------------------------------------------------------ */
 @media print {
-  .no-print { display: none !important; }
-  body { background: white; color: black; }
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Navigation, buttons, inputs, tabs and every interactive shell are dropped. */
+  .no-print,
+  [data-no-print],
+  nav,
+  button,
+  input,
+  select,
+  textarea,
+  [role="tablist"],
+  [data-slot="tabs-list"] {
+    display: none !important;
+  }
+
+  /* Only the recipe sheet remains, laid out from the top of the page. */
+  body * {
+    visibility: hidden;
+  }
+
+  .print-sheet,
+  .print-sheet * {
+    visibility: visible !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .print-sheet {
+    display: block !important;
+    position: absolute !important;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  /* No cuts inside a logical block. */
+  .print-sheet section,
+  .print-sheet table,
+  .print-sheet tr,
+  .print-sheet img,
+  .print-sheet pre,
+  .print-sheet .avoid-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .print-sheet h1,
+  .print-sheet h2,
+  .print-sheet h3 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .print-sheet img {
+    max-width: 46% !important;
+    height: auto !important;
+  }
 }
+

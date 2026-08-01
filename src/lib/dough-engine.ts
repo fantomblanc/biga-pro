@@ -44,6 +44,14 @@ export function clampHydrationToStyle(h: number, s?: PizzaStyle): number {
   return Math.min(c.hydrMax, Math.max(c.hydrMin, h));
 }
 
+export interface TrayConfig {
+  count: number;
+  lengthCm: number;
+  widthCm: number;
+  /** g of dough per cm² (0.6 by default). */
+  coef: number;
+}
+
 export interface RecipeInputs {
   engine: EngineType;
   ballsCount: number;
@@ -61,7 +69,28 @@ export interface RecipeInputs {
   bigaPct?: number; // % of total flour that goes into the pre-ferment (20-100). Default 80.
   style?: PizzaStyle; // selected pizza style
   preFerment?: PreFermentType; // "biga" (default) or "poolish" — used only when engine === "biga"
+
+  /* --- Professional extensions (all optional / backwards compatible) --- */
+  ovenType?: "domestic" | "gas_high" | "electric_pro";
+  /** -100 extensible … 0 balanced … +100 tenacious */
+  tenacity?: number;
+  autolyse?: import("./dough-pro").AutolyseConfig;
+  blend?: import("./dough-pro").FlourBlend;
+  prefermentLoc?: import("./dough-pro").PrefermentLocation;
+  /** Overrides the pre-ferment hydration (biga 50% / cellar biga 44.5% / poolish 100%). */
+  preFermentHydrPct?: number;
+  trays?: TrayConfig;
+  mixer?: "hand" | "spiral";
+  flourTemp?: number;
+  targetDoughTemp?: number;
+  /** Water temperature suggested by the professional formula, stored for the protocol. */
+  waterTempSuggested?: number;
+  /** Bulk rest override in minutes (tenacity arbitration). */
+  bulkOverrideMin?: number;
+  /** Flour actually available, when scaling in reverse. */
+  flourAvailable?: number;
 }
+
 
 
 export interface RecipeCalc {

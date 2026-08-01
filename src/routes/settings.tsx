@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { LANGS } from "@/lib/translations";
 import { loadSettings, saveSettings } from "@/lib/storage";
+import { getCloudSettings, saveCloudSettings } from "@/lib/cloud";
+import { useAuth } from "@/lib/auth";
 import { requestNotifPermission } from "@/lib/notifications";
 import { toast } from "sonner";
 import { Bell, Languages, Info } from "lucide-react";
@@ -24,11 +26,18 @@ export const Route = createFileRoute("/settings")({
 
 function SettingsPage() {
   const { t, lang, setLang } = useI18n();
+  const { user } = useAuth();
   const [notifEnabled, setNotifEnabled] = useState(false);
 
   useEffect(() => {
-    setNotifEnabled(loadSettings().notificationsEnabled);
-  }, []);
+    if (user) {
+      getCloudSettings()
+        .then((s) => setNotifEnabled(s.notificationsEnabled))
+        .catch(() => setNotifEnabled(loadSettings().notificationsEnabled));
+    } else {
+      setNotifEnabled(loadSettings().notificationsEnabled);
+    }
+  }, [user]);
 
   async function toggleNotif(v: boolean) {
     if (v) {
@@ -40,7 +49,22 @@ function SettingsPage() {
       toast.success(t("notif_granted"));
     }
     setNotifEnabled(v);
-    saveSettings({ notificationsEnabled: v });
+    if (user) {
+      try {
+        await saveCloudSettings({ notificationsEnabled: v });
+      } catch {
+        toast.error(t("cloud_error"));
+      }
+    } else {
+      saveSettings({ notificationsEnabled: v });
+    }
+  }
+
+  function handleSetLang(l: (typeof LANGS)[number]["code"]) {
+    setLang(l);
+    if (user) {
+      saveCloudSettings({ notificationsEnabled: notifEnabled }).catch(() => {});
+    }
   }
 
   return (
@@ -58,7 +82,7 @@ function SettingsPage() {
             {LANGS.map((l) => (
               <button
                 key={l.code}
-                onClick={() => setLang(l.code)}
+                onClick={() => handleSetLang(l.code)}
                 className={`flex items-center gap-2 h-11 px-3 rounded-lg border text-sm font-medium transition-colors ${
                   lang === l.code
                     ? "border-primary bg-primary/10 text-primary"

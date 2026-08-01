@@ -220,7 +220,7 @@ function LogCard({ log, onDelete, onDuplicate }: { log: BakeLog; onDelete: () =>
           ))}
         </div>
       )}
-      {log.recipeSnapshot && (
+      {Boolean(log.recipeSnapshot) && (
         <Button size="sm" variant="ghost" onClick={onDuplicate} className="text-xs">
           <Copy className="size-3.5 mr-1" /> {t("journal_duplicate")}
         </Button>

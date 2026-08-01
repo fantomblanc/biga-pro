@@ -1,16 +1,19 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { LanguageSelector } from "./LanguageSelector";
 import { useI18n } from "@/lib/i18n";
-import { Flame, Home, Plus, Settings } from "lucide-react";
+import { Flame, Home, Plus, Settings, BookOpen, LogOut, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { t } = useI18n();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { user, signOut } = useAuth();
 
   const navItems = [
     { to: "/", label: t("nav_dashboard"), Icon: Home },
     { to: "/new", label: t("nav_new"), Icon: Plus },
+    { to: "/journal", label: t("journal_history"), Icon: BookOpen },
     { to: "/settings", label: t("nav_settings"), Icon: Settings },
   ];
 
@@ -29,14 +32,34 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           </Link>
-          <LanguageSelector />
+          <div className="flex items-center gap-2">
+            <LanguageSelector />
+            {user ? (
+              <button
+                onClick={() => signOut()}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                title={user.email ?? ""}
+              >
+                <span className="hidden sm:inline max-w-[100px] truncate">{user.email}</span>
+                <LogOut className="size-4" />
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors font-medium"
+              >
+                <LogIn className="size-4" />
+                {t("auth_sign_in")}
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 
       <main className="flex-1 mx-auto w-full max-w-3xl px-4 pb-28 pt-4">{children}</main>
 
       <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-border/60 bg-background/95 backdrop-blur no-print">
-        <div className="mx-auto max-w-3xl grid grid-cols-3">
+        <div className="mx-auto max-w-3xl grid grid-cols-4">
           {navItems.map(({ to, label, Icon }) => {
             const active = to === "/" ? pathname === "/" : pathname.startsWith(to);
             return (

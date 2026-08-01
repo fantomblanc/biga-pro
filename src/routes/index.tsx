@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { useI18n } from "@/lib/i18n";
-import { loadActiveId, loadRecipes, deleteRecipe, type SavedRecipe } from "@/lib/storage";
+import { useAuth } from "@/lib/auth";
+import { loadActiveId, type SavedRecipe } from "@/lib/storage";
+import { listRecipes, removeRecipe } from "@/lib/cloud";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Flame, Plus, Trash2, ArrowRight, Clock, Scale } from "lucide-react";
+import { Flame, Plus, Trash2, ArrowRight, Clock, Scale, BookOpen } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
@@ -13,20 +16,51 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const { t } = useI18n();
-  const [recipes, setRecipes] = useState<SavedRecipe[]>([]);
+  const { user, loading } = useAuth();
   const [activeId, setActiveIdState] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  const { data: recipes = [] } = useQuery({
+    queryKey: ["recipes"],
+    queryFn: listRecipes,
+    enabled: !!user,
+  });
 
   useEffect(() => {
-    setRecipes(loadRecipes());
     setActiveIdState(loadActiveId());
   }, []);
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => removeRecipe(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["recipes"] }),
+  });
+
   const active = recipes.find((r) => r.id === activeId) ?? null;
 
-  function handleDelete(id: string) {
-    deleteRecipe(id);
-    setRecipes(loadRecipes());
-    setActiveIdState(loadActiveId());
+  if (loading) {
+    return (
+      <AppShell>
+        <p className="text-sm text-muted-foreground text-center py-8">…</p>
+      </AppShell>
+    );
+  }
+
+  if (!user) {
+    return (
+      <AppShell>
+        <div className="space-y-6">
+          <Card className="p-6 grain-bg border-dashed text-center space-y-4">
+            <span className="grid place-items-center size-12 rounded-xl ember-gradient shadow-lg shadow-primary/30 mx-auto">
+              <Flame className="size-6 text-primary-foreground" />
+            </span>
+            <p className="text-sm text-muted-foreground">{t("auth_required")}</p>
+            <Button asChild size="lg" className="font-semibold">
+              <Link to="/auth">{t("auth_sign_in")}</Link>
+            </Button>
+          </Card>
+        </div>
+      </AppShell>
+    );
   }
 
   return (
@@ -54,6 +88,21 @@ function Dashboard() {
           )}
         </section>
 
+        {/* Journal link */}
+        <section>
+          <Card className="p-4 flex items-center justify-between hover:border-primary/40 transition-colors">
+            <div className="flex items-center gap-2">
+              <BookOpen className="size-4 text-primary" />
+              <span className="font-display font-semibold text-sm">{t("journal_history")}</span>
+            </div>
+            <Button asChild size="sm" variant="ghost">
+              <Link to="/journal">
+                <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </Card>
+        </section>
+
         {/* Saved recipes */}
         <section>
           <div className="flex items-center justify-between mb-3">
@@ -71,7 +120,7 @@ function Dashboard() {
                   key={r.id}
                   r={r}
                   isActive={r.id === activeId}
-                  onDelete={() => handleDelete(r.id)}
+                  onDelete={() => deleteMutation.mutate(r.id)}
                 />
               ))}
             </div>

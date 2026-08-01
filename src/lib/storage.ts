@@ -12,6 +12,8 @@ export interface SavedRecipe {
   photos: string[]; // base64 data URLs
   customBakeVoute?: [number, number];
   customBakeSole?: [number, number];
+  isShared?: boolean;
+  shareToken?: string;
 }
 
 const RECIPES_KEY = "carpibiga_recipes";

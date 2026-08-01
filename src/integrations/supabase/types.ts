@@ -14,7 +14,158 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bake_logs: {
+        Row: {
+          baked_at: string
+          comment: string
+          created_at: string
+          id: string
+          photos: Json
+          rating_chew: number | null
+          rating_cornicione: number | null
+          rating_crumb: number | null
+          recipe_id: string | null
+          recipe_name: string
+          recipe_snapshot: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          baked_at?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          photos?: Json
+          rating_chew?: number | null
+          rating_cornicione?: number | null
+          rating_crumb?: number | null
+          recipe_id?: string | null
+          recipe_name?: string
+          recipe_snapshot?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          baked_at?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          photos?: Json
+          rating_chew?: number | null
+          rating_cornicione?: number | null
+          rating_crumb?: number | null
+          recipe_id?: string | null
+          recipe_name?: string
+          recipe_snapshot?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bake_logs_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      recipes: {
+        Row: {
+          calc: Json
+          created_at: string
+          custom_bake_sole: Json | null
+          custom_bake_voute: Json | null
+          final_proof_h: number
+          id: string
+          inputs: Json
+          is_shared: boolean
+          name: string
+          notes: string
+          photos: Json
+          share_token: string
+          timeline: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calc?: Json
+          created_at?: string
+          custom_bake_sole?: Json | null
+          custom_bake_voute?: Json | null
+          final_proof_h?: number
+          id?: string
+          inputs?: Json
+          is_shared?: boolean
+          name?: string
+          notes?: string
+          photos?: Json
+          share_token?: string
+          timeline?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          calc?: Json
+          created_at?: string
+          custom_bake_sole?: Json | null
+          custom_bake_voute?: Json | null
+          final_proof_h?: number
+          id?: string
+          inputs?: Json
+          is_shared?: boolean
+          name?: string
+          notes?: string
+          photos?: Json
+          share_token?: string
+          timeline?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          lang: string
+          notifications_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          lang?: string
+          notifications_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          lang?: string
+          notifications_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

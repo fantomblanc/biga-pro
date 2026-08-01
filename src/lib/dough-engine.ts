@@ -203,7 +203,7 @@ export function calculateRecipe(inp: RecipeInputs): RecipeCalc {
 
   // Pre-ferment: biga (50% hydration) or poolish (100% hydration)
   const preFerment: PreFermentType = inp.preFerment ?? "biga";
-  const preHydrRatio = preFerment === "poolish" ? 1.0 : 0.5;
+  const preHydrRatio = (inp.preFermentHydrPct ?? (preFerment === "poolish" ? 100 : 50)) / 100;
   const bigaPct = Math.min(100, Math.max(20, inp.bigaPct ?? 80));
   const bigaFlour = totalFlour * (bigaPct / 100);
   const bigaWater = bigaFlour * preHydrRatio;
@@ -223,7 +223,7 @@ export function calculateRecipe(inp: RecipeInputs): RecipeCalc {
   const directYeastFresh = totalFlour * 0.0015;
   const directYeastShown = inp.yeastType === "dry" ? directYeastFresh / 3 : directYeastFresh;
 
-  const bulkFermentMin = calcBulkFermentMin(inp.cellarTemp);
+  const bulkFermentMin = Math.round(inp.bulkOverrideMin ?? calcBulkFermentMin(inp.cellarTemp));
   const bulkTooHot = inp.engine === "direct" && inp.cellarTemp > 25;
 
   const bt = calcBakingTemps(inp.engine, inp.hydration);
@@ -317,7 +317,7 @@ export function buildTimeline(inp: RecipeInputs, finalProofH: number): TimelineS
   } else {
     // Direct 72h: Kneading -> Bulk (room temp) -> Fridge (4°C) -> Final proof (room) -> Bake
     // Total cold-block held constant at 72h regardless of bulk length.
-    const bulkMin = calcBulkFermentMin(inp.cellarTemp);
+    const bulkMin = Math.round(inp.bulkOverrideMin ?? calcBulkFermentMin(inp.cellarTemp));
     const proofStart = bake - finalProofH * h;
     const fridgeEnd = proofStart;
     const fridgeStart = fridgeEnd - 72 * h;

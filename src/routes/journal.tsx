@@ -1,5 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { useI18n } from "@/lib/i18n";
@@ -50,7 +50,6 @@ function JournalPage() {
 
 function JournalContent() {
   const { t } = useI18n();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { data: logs = [], isLoading } = useQuery({
@@ -63,7 +62,6 @@ function JournalContent() {
   const [chew, setChew] = useState(0);
   const [cornicione, setCornicione] = useState(0);
   const [files, setFiles] = useState<File[]>([]);
-  const [saving, setSaving] = useState(false);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -107,7 +105,7 @@ function JournalContent() {
   function duplicate(log: BakeLog) {
     if (!log.recipeSnapshot) return;
     sessionStorage.setItem("carpibiga_prefill", JSON.stringify(log.recipeSnapshot));
-    navigate({ to: "/new", search: { from: log.id } as never });
+    window.location.href = `/new?from=${log.id ?? ""}`;
   }
 
   return (
@@ -144,7 +142,7 @@ function JournalContent() {
         </div>
         <Button
           size="sm"
-          disabled={saving || saveMutation.isPending}
+          disabled={saveMutation.isPending}
           onClick={() => saveMutation.mutate()}
           className="w-full font-semibold"
         >
@@ -186,11 +184,15 @@ function LogCard({ log, onDelete, onDuplicate }: { log: BakeLog; onDelete: () =>
   const { t } = useI18n();
   const [urls, setUrls] = useState<string[]>([]);
 
-  useState(() => {
-    Promise.all(log.photos.map((p) => photoUrl(p).catch(() => null))).then((res) =>
-      setUrls(res.filter((u): u is string => !!u)),
-    );
-  });
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all(log.photos.map((p) => photoUrl(p).catch(() => null))).then((res) => {
+      if (!cancelled) setUrls(res.filter((u): u is string => !!u));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [log.photos]);
 
   return (
     <Card className="p-4 space-y-2">

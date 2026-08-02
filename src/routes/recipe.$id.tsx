@@ -53,6 +53,7 @@ function RecipePage() {
   const { id } = Route.useParams();
   const router = useRouter();
   const [recipe, setRecipe] = useState<SavedRecipe | null>(null);
+  const [loadingRecipe, setLoadingRecipe] = useState(true);
   const [isActive, setIsActive] = useState(false);
   const [wakeOn, setWakeOn] = useState(false);
   const [kitchenTemp, setKitchenTemp] = useState(22);

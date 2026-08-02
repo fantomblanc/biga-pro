@@ -65,10 +65,16 @@ function RecipePage() {
   useWakeLock(wakeOn);
 
   useEffect(() => {
-    const r = loadRecipe(id);
-    setRecipe(r);
+    let cancelled = false;
+    setLoadingRecipe(true);
+    getRecipe(id)
+      .then((r) => { if (!cancelled) setRecipe(r); })
+      .catch((e) => { console.error(e); if (!cancelled) setRecipe(null); })
+      .finally(() => { if (!cancelled) setLoadingRecipe(false); });
     setIsActive(loadActiveId() === id);
+    return () => { cancelled = true; };
   }, [id]);
+
 
   // Auto-open kitchen temp prompt shortly before final proof
   useEffect(() => {

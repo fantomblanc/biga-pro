@@ -170,10 +170,9 @@ function RecipePage() {
   }
 
   function updateCustomBake(voute: [number, number] | undefined, sole: [number, number] | undefined) {
-    const updated: SavedRecipe = { ...recipe!, customBakeVoute: voute, customBakeSole: sole };
-    upsertRecipe(updated);
-    setRecipe(updated);
+    persist({ ...recipe!, customBakeVoute: voute, customBakeSole: sole });
   }
+
 
   async function downloadPdf() {
     if (!printableRef.current) return;

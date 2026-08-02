@@ -427,9 +427,11 @@ function NewRecipePage() {
               className="mt-1"
             />
           </div>
-          <Button size="lg" className="w-full h-12 font-semibold" onClick={() => save(true)}>
-            <Save className="size-4 mr-2" /> {t("save_recipe")}
+          {!user && <Warning>{t("auth_required")}</Warning>}
+          <Button size="lg" className="w-full h-12 font-semibold" onClick={() => save(true)} disabled={saving}>
+            <Save className="size-4 mr-2" /> {saving ? "…" : t("save_recipe")}
           </Button>
+
         </Card>
       </div>
     </AppShell>

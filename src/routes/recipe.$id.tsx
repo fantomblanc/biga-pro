@@ -3,10 +3,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useI18n } from "@/lib/i18n";
 import {
-  loadRecipe, upsertRecipe, setActiveId, loadActiveId, clearActiveId,
+  setActiveId, loadActiveId, clearActiveId,
   type SavedRecipe,
 } from "@/lib/storage";
+import {
+  getRecipe, saveRecipe, uploadPhoto, photoUrl, deletePhoto as deleteCloudPhoto,
+} from "@/lib/cloud";
 import { calcFinalProofHours, buildTimeline } from "@/lib/dough-engine";
+
 import { Timeline } from "@/components/Timeline";
 import { CookTimer } from "@/components/CookTimer";
 import { WaterTempCalculator } from "@/components/WaterTempCalculator";

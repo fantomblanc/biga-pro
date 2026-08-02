@@ -399,7 +399,7 @@ function RecipePage() {
               <div className="grid grid-cols-3 gap-2">
                 {recipe.photos.map((p, i) => (
                   <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-border">
-                    <img src={p} alt={`crumb ${i}`} className="w-full h-full object-cover" />
+                    <CloudImg path={p} alt={`crumb ${i}`} />
                     <button
                       onClick={() => deletePhoto(i)}
                       className="absolute top-1 right-1 p-1 rounded-md bg-black/60 text-white opacity-80 hover:opacity-100"

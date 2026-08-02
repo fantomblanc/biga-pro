@@ -102,6 +102,14 @@ function RecipePage() {
     return () => clearScheduled(recipe.id);
   }, [recipe, isActive, t]);
 
+  if (loadingRecipe) {
+    return (
+      <AppShell>
+        <p className="text-sm text-muted-foreground text-center py-16">…</p>
+      </AppShell>
+    );
+  }
+
   if (!recipe) {
     return (
       <AppShell>

@@ -112,26 +112,41 @@ function NewRecipePage() {
   const finalProofH = 3.5;
   const timeline = useMemo(() => buildTimeline(inputs, finalProofH), [inputs]);
 
-  function save(loadAsActive: boolean) {
-    const id = newId();
+  const [saving, setSaving] = useState(false);
+
+  async function save(loadAsActive: boolean) {
+    if (!user) {
+      toast.error(t("auth_required"));
+      navigate({ to: "/auth" });
+      return;
+    }
+    const id = crypto.randomUUID();
     const styleLabel = t(cfg.labelKey);
     const finalName = name.trim() || `${styleLabel} ${clampedHydration}%`;
-    const recipe = {
-      id,
-      name: finalName,
-      createdAt: new Date().toISOString(),
-      inputs,
-      calc,
-      timeline,
-      finalProofH,
-      notes: "",
-      photos: [],
-    };
-    upsertRecipe(recipe);
-    if (loadAsActive) setActiveId(id);
-    toast.success(t("recipe_saved"));
-    navigate({ to: "/recipe/$id", params: { id } });
+    setSaving(true);
+    try {
+      const saved = await saveRecipe({
+        id,
+        name: finalName,
+        createdAt: new Date().toISOString(),
+        inputs,
+        calc,
+        timeline,
+        finalProofH,
+        notes: "",
+        photos: [],
+      });
+      if (loadAsActive) setActiveId(saved.id);
+      toast.success(t("recipe_saved"));
+      navigate({ to: "/recipe/$id", params: { id: saved.id } });
+    } catch (e) {
+      console.error(e);
+      toast.error(t("cloud_error"));
+    } finally {
+      setSaving(false);
+    }
   }
+
 
   const yeastFresh = engine === "biga" ? calc.bigaYeastFresh : calc.directYeastFresh;
   const yeastShown = engine === "biga" ? calc.bigaYeastShown : calc.directYeastShown;

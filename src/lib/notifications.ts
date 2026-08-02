@@ -40,3 +40,12 @@ export function clearScheduled(recipeId: string) {
   list.forEach((t) => clearTimeout(t.timeoutId));
   scheduled.delete(recipeId);
 }
+
+export function isNotifDenied(): boolean {
+  return typeof window !== "undefined" && "Notification" in window && Notification.permission === "denied";
+}
+
+/** Returns the i18n key explaining why notifications can't fire, if applicable. */
+export function notifDeniedHelpKey(): string | null {
+  return isNotifDenied() ? "notif_denied_help" : null;
+}

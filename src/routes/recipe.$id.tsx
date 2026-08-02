@@ -3,10 +3,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useI18n } from "@/lib/i18n";
 import {
-  loadRecipe, upsertRecipe, setActiveId, loadActiveId, clearActiveId,
+  setActiveId, loadActiveId, clearActiveId,
   type SavedRecipe,
 } from "@/lib/storage";
+import {
+  getRecipe, saveRecipe, uploadPhoto, photoUrl, deletePhoto as deleteCloudPhoto,
+  shareRecipe, unshareRecipe,
+} from "@/lib/cloud";
 import { calcFinalProofHours, buildTimeline } from "@/lib/dough-engine";
+import { computeAutolyse } from "@/lib/dough-pro";
+import { flourById } from "@/lib/dough-pro";
+
 import { Timeline } from "@/components/Timeline";
 import { CookTimer } from "@/components/CookTimer";
 import { WaterTempCalculator } from "@/components/WaterTempCalculator";
@@ -26,12 +33,12 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  RotateCcw, FileDown, Camera, Trash2, Wrench, Play, ChevronLeft, Eye, MonitorUp,
-  MonitorOff, Save, LifeBuoy,
+  RotateCcw, Printer, Camera, Trash2, Wrench, Play, ChevronLeft, MonitorUp,
+  MonitorOff, Save, LifeBuoy, Share2, Copy, Ban,
 } from "lucide-react";
 import { useWakeLock } from "@/lib/wake-lock";
 import { toast } from "sonner";
-import { requestNotifPermission, scheduleNotification, clearScheduled } from "@/lib/notifications";
+import { requestNotifPermission, scheduleNotification, clearScheduled, notifDeniedHelpKey } from "@/lib/notifications";
 import { loadSettings } from "@/lib/storage";
 
 export const Route = createFileRoute("/recipe/$id")({
@@ -44,27 +51,152 @@ export const Route = createFileRoute("/recipe/$id")({
   component: RecipePage,
 });
 
+export interface ProtocolStep {
+  key: string;
+  titleKey: string;
+  lines: string[];
+}
+
+export function buildProtocol(
+  recipe: SavedRecipe,
+  t: (k: string) => string,
+  voute: readonly [number, number] | number[],
+  sole: readonly [number, number] | number[],
+): ProtocolStep[] {
+  const c = recipe.calc;
+  const inp = recipe.inputs;
+  const g = t("grams");
+  const isBiga = inp.engine === "biga";
+  const yeastShown = isBiga ? c.bigaYeastShown : c.directYeastShown;
+  const steps: ProtocolStep[] = [];
+
+  if (inp.autolyse?.enabled) {
+    const auto = computeAutolyse(inp.autolyse, c.totalFlour, c.totalWater, inp.flourW);
+    const yeastNote = inp.autolyse.kind === "fermentolyse" ? t("autolyse_step_yeast") : "";
+    steps.push({
+      key: "autolyse",
+      titleKey: "autolyse_title",
+      lines: [
+        t("autolyse_step")
+          .replace("{flour}", `${auto.flour.toFixed(1)} ${g}`)
+          .replace("{water}", `${auto.water.toFixed(1)} ${g}`)
+          .replace("{min}", `${inp.autolyse.minutes}`)
+          .replace("{yeast}", yeastNote),
+      ],
+    });
+  }
+
+  const kneadWater = isBiga ? c.refreshWater : c.totalWater;
+  const kneadFlour = isBiga ? c.refreshFlour : c.totalFlour;
+  const kneadLines: string[] = [
+    t("proto_knead")
+      .replace("{yeast}", `${yeastShown.toFixed(3)} ${g}`)
+      .replace("{water}", `${kneadWater.toFixed(1)} ${g}`)
+      .replace("{flour}", `${kneadFlour.toFixed(1)} ${g}`)
+      .replace("{salt}", `${c.totalSalt.toFixed(1)} ${g}`),
+  ];
+  if (inp.blend?.enabled) {
+    const a = flourById(inp.blend.flourAId);
+    const b = flourById(inp.blend.flourBId);
+    if (a && b) {
+      const ra = inp.blend.ratioA / 100;
+      kneadLines.push(
+        t("proto_knead_blend")
+          .replace("{nameA}", a.name)
+          .replace("{a}", `${(kneadFlour * ra).toFixed(1)} ${g}`)
+          .replace("{nameB}", b.name)
+          .replace("{b}", `${(kneadFlour * (1 - ra)).toFixed(1)} ${g}`),
+      );
+    }
+  }
+  if (inp.useMalt) kneadLines.push(t("proto_malt").replace("{malt}", `${c.totalMalt.toFixed(2)} ${g}`));
+  if (inp.useOil) kneadLines.push(t("proto_oil").replace("{oil}", `${c.totalOil.toFixed(1)} ${g}`));
+  if (isBiga) kneadLines.push(t("proto_bassinage").replace("{water}", `${c.bassinageWater.toFixed(1)} ${g}`));
+  steps.push({ key: "knead", titleKey: "step_knead_title", lines: kneadLines });
+
+  steps.push({
+    key: "bulk",
+    titleKey: "step_bulk_title",
+    lines: [t("proto_bulk").replace("{min}", `${c.bulkFermentMin ?? 30}`).replace("{temp}", `${inp.cellarTemp}`)],
+  });
+
+  const ballLine = inp.trays
+    ? t("proto_ball_trays")
+        .replace("{count}", `${inp.trays.count}`)
+        .replace("{weight}", `${Math.round(c.totalDough / inp.trays.count)}`)
+    : t("proto_ball").replace("{count}", `${inp.ballsCount}`).replace("{weight}", `${inp.ballWeight}`);
+  steps.push({ key: "ball", titleKey: "step_ball_title", lines: [ballLine] });
+
+  steps.push({
+    key: "proof",
+    titleKey: "step_proof_title",
+    lines: [t("proto_proof").replace("{hours}", `${recipe.finalProofH.toFixed(1)}`)],
+  });
+
+  steps.push({
+    key: "bake",
+    titleKey: "step_bake_title",
+    lines: [t("proto_bake").replace("{voute}", `${voute[0]}–${voute[1]}`).replace("{sole}", `${sole[0]}–${sole[1]}`)],
+  });
+
+  return steps;
+}
+
+function DetailedProtocol({ steps }: { steps: ProtocolStep[] }) {
+  const { t } = useI18n();
+  return (
+    <Card className="p-4 space-y-3 avoid-break">
+      <h2 className="font-display text-sm font-bold uppercase tracking-wider text-muted-foreground">
+        {t("protocol_detail")}
+      </h2>
+      <ol className="space-y-3">
+        {steps.map((s, i) => (
+          <li key={s.key} className="flex gap-3">
+            <span className="grid place-items-center size-6 shrink-0 rounded-full bg-primary/15 text-primary text-[11px] font-bold">
+              {i + 1}
+            </span>
+            <div className="space-y-1">
+              <div className="text-sm font-semibold">{t(s.titleKey)}</div>
+              {s.lines.map((l, j) => (
+                <p key={j} className="text-xs text-muted-foreground leading-relaxed">{l}</p>
+              ))}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </Card>
+  );
+}
+
 function RecipePage() {
   const { t } = useI18n();
   const { id } = Route.useParams();
   const router = useRouter();
   const [recipe, setRecipe] = useState<SavedRecipe | null>(null);
+  const [loadingRecipe, setLoadingRecipe] = useState(true);
   const [isActive, setIsActive] = useState(false);
   const [wakeOn, setWakeOn] = useState(false);
   const [kitchenTemp, setKitchenTemp] = useState(22);
   const [kitchenPromptOpen, setKitchenPromptOpen] = useState(false);
   const [rigeneroOpen, setRigeneroOpen] = useState(false);
-  const [pdfBusy, setPdfBusy] = useState(false);
+  const [shareBusy, setShareBusy] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const printableRef = useRef<HTMLDivElement>(null);
   const kitchenAskedRef = useRef(false);
 
   useWakeLock(wakeOn);
 
   useEffect(() => {
-    const r = loadRecipe(id);
-    setRecipe(r);
+    let cancelled = false;
+    setLoadingRecipe(true);
+    getRecipe(id)
+      .then((r) => { if (!cancelled) { setRecipe(r); setShareUrl(r?.isShared && r.shareToken ? `${window.location.origin}/share/${r.shareToken}` : null); } })
+      .catch((e) => { console.error(e); if (!cancelled) setRecipe(null); })
+      .finally(() => { if (!cancelled) setLoadingRecipe(false); });
     setIsActive(loadActiveId() === id);
+    return () => { cancelled = true; };
   }, [id]);
+
 
   // Auto-open kitchen temp prompt shortly before final proof
   useEffect(() => {
@@ -85,11 +217,24 @@ function RecipePage() {
     if (!recipe || !isActive) return;
     const settings = loadSettings();
     if (!settings.notificationsEnabled) return;
+    const deniedKey = notifDeniedHelpKey();
+    if (deniedKey) {
+      toast.error(t(deniedKey));
+      return;
+    }
     recipe.timeline.forEach((s) => {
       scheduleNotification(recipe.id, s.id, s.timeISO, `🍕 ${recipe.name}`, t(s.labelKey));
     });
     return () => clearScheduled(recipe.id);
   }, [recipe, isActive, t]);
+
+  if (loadingRecipe) {
+    return (
+      <AppShell>
+        <p className="text-sm text-muted-foreground text-center py-16">…</p>
+      </AppShell>
+    );
+  }
 
   if (!recipe) {
     return (
@@ -115,40 +260,43 @@ function RecipePage() {
     toast.success(t("session_reset"));
   }
 
+  function persist(updated: SavedRecipe) {
+    setRecipe(updated);
+    saveRecipe(updated).catch((e) => {
+      console.error(e);
+      toast.error(t("cloud_error"));
+    });
+  }
+
   function recalibrateProof(newTemp: number) {
     const finalProofH = calcFinalProofHours(newTemp);
     const timeline = buildTimeline(recipe!.inputs, finalProofH);
-    const updated: SavedRecipe = { ...recipe!, timeline, finalProofH };
-    upsertRecipe(updated);
-    setRecipe(updated);
+    persist({ ...recipe!, timeline, finalProofH });
     setKitchenPromptOpen(false);
     toast.success(`${t("proof_time")}: ${finalProofH.toFixed(1)}${t("hours")}`);
   }
 
   function saveNotes(notes: string) {
-    const updated = { ...recipe!, notes };
-    upsertRecipe(updated);
-    setRecipe(updated);
+    persist({ ...recipe!, notes });
   }
 
   async function addPhoto(file: File) {
-    const b64: string = await new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result as string);
-      r.onerror = rej;
-      r.readAsDataURL(file);
-    });
-    const updated = { ...recipe!, photos: [...recipe!.photos, b64] };
-    upsertRecipe(updated);
-    setRecipe(updated);
+    try {
+      const path = await uploadPhoto(recipe!.id, file);
+      persist({ ...recipe!, photos: [...recipe!.photos, path] });
+    } catch (e) {
+      console.error(e);
+      toast.error(t("cloud_error"));
+    }
   }
 
   function deletePhoto(idx: number) {
+    const target = recipe!.photos[idx];
     const photos = recipe!.photos.filter((_, i) => i !== idx);
-    const updated = { ...recipe!, photos };
-    upsertRecipe(updated);
-    setRecipe(updated);
+    persist({ ...recipe!, photos });
+    if (target) void deleteCloudPhoto(target).catch(() => {});
   }
+
 
   function suggestedBake(r: SavedRecipe): { voute: [number, number]; sole: [number, number] } {
     const voute = (r.calc.bakeVoute ?? (
@@ -163,33 +311,41 @@ function RecipePage() {
   }
 
   function updateCustomBake(voute: [number, number] | undefined, sole: [number, number] | undefined) {
-    const updated: SavedRecipe = { ...recipe!, customBakeVoute: voute, customBakeSole: sole };
-    upsertRecipe(updated);
-    setRecipe(updated);
+    persist({ ...recipe!, customBakeVoute: voute, customBakeSole: sole });
   }
 
-  async function downloadPdf() {
-    if (!printableRef.current) return;
-    setPdfBusy(true);
+
+  function printRecipe() {
+    window.print();
+  }
+
+  async function toggleShare() {
+    setShareBusy(true);
     try {
-      const html2pdf = (await import("html2pdf.js")).default;
-      const filename = `${recipe!.name.replace(/[^a-z0-9-_]+/gi, "_")}.pdf`;
-      await html2pdf()
-        .set({
-          margin: [10, 10, 12, 10],
-          filename,
-          image: { type: "jpeg", quality: 0.95 },
-          html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-          pagebreak: { mode: ["css", "legacy"] },
-        } as any)
-        .from(printableRef.current)
-        .save();
+      if (shareUrl) {
+        await unshareRecipe(recipe!.id);
+        setShareUrl(null);
+        setRecipe({ ...recipe!, isShared: false });
+      } else {
+        const url = await shareRecipe(recipe!.id);
+        setShareUrl(url);
+        setRecipe({ ...recipe!, isShared: true });
+      }
     } catch (e) {
       console.error(e);
-      toast.error("PDF error");
+      toast.error(t("cloud_error"));
     } finally {
-      setPdfBusy(false);
+      setShareBusy(false);
+    }
+  }
+
+  async function copyShareLink() {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success(t("share_copied"));
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -198,6 +354,7 @@ function RecipePage() {
   const activeVoute: [number, number] = recipe.customBakeVoute ?? suggested.voute;
   const activeSole: [number, number] = recipe.customBakeSole ?? suggested.sole;
   const isPoolish = recipe.inputs.engine === "biga" && (recipe.calc.preFerment ?? recipe.inputs.preFerment) === "poolish";
+  const protocolSteps = buildProtocol(recipe, t, activeVoute, activeSole);
   const bakeStepExtra = t("step_bake_at")
     .replace("{voute}", `${activeVoute[0]}–${activeVoute[1]}`)
     .replace("{sole}", `${activeSole[0]}–${activeSole[1]}`);
@@ -218,8 +375,17 @@ function RecipePage() {
           >
             {wakeOn ? <MonitorUp className="size-4" /> : <MonitorOff className="size-4" />}
           </Button>
-          <Button variant="outline" size="sm" onClick={downloadPdf} disabled={pdfBusy}>
-            <FileDown className="size-4 mr-1" /> {pdfBusy ? t("pdf_generating") : t("download_pdf")}
+          <Button variant="outline" size="sm" onClick={printRecipe} title={t("print_hint")}>
+            <Printer className="size-4 mr-1" /> {t("print_recipe")}
+          </Button>
+          <Button
+            variant={shareUrl ? "default" : "outline"}
+            size="sm"
+            onClick={toggleShare}
+            disabled={shareBusy}
+            title={shareUrl ? t("share_stop") : t("share_recipe")}
+          >
+            {shareUrl ? <Ban className="size-4" /> : <Share2 className="size-4" />}
           </Button>
         </div>
       </div>
@@ -271,33 +437,20 @@ function RecipePage() {
             onChange={updateCustomBake}
           />
 
-          {recipe.inputs.engine === "direct" && (
-            <Card className="p-4 border-[color:var(--cellar)]/40 bg-[color:var(--cellar)]/5">
-              <h3 className="font-display font-semibold text-sm">⏱ {t("bulk_ferment")}</h3>
-              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{t("bulk_desc")}</p>
-              <div className="mt-3 tabular text-2xl font-bold" style={{ color: "var(--cellar)" }}>
-                {recipe.calc.bulkFermentMin ?? 30}
-                <span className="text-sm text-muted-foreground ml-1">{t("minutes")}</span>
-                <span className="text-xs text-muted-foreground ml-3">@ {recipe.inputs.cellarTemp}°C</span>
-              </div>
-              {recipe.calc.bulkTooHot && (
-                <p className="mt-2 text-xs text-warning-foreground/90 bg-warning/10 border border-warning/40 rounded-md p-2">
-                  {t("bulk_hot_warning")}
-                </p>
-              )}
-            </Card>
+          <DetailedProtocol steps={protocolSteps} />
+
+          {recipe.calc.bulkTooHot && (
+            <p className="text-xs text-warning-foreground/90 bg-warning/10 border border-warning/40 rounded-md p-2">
+              {t("bulk_hot_warning")}
+            </p>
           )}
 
-          {recipe.inputs.engine === "biga" && (
-            <Card className="p-4 border-primary/30 bg-primary/5">
-              <h3 className="font-display font-semibold text-sm flex items-center gap-2">
-                💧 {t("bassinage")}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{t("bassinage_desc")}</p>
-              <div className="mt-3 tabular text-2xl font-bold text-primary">
-                {recipe.calc.bassinageWater.toFixed(1)}
-                <span className="text-sm text-muted-foreground ml-1">g {t("bassinage_water")}</span>
-              </div>
+          {shareUrl && (
+            <Card className="p-3 flex items-center justify-between gap-2 no-print">
+              <p className="text-xs text-muted-foreground">{t("share_active")}</p>
+              <Button variant="outline" size="sm" onClick={copyShareLink}>
+                <Copy className="size-3.5 mr-1" /> {t("share_copy")}
+              </Button>
             </Card>
           )}
 
@@ -378,7 +531,7 @@ function RecipePage() {
               <div className="grid grid-cols-3 gap-2">
                 {recipe.photos.map((p, i) => (
                   <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-border">
-                    <img src={p} alt={`crumb ${i}`} className="w-full h-full object-cover" />
+                    <CloudImg path={p} alt={`crumb ${i}`} />
                     <button
                       onClick={() => deletePhoto(i)}
                       className="absolute top-1 right-1 p-1 rounded-md bg-black/60 text-white opacity-80 hover:opacity-100"
@@ -434,18 +587,31 @@ function RecipePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Off-screen printable layout (rendered but hidden) for PDF export */}
-      <div style={{ position: "fixed", left: -10000, top: 0, width: 760, pointerEvents: "none", opacity: 0 }} aria-hidden>
+      {/* Printable layout — hidden on screen, the only thing shown when printing */}
+      <div className="hidden print:block">
         <PrintableRecipe
           ref={printableRef}
           recipe={recipe}
           voute={activeVoute}
           sole={activeSole}
           isPoolish={isPoolish}
+          protocolSteps={protocolSteps}
         />
       </div>
+
     </AppShell>
   );
+}
+
+function CloudImg({ path, alt }: { path: string; alt: string }) {
+  const [url, setUrl] = useState<string>("");
+  useEffect(() => {
+    let cancelled = false;
+    photoUrl(path).then((u) => { if (!cancelled) setUrl(u); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [path]);
+  if (!url) return <div className="w-full h-full bg-muted animate-pulse" />;
+  return <img src={url} alt={alt} className="w-full h-full object-cover" />;
 }
 
 function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastShown: number }) {

@@ -27,7 +27,9 @@ import {
   type PreFermentType,
   type PizzaStyle,
 } from "@/lib/dough-engine";
-import { newId, upsertRecipe, setActiveId } from "@/lib/storage";
+import { setActiveId } from "@/lib/storage";
+import { saveRecipe } from "@/lib/cloud";
+import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { AlertTriangle, Save, Flame, Pizza, Wheat } from "lucide-react";
 

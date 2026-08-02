@@ -57,6 +57,8 @@ function defaultBakeISO(): string {
 function NewRecipePage() {
   const { t } = useI18n();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
 
   // Wizard state
   const [style, setStyle] = useState<PizzaStyle>("contemporanea");

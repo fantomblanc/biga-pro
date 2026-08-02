@@ -142,6 +142,32 @@ export function buildProtocol(
   return steps;
 }
 
+function DetailedProtocol({ steps }: { steps: ProtocolStep[] }) {
+  const { t } = useI18n();
+  return (
+    <Card className="p-4 space-y-3 avoid-break">
+      <h2 className="font-display text-sm font-bold uppercase tracking-wider text-muted-foreground">
+        {t("protocol_detail")}
+      </h2>
+      <ol className="space-y-3">
+        {steps.map((s, i) => (
+          <li key={s.key} className="flex gap-3">
+            <span className="grid place-items-center size-6 shrink-0 rounded-full bg-primary/15 text-primary text-[11px] font-bold">
+              {i + 1}
+            </span>
+            <div className="space-y-1">
+              <div className="text-sm font-semibold">{t(s.titleKey)}</div>
+              {s.lines.map((l, j) => (
+                <p key={j} className="text-xs text-muted-foreground leading-relaxed">{l}</p>
+              ))}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </Card>
+  );
+}
+
 function RecipePage() {
   const { t } = useI18n();
   const { id } = Route.useParams();

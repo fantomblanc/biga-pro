@@ -560,16 +560,18 @@ function RecipePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Off-screen printable layout (rendered but hidden) for PDF export */}
-      <div style={{ position: "fixed", left: -10000, top: 0, width: 760, pointerEvents: "none", opacity: 0 }} aria-hidden>
+      {/* Printable layout — hidden on screen, the only thing shown when printing */}
+      <div className="hidden print:block">
         <PrintableRecipe
           ref={printableRef}
           recipe={recipe}
           voute={activeVoute}
           sole={activeSole}
           isPoolish={isPoolish}
+          protocolSteps={protocolSteps}
         />
       </div>
+
     </AppShell>
   );
 }

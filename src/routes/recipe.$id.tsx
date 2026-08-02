@@ -119,40 +119,43 @@ function RecipePage() {
     toast.success(t("session_reset"));
   }
 
+  function persist(updated: SavedRecipe) {
+    setRecipe(updated);
+    saveRecipe(updated).catch((e) => {
+      console.error(e);
+      toast.error(t("cloud_error"));
+    });
+  }
+
   function recalibrateProof(newTemp: number) {
     const finalProofH = calcFinalProofHours(newTemp);
     const timeline = buildTimeline(recipe!.inputs, finalProofH);
-    const updated: SavedRecipe = { ...recipe!, timeline, finalProofH };
-    upsertRecipe(updated);
-    setRecipe(updated);
+    persist({ ...recipe!, timeline, finalProofH });
     setKitchenPromptOpen(false);
     toast.success(`${t("proof_time")}: ${finalProofH.toFixed(1)}${t("hours")}`);
   }
 
   function saveNotes(notes: string) {
-    const updated = { ...recipe!, notes };
-    upsertRecipe(updated);
-    setRecipe(updated);
+    persist({ ...recipe!, notes });
   }
 
   async function addPhoto(file: File) {
-    const b64: string = await new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result as string);
-      r.onerror = rej;
-      r.readAsDataURL(file);
-    });
-    const updated = { ...recipe!, photos: [...recipe!.photos, b64] };
-    upsertRecipe(updated);
-    setRecipe(updated);
+    try {
+      const path = await uploadPhoto(recipe!.id, file);
+      persist({ ...recipe!, photos: [...recipe!.photos, path] });
+    } catch (e) {
+      console.error(e);
+      toast.error(t("cloud_error"));
+    }
   }
 
   function deletePhoto(idx: number) {
+    const target = recipe!.photos[idx];
     const photos = recipe!.photos.filter((_, i) => i !== idx);
-    const updated = { ...recipe!, photos };
-    upsertRecipe(updated);
-    setRecipe(updated);
+    persist({ ...recipe!, photos });
+    if (target) void deleteCloudPhoto(target).catch(() => {});
   }
+
 
   function suggestedBake(r: SavedRecipe): { voute: [number, number]; sole: [number, number] } {
     const voute = (r.calc.bakeVoute ?? (

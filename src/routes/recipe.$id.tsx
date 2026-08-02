@@ -33,7 +33,7 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  RotateCcw, Printer, Camera, Trash2, Wrench, Play, ChevronLeft, Eye, MonitorUp,
+  RotateCcw, Printer, Camera, Trash2, Wrench, Play, ChevronLeft, MonitorUp,
   MonitorOff, Save, LifeBuoy, Share2, Copy, Ban,
 } from "lucide-react";
 import { useWakeLock } from "@/lib/wake-lock";

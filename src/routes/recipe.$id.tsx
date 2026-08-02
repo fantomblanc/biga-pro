@@ -410,7 +410,7 @@ function RecipePage() {
             onChange={updateCustomBake}
           />
 
-          <DetailedProtocol steps={buildProtocol(recipe, t, activeVoute, activeSole)} />
+          <DetailedProtocol steps={protocolSteps} />
 
           {recipe.calc.bulkTooHot && (
             <p className="text-xs text-warning-foreground/90 bg-warning/10 border border-warning/40 rounded-md p-2">

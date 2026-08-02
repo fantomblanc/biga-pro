@@ -469,6 +469,17 @@ function RecipePage() {
   );
 }
 
+function CloudImg({ path, alt }: { path: string; alt: string }) {
+  const [url, setUrl] = useState<string>("");
+  useEffect(() => {
+    let cancelled = false;
+    photoUrl(path).then((u) => { if (!cancelled) setUrl(u); }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [path]);
+  if (!url) return <div className="w-full h-full bg-muted animate-pulse" />;
+  return <img src={url} alt={alt} className="w-full h-full object-cover" />;
+}
+
 function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastShown: number }) {
   const { t } = useI18n();
   const rows: Array<[string, string, string]> = [];

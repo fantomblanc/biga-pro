@@ -328,6 +328,7 @@ function RecipePage() {
   const activeVoute: [number, number] = recipe.customBakeVoute ?? suggested.voute;
   const activeSole: [number, number] = recipe.customBakeSole ?? suggested.sole;
   const isPoolish = recipe.inputs.engine === "biga" && (recipe.calc.preFerment ?? recipe.inputs.preFerment) === "poolish";
+  const protocolSteps = buildProtocol(recipe, t, activeVoute, activeSole);
   const bakeStepExtra = t("step_bake_at")
     .replace("{voute}", `${activeVoute[0]}–${activeVoute[1]}`)
     .replace("{sole}", `${activeSole[0]}–${activeSole[1]}`);

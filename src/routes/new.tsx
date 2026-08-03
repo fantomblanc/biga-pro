@@ -783,19 +783,27 @@ function NewRecipePage() {
               <MiniHeader>{preLabels.phase} · {bigaPct}%</MiniHeader>
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <Stat label={`${preLabels.flour} (${bigaPct}%)`} value={`${calc.bigaFlour.toFixed(1)}${t("grams")}`} />
-                <Stat label={preLabels.water} value={`${calc.bigaWater.toFixed(1)}${t("grams")}`} />
+                <Stat label={`${preLabels.water} (${preFermentHydrPct}%)`} value={`${calc.bigaWater.toFixed(1)}${t("grams")}`} />
                 <Stat label={preLabels.yeast} value={`${yeastShown.toFixed(2)}${t("grams")}`} highlight />
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <Stat label={t("water_temp_biga_label")} value={`${calc.bigaWaterTemp.toFixed(1)}°C`} />
+                <Stat label={t("water_temp_refresh_label")} value={`${calc.refreshWaterTemp.toFixed(1)}°C`} />
               </div>
               <MiniHeader>{t("refresh_phase")}</MiniHeader>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <Stat label={`${t("refresh_flour_dyn")} (${(100 - bigaPct)}%)`} value={`${calc.refreshFlour.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("refresh_water")} value={`${calc.refreshWater.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("refresh_salt")} value={`${calc.totalSalt.toFixed(1)}${t("grams")}`} />
+                {useRefreshYeast && refreshYeastPct > 0 && (
+                  <Stat label={t("refresh_yeast_label")} value={`${calc.refreshYeastShown.toFixed(2)}${t("grams")}`} highlight />
+                )}
                 {useMalt && <Stat label={t("refresh_malt")} value={`${calc.totalMalt.toFixed(2)}${t("grams")}`} />}
                 {useOil && <Stat label={t("refresh_oil")} value={`${calc.totalOil.toFixed(1)}${t("grams")}`} />}
               </div>
             </>
           ) : (
+
             <>
               <MiniHeader>{t("engine_direct")}</MiniHeader>
               <div className="grid grid-cols-2 gap-2 text-sm">

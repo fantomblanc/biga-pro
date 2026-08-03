@@ -50,8 +50,11 @@ import {
   doughPerTray,
   TRAY_PRESETS,
   avpnRules,
-  scaleFromFlour,
+  BIGA_HYDR_MIN,
+  BIGA_HYDR_MAX,
+  BIGA_HYDR_DEFAULT,
   type MixerType,
+
 } from "@/lib/dough-pro";
 import { setActiveId } from "@/lib/storage";
 import { saveRecipe } from "@/lib/cloud";

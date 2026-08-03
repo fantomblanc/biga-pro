@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { WaterTempPro } from "@/components/WaterTempPro";
+import { WaterTempSplit } from "@/components/WaterTempSplit";
 import { FlourSelect } from "@/components/FlourSelect";
 import { MaturationAdvisor } from "@/components/MaturationAdvisor";
 import { LabelWithInfo } from "@/components/InfoTip";

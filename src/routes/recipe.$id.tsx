@@ -715,21 +715,29 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
   const isPoolish = recipe.inputs.engine === "biga" && (recipe.calc.preFerment ?? recipe.inputs.preFerment) === "poolish";
 
   if (recipe.inputs.engine === "biga") {
-    const bigaPct = recipe.calc.bigaPct ?? recipe.inputs.bigaPct ?? 80;
+    const c = recipe.calc;
+    const bigaPct = c.bigaPct ?? recipe.inputs.bigaPct ?? 80;
+    const preHydr = c.preFermentHydrPct ?? (isPoolish ? 100 : 45);
     const flourLabel = isPoolish ? t("poolish_flour_dyn") : t("biga_flour_dyn");
-    const waterLabel = isPoolish ? t("poolish_water") : t("biga_water");
+    const waterLabel = isPoolish ? t("poolish_water") : t("biga_water_dyn");
     const yeastLabel = isPoolish ? t("poolish_yeast") : t("biga_yeast");
-    rows.push(["biga", `${flourLabel} (${bigaPct}%)`, `${recipe.calc.bigaFlour.toFixed(1)} ${g}`]);
-    rows.push(["biga", waterLabel, `${recipe.calc.bigaWater.toFixed(1)} ${g}`]);
+    rows.push(["biga", `${flourLabel} (${bigaPct}%)`, `${c.bigaFlour.toFixed(1)} ${g}`]);
+    rows.push(["biga", `${waterLabel} (${preHydr}%)`, `${c.bigaWater.toFixed(1)} ${g}`]);
     rows.push(["biga", yeastLabel, `${yeastShown.toFixed(3)} ${g}`]);
-    rows.push(["refresh", `${t("refresh_flour_dyn")} (${100 - bigaPct}%)`, `${recipe.calc.refreshFlour.toFixed(1)} ${g}`]);
-    rows.push(["refresh", t("refresh_water"), `${recipe.calc.refreshWater.toFixed(1)} ${g}`]);
-    rows.push(["refresh", t("refresh_salt"), `${recipe.calc.totalSalt.toFixed(1)} ${g}`]);
-    if (recipe.inputs.useMalt) rows.push(["refresh", t("refresh_malt"), `${recipe.calc.totalMalt.toFixed(2)} ${g}`]);
-    if (recipe.inputs.useOil) rows.push(["refresh", t("refresh_oil"), `${recipe.calc.totalOil.toFixed(1)} ${g}`]);
+    if (c.bigaWaterTemp !== undefined) rows.push(["biga", t("water_temp_biga_label"), `${c.bigaWaterTemp.toFixed(1)} °C`]);
+    rows.push(["refresh", `${t("refresh_flour_dyn")} (${100 - bigaPct}%)`, `${c.refreshFlour.toFixed(1)} ${g}`]);
+    rows.push(["refresh", t("refresh_water"), `${c.refreshWater.toFixed(1)} ${g}`]);
+    if (c.refreshWaterTemp !== undefined) rows.push(["refresh", t("water_temp_refresh_label"), `${c.refreshWaterTemp.toFixed(1)} °C`]);
+    rows.push(["refresh", t("refresh_salt"), `${c.totalSalt.toFixed(1)} ${g}`]);
+    if ((c.refreshYeastPct ?? 0) > 0) {
+      rows.push(["refresh", `${t("refresh_yeast_label")} (${(c.refreshYeastPct ?? 0).toFixed(2)}%)`, `${(c.refreshYeastShown ?? 0).toFixed(2)} ${g}`]);
+    }
+    if (recipe.inputs.useMalt) rows.push(["refresh", t("refresh_malt"), `${c.totalMalt.toFixed(2)} ${g}`]);
+    if (recipe.inputs.useOil) rows.push(["refresh", t("refresh_oil"), `${c.totalOil.toFixed(1)} ${g}`]);
   } else {
     rows.push(["mix", t("total_flour"), `${recipe.calc.totalFlour.toFixed(1)} ${g}`]);
     rows.push(["mix", t("total_water"), `${recipe.calc.totalWater.toFixed(1)} ${g}`]);
+    if (recipe.calc.refreshWaterTemp !== undefined) rows.push(["mix", t("water_temp_refresh_label"), `${recipe.calc.refreshWaterTemp.toFixed(1)} °C`]);
     rows.push(["mix", t("total_salt"), `${recipe.calc.totalSalt.toFixed(1)} ${g}`]);
     rows.push(["mix", t("biga_yeast"), `${yeastShown.toFixed(3)} ${g}`]);
     if (recipe.inputs.useMalt) rows.push(["mix", t("refresh_malt"), `${recipe.calc.totalMalt.toFixed(2)} ${g}`]);
@@ -739,8 +747,8 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
 
 
   const phaseLabel: Record<string, string> = {
-    biga: isPoolish ? t("phase1_title") : t("phase1_title"),
-    refresh: isPoolish ? t("phase2_title_poolish") : t("phase2_title"),
+    biga: isPoolish ? t("proto_phase1_title_poolish") : t("proto_phase1_title"),
+    refresh: t("proto_phase3_title"),
     mix: t("direct_phase_title"),
     bulk: t("bulk_ferment"),
   };
@@ -750,6 +758,7 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
     mix: t("direct_steps"),
     bulk: "",
   };
+
   const phases = [...new Set(rows.map((r) => r[0]))];
 
   return (

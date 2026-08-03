@@ -185,40 +185,33 @@ function NewRecipePage() {
     () => computeAutolyse(autolyse, effectiveBallsCount * effectiveBallWeight / (1 + clampedHydration / 100 + effectiveSalt / 100), 0, effectiveFlourW),
     [autolyse, effectiveBallsCount, effectiveBallWeight, clampedHydration, effectiveSalt, effectiveFlourW],
   );
+  const autolysePenalty = autolyse.enabled ? autolyseResult.waterTempPenalty : 0;
 
-  // Scale by available flour (reverse mode).
-  const flourScale = useFlourAvailable
-    ? scaleFromFlour({
-        availableFlour: flourAvailable,
-        hydration: clampedHydration,
-        saltPct: effectiveSalt,
-        maltPct: useMalt ? maltPct : 0,
-        oilPct: useOil ? oilPct : 0,
-        unitWeight: effectiveBallWeight,
-      })
-    : null;
-
-  const finalBallsCount = flourScale ? flourScale.ballsCount : effectiveBallsCount;
+  // Pre-ferment hydration actually used: biga slider (44–50%), poolish fixed at 100%.
+  const preFermentHydrPct = preFerment === "poolish" ? 100 : bigaHydr;
 
   const bulkFactorMin = engine === "direct" ? Math.round(30 * tenacityResult.bulkFactor) : undefined;
 
   const inputs: RecipeInputs = useMemo(() => ({
-    engine, ballsCount: finalBallsCount, ballWeight: effectiveBallWeight, hydration: clampedHydration,
+    engine, ballsCount: effectiveBallsCount, ballWeight: effectiveBallWeight, hydration: clampedHydration,
     saltPct: effectiveSalt, yeastType, flourW: effectiveFlourW,
     useMalt: avpn.banOilAndMalt ? false : useMalt, maltPct, useOil: avpn.banOilAndMalt ? false : useOil, oilPct, cellarTemp, bigaPct,
     style, preFerment: engine === "biga" ? preFerment : undefined,
     targetBakeISO: new Date(targetBake).toISOString(),
     ovenType, tenacity, autolyse, blend,
     prefermentLoc: engine === "biga" ? prefermentLoc : undefined,
-    preFermentHydrPct: engine === "biga" ? preFermentProfileVal.bigaHydrPct : undefined,
+    preFermentHydrPct: engine === "biga" ? preFermentHydrPct : undefined,
+    refreshYeastPct: engine === "biga" && useRefreshYeast ? refreshYeastPct : 0,
     trays: isTeglia ? trays : undefined,
-    mixer, flourTemp, targetDoughTemp, waterTempSuggested,
+    mixer, flourTemp, ambientTemp, autolyseTempPenalty: autolysePenalty,
     bulkOverrideMin: bulkFactorMin,
     flourAvailable: useFlourAvailable ? flourAvailable : undefined,
-  }), [engine, finalBallsCount, effectiveBallWeight, clampedHydration, effectiveSalt, yeastType, effectiveFlourW,
+  }), [engine, effectiveBallsCount, effectiveBallWeight, clampedHydration, effectiveSalt, yeastType, effectiveFlourW,
       useMalt, maltPct, useOil, oilPct, cellarTemp, bigaPct, style, preFerment, targetBake, ovenType, tenacity,
-      autolyse, blend, prefermentLoc, preFermentProfileVal, isTeglia, trays, mixer, flourTemp, targetDoughTemp,
-      waterTempSuggested, bulkFactorMin, useFlourAvailable, flourAvailable, avpn.banOilAndMalt]);
+      autolyse, blend, prefermentLoc, preFermentHydrPct, isTeglia, trays, mixer, flourTemp, ambientTemp,
+      autolysePenalty, useRefreshYeast, refreshYeastPct, bulkFactorMin, useFlourAvailable, flourAvailable,
+      avpn.banOilAndMalt]);
+
 
   const calc = useMemo(() => calculateRecipe(inputs), [inputs]);
   const finalProofH = 3.5;

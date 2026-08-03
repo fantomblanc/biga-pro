@@ -176,7 +176,7 @@ function NewRecipePage() {
     ? Math.min(avpn.saltMax, Math.max(avpn.saltMin, tenacityResult.saltPct))
     : tenacityResult.saltPct;
 
-  const preFermentProfileVal = prefermentProfile(prefermentLoc, preFerment);
+  
 
   // Teglia: tray count/size drives "balls" (trays) and per-unit weight.
   const trayWeight = doughPerTray(trays.lengthCm, trays.widthCm, trays.coef);

@@ -77,8 +77,12 @@ export interface RecipeInputs {
   autolyse?: import("./dough-pro").AutolyseConfig;
   blend?: import("./dough-pro").FlourBlend;
   prefermentLoc?: import("./dough-pro").PrefermentLocation;
-  /** Overrides the pre-ferment hydration (biga 50% / cellar biga 44.5% / poolish 100%). */
+  /** Overrides the pre-ferment hydration (biga 44–50%, default 45; poolish 100%). */
   preFermentHydrPct?: number;
+  /** Optional yeast added at refreshment, % of refreshment flour (0–0.3). */
+  refreshYeastPct?: number;
+  /** Ambient (kitchen) temperature where mixing happens — drives water temperatures. */
+  ambientTemp?: number;
   trays?: TrayConfig;
   mixer?: "hand" | "spiral";
   flourTemp?: number;
@@ -89,7 +93,10 @@ export interface RecipeInputs {
   bulkOverrideMin?: number;
   /** Flour actually available, when scaling in reverse. */
   flourAvailable?: number;
+  /** Autolyse water-temperature penalty already applied upstream. */
+  autolyseTempPenalty?: number;
 }
+
 
 
 

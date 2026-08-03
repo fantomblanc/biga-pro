@@ -389,6 +389,83 @@ function NewRecipePage() {
               </div>
             </div>
 
+            {/* Biga hydration 44–50% (poolish is fixed at 100%) */}
+            <div className="mt-4 pt-3 border-t border-border/50 space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <LabelWithInfo label={t("biga_hydr_label")} info={t("info_biga_hydr")} />
+                </Label>
+                <span className="tabular text-sm font-semibold text-primary">
+                  {preFerment === "poolish" ? 100 : bigaHydr}%
+                </span>
+              </div>
+              {preFerment === "poolish" ? (
+                <p className="text-[11px] text-muted-foreground">{t("poolish_hydr_fixed")}</p>
+              ) : (
+                <>
+                  <Slider
+                    value={[bigaHydr]}
+                    min={BIGA_HYDR_MIN}
+                    max={BIGA_HYDR_MAX}
+                    step={0.5}
+                    onValueChange={(v) => setBigaHydr(v[0])}
+                  />
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      value={bigaHydr}
+                      min={BIGA_HYDR_MIN}
+                      max={BIGA_HYDR_MAX}
+                      step={0.5}
+                      onChange={(e) => setBigaHydr(Math.min(BIGA_HYDR_MAX, Math.max(BIGA_HYDR_MIN, Number(e.target.value) || BIGA_HYDR_DEFAULT)))}
+                      className="tabular h-9 w-24"
+                    />
+                    <p className="text-[11px] text-muted-foreground leading-tight">{t("biga_hydr_help")}</p>
+                  </div>
+                </>
+              )}
+              <p className="text-[11px] text-muted-foreground tabular">
+                {t("biga_water_formula")
+                  .replace("{flour}", `${calc.bigaFlour.toFixed(1)}${t("grams")}`)
+                  .replace("{pct}", String(preFermentHydrPct))
+                  .replace("{water}", `${calc.bigaWater.toFixed(1)}${t("grams")}`)}
+              </p>
+              <p className="text-[11px] text-muted-foreground tabular">
+                {t("refresh_water_formula")
+                  .replace("{total}", `${calc.totalWater.toFixed(1)}${t("grams")}`)
+                  .replace("{biga}", `${calc.bigaWater.toFixed(1)}${t("grams")}`)
+                  .replace("{rest}", `${calc.refreshWater.toFixed(1)}${t("grams")}`)}
+              </p>
+            </div>
+
+            {/* Yeast at refreshment */}
+            <div className="mt-4 pt-3 border-t border-border/50 space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">
+                  <LabelWithInfo label={t("refresh_yeast_toggle")} info={t("info_refresh_yeast")} />
+                </Label>
+                <Switch checked={useRefreshYeast} onCheckedChange={setUseRefreshYeast} />
+              </div>
+              {useRefreshYeast && (
+                <div className="space-y-2 pl-2 border-l-2 border-primary/30">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("refresh_yeast_pct")}</Label>
+                    <span className="tabular text-sm font-semibold text-primary">{refreshYeastPct.toFixed(2)}%</span>
+                  </div>
+                  <Slider
+                    value={[refreshYeastPct]}
+                    min={0}
+                    max={0.3}
+                    step={0.01}
+                    onValueChange={(v) => setRefreshYeastPct(v[0])}
+                  />
+                  <p className="text-[11px] text-muted-foreground tabular">
+                    {t("refresh_yeast_weight").replace("{yeast}", `${calc.refreshYeastShown.toFixed(2)}${t("grams")}`)}
+                  </p>
+                </div>
+              )}
+            </div>
+
             <div className="mt-4 pt-3 border-t border-border/50 space-y-2">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
                 <LabelWithInfo label={t("preferment_loc")} info={t("info_preferment_loc")} />
@@ -403,12 +480,10 @@ function NewRecipePage() {
               <p className="text-[11px] text-muted-foreground leading-relaxed">
                 {t(prefermentProfile(prefermentLoc, preFerment).descKey)}
               </p>
-              <p className="text-[10px] text-muted-foreground tabular">
-                {t("preferment_loc_hydr").replace("{pct}", String(preFermentProfileVal.bigaHydrPct))}
-              </p>
             </div>
           </Card>
         )}
+
 
         {/* Ingredients */}
         <Card className="p-4 space-y-4">

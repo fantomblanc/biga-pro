@@ -634,7 +634,7 @@ function NewRecipePage() {
           {bt.gearKey && <p className="text-[11px] text-muted-foreground italic">{t(bt.gearKey)}</p>}
         </Card>
 
-        {/* Scale by available flour */}
+        {/* Strict sync: available flour ⇄ balls ⇄ ball weight */}
         <Card className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <Label className="text-sm">
@@ -645,32 +645,49 @@ function NewRecipePage() {
           {useFlourAvailable && (
             <div className="space-y-2 pl-2 border-l-2 border-primary/30">
               <NumField label={t("flour_available_label")} value={flourAvailable} onChange={setFlourAvailable} min={100} step={50} suffix="g" />
-              {flourScale && (
-                <p className="text-xs text-muted-foreground tabular">
-                  {t(isTeglia ? "flour_available_result_trays" : "flour_available_result")
-                    .replace("{dough}", `${flourScale.totalDough.toFixed(0)}${t("grams")}`)
-                    .replace("{balls}", String(flourScale.ballsCount))
-                    .replace("{exact}", flourScale.ballsExact.toFixed(2))}
-                </p>
+              <p className="text-xs text-muted-foreground tabular">
+                {t(isTeglia ? "flour_available_result_trays" : "flour_available_result")
+                  .replace("{dough}", `${calc.totalDough.toFixed(0)}${t("grams")}`)
+                  .replace("{balls}", String(Math.round(calc.ballsExact)))
+                  .replace("{exact}", calc.ballsExact.toFixed(2))}
+              </p>
+              {!isTeglia && (
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setBalls(Math.max(1, Math.round(calc.ballsExact)))}
+                  >
+                    {t("sync_round_balls").replace("{balls}", String(Math.max(1, Math.round(calc.ballsExact))))}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setBallW(Math.round(calc.totalDough / Math.max(1, ballsCount)))}
+                  >
+                    {t("sync_adjust_weight").replace("{weight}", String(Math.round(calc.totalDough / Math.max(1, ballsCount))))}
+                  </Button>
+                </div>
               )}
+              <p className="text-[10px] text-muted-foreground">{t("sync_help")}</p>
             </div>
           )}
         </Card>
 
         <MaturationAdvisor flourW={effectiveFlourW} />
 
-        <WaterTempPro
-          defaultRoom={cellarTemp}
-          defaultFlour={flourTemp}
-          defaultTarget={targetDoughTemp}
-          autolysePenalty={autolyse.enabled ? autolyseResult.waterTempPenalty : 0}
-          onResult={(temp, opts) => {
-            if (temp !== waterTempSuggested) setWaterTempSuggested(temp);
-            if (opts.mixer !== mixer) setMixer(opts.mixer);
-            if (opts.flour !== flourTemp) setFlourTemp(opts.flour);
-            if (opts.target !== targetDoughTemp) setTargetDoughTemp(opts.target);
-          }}
+        <WaterTempSplit
+          ambient={ambientTemp}
+          onAmbient={setAmbientTemp}
+          flourTemp={flourTemp}
+          onFlourTemp={setFlourTemp}
+          mixer={mixer}
+          onMixer={setMixer}
+          bigaTemp={engine === "biga" ? calc.bigaWaterTemp : undefined}
+          refreshTemp={calc.refreshWaterTemp}
+          autolysePenalty={autolysePenalty}
         />
+
 
 
         {/* Live preview */}

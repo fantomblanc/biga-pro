@@ -299,6 +299,12 @@ export type MixerType = "hand" | "spiral";
 
 export const MIXER_FRICTION: Record<MixerType, number> = { hand: 2, spiral: 9 };
 
+/* Biga hydration range (Italian practice: 44–50%, 45% standard). */
+export const BIGA_HYDR_MIN = 44;
+export const BIGA_HYDR_MAX = 50;
+export const BIGA_HYDR_DEFAULT = 45;
+
+
 /** T°water = (target × 3) − (room + flour + friction) − autolyse penalty. */
 export function calcProWaterTemp(opts: {
   targetDough: number;

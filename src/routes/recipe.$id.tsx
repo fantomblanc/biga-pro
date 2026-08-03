@@ -11,8 +11,9 @@ import {
   shareRecipe, unshareRecipe,
 } from "@/lib/cloud";
 import { calcFinalProofHours, buildTimeline } from "@/lib/dough-engine";
-import { computeAutolyse } from "@/lib/dough-pro";
+import { computeAutolyse, prefermentProfile, PREFERMENT_LOCATION_LABEL_KEY } from "@/lib/dough-pro";
 import { flourById } from "@/lib/dough-pro";
+
 
 import { Timeline } from "@/components/Timeline";
 import { CookTimer } from "@/components/CookTimer";
@@ -67,8 +68,9 @@ export function buildProtocol(
   const inp = recipe.inputs;
   const g = t("grams");
   const isBiga = inp.engine === "biga";
-  const yeastShown = isBiga ? c.bigaYeastShown : c.directYeastShown;
+  const isPoolish = isBiga && (c.preFerment ?? inp.preFerment) === "poolish";
   const steps: ProtocolStep[] = [];
+  const num = (v: number | undefined, d = 1) => `${(v ?? 0).toFixed(d)} ${g}`;
 
   if (inp.autolyse?.enabled) {
     const auto = computeAutolyse(inp.autolyse, c.totalFlour, c.totalWater, inp.flourW);
@@ -78,22 +80,114 @@ export function buildProtocol(
       titleKey: "autolyse_title",
       lines: [
         t("autolyse_step")
-          .replace("{flour}", `${auto.flour.toFixed(1)} ${g}`)
-          .replace("{water}", `${auto.water.toFixed(1)} ${g}`)
+          .replace("{flour}", num(auto.flour))
+          .replace("{water}", num(auto.water))
           .replace("{min}", `${inp.autolyse.minutes}`)
           .replace("{yeast}", yeastNote),
       ],
     });
   }
 
-  const kneadWater = isBiga ? c.refreshWater : c.totalWater;
-  const kneadFlour = isBiga ? c.refreshFlour : c.totalFlour;
+  if (isBiga) {
+    /* ---- PHASE 1 — Pre-ferment ---- */
+    const preHydr = c.preFermentHydrPct ?? (isPoolish ? 100 : 45);
+    steps.push({
+      key: "phase1",
+      titleKey: isPoolish ? "proto_phase1_title_poolish" : "proto_phase1_title",
+      lines: [
+        t("proto_phase1_weigh")
+          .replace("{flour}", num(c.bigaFlour))
+          .replace("{pct}", String(c.bigaPct ?? inp.bigaPct ?? 80))
+          .replace("{water}", num(c.bigaWater))
+          .replace("{hydr}", String(preHydr))
+          .replace("{temp}", `${(c.bigaWaterTemp ?? 0).toFixed(1)}`)
+          .replace("{yeast}", num(c.bigaYeastShown, 2)),
+        isPoolish ? t("proto_phase1_mix_poolish") : t("proto_phase1_mix_biga"),
+      ],
+    });
+
+    /* ---- PHASE 2 — Maturation ---- */
+    const loc = inp.prefermentLoc ?? "cellar";
+    const prof = prefermentProfile(loc, isPoolish ? "poolish" : "biga");
+    steps.push({
+      key: "phase2",
+      titleKey: "proto_phase2_title",
+      lines: [
+        t("proto_phase2_rest")
+          .replace("{hours}", String(prof.hours))
+          .replace("{temp}", String(inp.cellarTemp))
+          .replace("{loc}", t(PREFERMENT_LOCATION_LABEL_KEY[loc])),
+      ],
+    });
+
+    /* ---- PHASE 3 — Refreshment ---- */
+    const p3: string[] = [];
+    const bassinage = c.bassinageWater ?? 0;
+    const firstWater = Math.max(0, (c.refreshWater ?? 0) - bassinage);
+    p3.push(
+      t("proto_phase3_start")
+        .replace("{water}", num(firstWater))
+        .replace("{temp}", `${(c.refreshWaterTemp ?? 0).toFixed(1)}`),
+    );
+    if ((c.refreshFlour ?? 0) > 0.5) {
+      p3.push(t("proto_phase3_flour").replace("{flour}", num(c.refreshFlour)).replace("{pct}", String(100 - (c.bigaPct ?? 80))));
+    }
+    if (inp.blend?.enabled) {
+      const a = flourById(inp.blend.flourAId);
+      const b = flourById(inp.blend.flourBId);
+      if (a && b) {
+        const ra = inp.blend.ratioA / 100;
+        p3.push(
+          t("proto_knead_blend")
+            .replace("{nameA}", a.name)
+            .replace("{a}", num(c.refreshFlour * ra))
+            .replace("{nameB}", b.name)
+            .replace("{b}", num(c.refreshFlour * (1 - ra))),
+        );
+      }
+    }
+    if ((c.refreshYeastPct ?? 0) > 0) {
+      p3.push(
+        t("proto_phase3_yeast")
+          .replace("{yeast}", num(c.refreshYeastShown, 2))
+          .replace("{pct}", (c.refreshYeastPct ?? 0).toFixed(2)),
+      );
+    }
+    p3.push(t("proto_phase3_salt").replace("{salt}", num(c.totalSalt)));
+    if (inp.useMalt) p3.push(t("proto_malt").replace("{malt}", num(c.totalMalt, 2)));
+    if (inp.useOil) p3.push(t("proto_oil").replace("{oil}", num(c.totalOil)));
+    if (bassinage > 0) p3.push(t("proto_bassinage").replace("{water}", num(bassinage)));
+    p3.push(t("proto_phase3_end").replace("{temp}", "23–24"));
+    steps.push({ key: "phase3", titleKey: "proto_phase3_title", lines: p3 });
+
+    /* ---- PHASE 4 — Bulk, balling, proof, bake ---- */
+    const ballLine = inp.trays
+      ? t("proto_ball_trays")
+          .replace("{count}", `${inp.trays.count}`)
+          .replace("{weight}", `${Math.round(c.totalDough / inp.trays.count)}`)
+      : t("proto_ball").replace("{count}", `${inp.ballsCount}`).replace("{weight}", `${inp.ballWeight}`);
+    steps.push({
+      key: "phase4",
+      titleKey: "proto_phase4_title",
+      lines: [
+        t("proto_bulk").replace("{min}", `${c.bulkFermentMin ?? 30}`).replace("{temp}", `${inp.cellarTemp}`),
+        ballLine,
+        t("proto_proof").replace("{hours}", `${recipe.finalProofH.toFixed(1)}`),
+        t("proto_bake").replace("{voute}", `${voute[0]}–${voute[1]}`).replace("{sole}", `${sole[0]}–${sole[1]}`),
+      ],
+    });
+
+    return steps;
+  }
+
+  /* ---------------- Direct method ---------------- */
   const kneadLines: string[] = [
     t("proto_knead")
-      .replace("{yeast}", `${yeastShown.toFixed(3)} ${g}`)
-      .replace("{water}", `${kneadWater.toFixed(1)} ${g}`)
-      .replace("{flour}", `${kneadFlour.toFixed(1)} ${g}`)
-      .replace("{salt}", `${c.totalSalt.toFixed(1)} ${g}`),
+      .replace("{yeast}", num(c.directYeastShown, 3))
+      .replace("{water}", num(c.totalWater))
+      .replace("{flour}", num(c.totalFlour))
+      .replace("{salt}", num(c.totalSalt)),
+    t("proto_water_temp_single").replace("{temp}", `${(c.refreshWaterTemp ?? 0).toFixed(1)}`),
   ];
   if (inp.blend?.enabled) {
     const a = flourById(inp.blend.flourAId);
@@ -103,15 +197,14 @@ export function buildProtocol(
       kneadLines.push(
         t("proto_knead_blend")
           .replace("{nameA}", a.name)
-          .replace("{a}", `${(kneadFlour * ra).toFixed(1)} ${g}`)
+          .replace("{a}", num(c.totalFlour * ra))
           .replace("{nameB}", b.name)
-          .replace("{b}", `${(kneadFlour * (1 - ra)).toFixed(1)} ${g}`),
+          .replace("{b}", num(c.totalFlour * (1 - ra))),
       );
     }
   }
-  if (inp.useMalt) kneadLines.push(t("proto_malt").replace("{malt}", `${c.totalMalt.toFixed(2)} ${g}`));
-  if (inp.useOil) kneadLines.push(t("proto_oil").replace("{oil}", `${c.totalOil.toFixed(1)} ${g}`));
-  if (isBiga) kneadLines.push(t("proto_bassinage").replace("{water}", `${c.bassinageWater.toFixed(1)} ${g}`));
+  if (inp.useMalt) kneadLines.push(t("proto_malt").replace("{malt}", num(c.totalMalt, 2)));
+  if (inp.useOil) kneadLines.push(t("proto_oil").replace("{oil}", num(c.totalOil)));
   steps.push({ key: "knead", titleKey: "step_knead_title", lines: kneadLines });
 
   steps.push({
@@ -141,6 +234,7 @@ export function buildProtocol(
 
   return steps;
 }
+
 
 function DetailedProtocol({ steps }: { steps: ProtocolStep[] }) {
   const { t } = useI18n();
@@ -621,21 +715,29 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
   const isPoolish = recipe.inputs.engine === "biga" && (recipe.calc.preFerment ?? recipe.inputs.preFerment) === "poolish";
 
   if (recipe.inputs.engine === "biga") {
-    const bigaPct = recipe.calc.bigaPct ?? recipe.inputs.bigaPct ?? 80;
+    const c = recipe.calc;
+    const bigaPct = c.bigaPct ?? recipe.inputs.bigaPct ?? 80;
+    const preHydr = c.preFermentHydrPct ?? (isPoolish ? 100 : 45);
     const flourLabel = isPoolish ? t("poolish_flour_dyn") : t("biga_flour_dyn");
-    const waterLabel = isPoolish ? t("poolish_water") : t("biga_water");
+    const waterLabel = isPoolish ? t("poolish_water") : t("biga_water_dyn");
     const yeastLabel = isPoolish ? t("poolish_yeast") : t("biga_yeast");
-    rows.push(["biga", `${flourLabel} (${bigaPct}%)`, `${recipe.calc.bigaFlour.toFixed(1)} ${g}`]);
-    rows.push(["biga", waterLabel, `${recipe.calc.bigaWater.toFixed(1)} ${g}`]);
+    rows.push(["biga", `${flourLabel} (${bigaPct}%)`, `${c.bigaFlour.toFixed(1)} ${g}`]);
+    rows.push(["biga", `${waterLabel} (${preHydr}%)`, `${c.bigaWater.toFixed(1)} ${g}`]);
     rows.push(["biga", yeastLabel, `${yeastShown.toFixed(3)} ${g}`]);
-    rows.push(["refresh", `${t("refresh_flour_dyn")} (${100 - bigaPct}%)`, `${recipe.calc.refreshFlour.toFixed(1)} ${g}`]);
-    rows.push(["refresh", t("refresh_water"), `${recipe.calc.refreshWater.toFixed(1)} ${g}`]);
-    rows.push(["refresh", t("refresh_salt"), `${recipe.calc.totalSalt.toFixed(1)} ${g}`]);
-    if (recipe.inputs.useMalt) rows.push(["refresh", t("refresh_malt"), `${recipe.calc.totalMalt.toFixed(2)} ${g}`]);
-    if (recipe.inputs.useOil) rows.push(["refresh", t("refresh_oil"), `${recipe.calc.totalOil.toFixed(1)} ${g}`]);
+    if (c.bigaWaterTemp !== undefined) rows.push(["biga", t("water_temp_biga_label"), `${c.bigaWaterTemp.toFixed(1)} °C`]);
+    rows.push(["refresh", `${t("refresh_flour_dyn")} (${100 - bigaPct}%)`, `${c.refreshFlour.toFixed(1)} ${g}`]);
+    rows.push(["refresh", t("refresh_water"), `${c.refreshWater.toFixed(1)} ${g}`]);
+    if (c.refreshWaterTemp !== undefined) rows.push(["refresh", t("water_temp_refresh_label"), `${c.refreshWaterTemp.toFixed(1)} °C`]);
+    rows.push(["refresh", t("refresh_salt"), `${c.totalSalt.toFixed(1)} ${g}`]);
+    if ((c.refreshYeastPct ?? 0) > 0) {
+      rows.push(["refresh", `${t("refresh_yeast_label")} (${(c.refreshYeastPct ?? 0).toFixed(2)}%)`, `${(c.refreshYeastShown ?? 0).toFixed(2)} ${g}`]);
+    }
+    if (recipe.inputs.useMalt) rows.push(["refresh", t("refresh_malt"), `${c.totalMalt.toFixed(2)} ${g}`]);
+    if (recipe.inputs.useOil) rows.push(["refresh", t("refresh_oil"), `${c.totalOil.toFixed(1)} ${g}`]);
   } else {
     rows.push(["mix", t("total_flour"), `${recipe.calc.totalFlour.toFixed(1)} ${g}`]);
     rows.push(["mix", t("total_water"), `${recipe.calc.totalWater.toFixed(1)} ${g}`]);
+    if (recipe.calc.refreshWaterTemp !== undefined) rows.push(["mix", t("water_temp_refresh_label"), `${recipe.calc.refreshWaterTemp.toFixed(1)} °C`]);
     rows.push(["mix", t("total_salt"), `${recipe.calc.totalSalt.toFixed(1)} ${g}`]);
     rows.push(["mix", t("biga_yeast"), `${yeastShown.toFixed(3)} ${g}`]);
     if (recipe.inputs.useMalt) rows.push(["mix", t("refresh_malt"), `${recipe.calc.totalMalt.toFixed(2)} ${g}`]);
@@ -645,8 +747,8 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
 
 
   const phaseLabel: Record<string, string> = {
-    biga: isPoolish ? t("phase1_title") : t("phase1_title"),
-    refresh: isPoolish ? t("phase2_title_poolish") : t("phase2_title"),
+    biga: isPoolish ? t("proto_phase1_title_poolish") : t("proto_phase1_title"),
+    refresh: t("proto_phase3_title"),
     mix: t("direct_phase_title"),
     bulk: t("bulk_ferment"),
   };
@@ -656,6 +758,7 @@ function IngredientsTable({ recipe, yeastShown }: { recipe: SavedRecipe; yeastSh
     mix: t("direct_steps"),
     bulk: "",
   };
+
   const phases = [...new Set(rows.map((r) => r[0]))];
 
   return (

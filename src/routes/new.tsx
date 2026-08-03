@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
-import { WaterTempPro } from "@/components/WaterTempPro";
+import { WaterTempSplit } from "@/components/WaterTempSplit";
 import { FlourSelect } from "@/components/FlourSelect";
 import { MaturationAdvisor } from "@/components/MaturationAdvisor";
 import { LabelWithInfo } from "@/components/InfoTip";
@@ -50,8 +50,11 @@ import {
   doughPerTray,
   TRAY_PRESETS,
   avpnRules,
-  scaleFromFlour,
+  BIGA_HYDR_MIN,
+  BIGA_HYDR_MAX,
+  BIGA_HYDR_DEFAULT,
   type MixerType,
+
 } from "@/lib/dough-pro";
 import { setActiveId } from "@/lib/storage";
 import { saveRecipe } from "@/lib/cloud";
@@ -117,10 +120,14 @@ function NewRecipePage() {
   const [trays, setTrays] = useState<TrayConfig>({ count: 2, lengthCm: 40, widthCm: 30, coef: 0.6 });
   const [mixer, setMixer] = useState<MixerType>("hand");
   const [flourTemp, setFlourTemp] = useState(20);
-  const [targetDoughTemp, setTargetDoughTemp] = useState(23);
-  const [waterTempSuggested, setWaterTempSuggested] = useState<number | undefined>(undefined);
+  const [ambientTemp, setAmbientTemp] = useState(22);
   const [useFlourAvailable, setUseFlourAvailable] = useState(false);
   const [flourAvailable, setFlourAvailable] = useState(1000);
+  /** Biga hydration, 44–50% (45% standard). Poolish stays at 100%. */
+  const [bigaHydr, setBigaHydr] = useState(BIGA_HYDR_DEFAULT);
+  const [useRefreshYeast, setUseRefreshYeast] = useState(false);
+  const [refreshYeastPct, setRefreshYeastPct] = useState(0.1);
+
 
   const cfg = STYLE_CONFIG[style];
   const isTeglia = style === "teglia";
@@ -169,7 +176,7 @@ function NewRecipePage() {
     ? Math.min(avpn.saltMax, Math.max(avpn.saltMin, tenacityResult.saltPct))
     : tenacityResult.saltPct;
 
-  const preFermentProfileVal = prefermentProfile(prefermentLoc, preFerment);
+  
 
   // Teglia: tray count/size drives "balls" (trays) and per-unit weight.
   const trayWeight = doughPerTray(trays.lengthCm, trays.widthCm, trays.coef);
@@ -181,40 +188,33 @@ function NewRecipePage() {
     () => computeAutolyse(autolyse, effectiveBallsCount * effectiveBallWeight / (1 + clampedHydration / 100 + effectiveSalt / 100), 0, effectiveFlourW),
     [autolyse, effectiveBallsCount, effectiveBallWeight, clampedHydration, effectiveSalt, effectiveFlourW],
   );
+  const autolysePenalty = autolyse.enabled ? autolyseResult.waterTempPenalty : 0;
 
-  // Scale by available flour (reverse mode).
-  const flourScale = useFlourAvailable
-    ? scaleFromFlour({
-        availableFlour: flourAvailable,
-        hydration: clampedHydration,
-        saltPct: effectiveSalt,
-        maltPct: useMalt ? maltPct : 0,
-        oilPct: useOil ? oilPct : 0,
-        unitWeight: effectiveBallWeight,
-      })
-    : null;
-
-  const finalBallsCount = flourScale ? flourScale.ballsCount : effectiveBallsCount;
+  // Pre-ferment hydration actually used: biga slider (44–50%), poolish fixed at 100%.
+  const preFermentHydrPct = preFerment === "poolish" ? 100 : bigaHydr;
 
   const bulkFactorMin = engine === "direct" ? Math.round(30 * tenacityResult.bulkFactor) : undefined;
 
   const inputs: RecipeInputs = useMemo(() => ({
-    engine, ballsCount: finalBallsCount, ballWeight: effectiveBallWeight, hydration: clampedHydration,
+    engine, ballsCount: effectiveBallsCount, ballWeight: effectiveBallWeight, hydration: clampedHydration,
     saltPct: effectiveSalt, yeastType, flourW: effectiveFlourW,
     useMalt: avpn.banOilAndMalt ? false : useMalt, maltPct, useOil: avpn.banOilAndMalt ? false : useOil, oilPct, cellarTemp, bigaPct,
     style, preFerment: engine === "biga" ? preFerment : undefined,
     targetBakeISO: new Date(targetBake).toISOString(),
     ovenType, tenacity, autolyse, blend,
     prefermentLoc: engine === "biga" ? prefermentLoc : undefined,
-    preFermentHydrPct: engine === "biga" ? preFermentProfileVal.bigaHydrPct : undefined,
+    preFermentHydrPct: engine === "biga" ? preFermentHydrPct : undefined,
+    refreshYeastPct: engine === "biga" && useRefreshYeast ? refreshYeastPct : 0,
     trays: isTeglia ? trays : undefined,
-    mixer, flourTemp, targetDoughTemp, waterTempSuggested,
+    mixer, flourTemp, ambientTemp, autolyseTempPenalty: autolysePenalty,
     bulkOverrideMin: bulkFactorMin,
     flourAvailable: useFlourAvailable ? flourAvailable : undefined,
-  }), [engine, finalBallsCount, effectiveBallWeight, clampedHydration, effectiveSalt, yeastType, effectiveFlourW,
+  }), [engine, effectiveBallsCount, effectiveBallWeight, clampedHydration, effectiveSalt, yeastType, effectiveFlourW,
       useMalt, maltPct, useOil, oilPct, cellarTemp, bigaPct, style, preFerment, targetBake, ovenType, tenacity,
-      autolyse, blend, prefermentLoc, preFermentProfileVal, isTeglia, trays, mixer, flourTemp, targetDoughTemp,
-      waterTempSuggested, bulkFactorMin, useFlourAvailable, flourAvailable, avpn.banOilAndMalt]);
+      autolyse, blend, prefermentLoc, preFermentHydrPct, isTeglia, trays, mixer, flourTemp, ambientTemp,
+      autolysePenalty, useRefreshYeast, refreshYeastPct, bulkFactorMin, useFlourAvailable, flourAvailable,
+      avpn.banOilAndMalt]);
+
 
   const calc = useMemo(() => calculateRecipe(inputs), [inputs]);
   const finalProofH = 3.5;
@@ -389,6 +389,83 @@ function NewRecipePage() {
               </div>
             </div>
 
+            {/* Biga hydration 44–50% (poolish is fixed at 100%) */}
+            <div className="mt-4 pt-3 border-t border-border/50 space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <LabelWithInfo label={t("biga_hydr_label")} info={t("info_biga_hydr")} />
+                </Label>
+                <span className="tabular text-sm font-semibold text-primary">
+                  {preFerment === "poolish" ? 100 : bigaHydr}%
+                </span>
+              </div>
+              {preFerment === "poolish" ? (
+                <p className="text-[11px] text-muted-foreground">{t("poolish_hydr_fixed")}</p>
+              ) : (
+                <>
+                  <Slider
+                    value={[bigaHydr]}
+                    min={BIGA_HYDR_MIN}
+                    max={BIGA_HYDR_MAX}
+                    step={0.5}
+                    onValueChange={(v) => setBigaHydr(v[0])}
+                  />
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      value={bigaHydr}
+                      min={BIGA_HYDR_MIN}
+                      max={BIGA_HYDR_MAX}
+                      step={0.5}
+                      onChange={(e) => setBigaHydr(Math.min(BIGA_HYDR_MAX, Math.max(BIGA_HYDR_MIN, Number(e.target.value) || BIGA_HYDR_DEFAULT)))}
+                      className="tabular h-9 w-24"
+                    />
+                    <p className="text-[11px] text-muted-foreground leading-tight">{t("biga_hydr_help")}</p>
+                  </div>
+                </>
+              )}
+              <p className="text-[11px] text-muted-foreground tabular">
+                {t("biga_water_formula")
+                  .replace("{flour}", `${calc.bigaFlour.toFixed(1)}${t("grams")}`)
+                  .replace("{pct}", String(preFermentHydrPct))
+                  .replace("{water}", `${calc.bigaWater.toFixed(1)}${t("grams")}`)}
+              </p>
+              <p className="text-[11px] text-muted-foreground tabular">
+                {t("refresh_water_formula")
+                  .replace("{total}", `${calc.totalWater.toFixed(1)}${t("grams")}`)
+                  .replace("{biga}", `${calc.bigaWater.toFixed(1)}${t("grams")}`)
+                  .replace("{rest}", `${calc.refreshWater.toFixed(1)}${t("grams")}`)}
+              </p>
+            </div>
+
+            {/* Yeast at refreshment */}
+            <div className="mt-4 pt-3 border-t border-border/50 space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">
+                  <LabelWithInfo label={t("refresh_yeast_toggle")} info={t("info_refresh_yeast")} />
+                </Label>
+                <Switch checked={useRefreshYeast} onCheckedChange={setUseRefreshYeast} />
+              </div>
+              {useRefreshYeast && (
+                <div className="space-y-2 pl-2 border-l-2 border-primary/30">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("refresh_yeast_pct")}</Label>
+                    <span className="tabular text-sm font-semibold text-primary">{refreshYeastPct.toFixed(2)}%</span>
+                  </div>
+                  <Slider
+                    value={[refreshYeastPct]}
+                    min={0}
+                    max={0.3}
+                    step={0.01}
+                    onValueChange={(v) => setRefreshYeastPct(v[0])}
+                  />
+                  <p className="text-[11px] text-muted-foreground tabular">
+                    {t("refresh_yeast_weight").replace("{yeast}", `${calc.refreshYeastShown.toFixed(2)}${t("grams")}`)}
+                  </p>
+                </div>
+              )}
+            </div>
+
             <div className="mt-4 pt-3 border-t border-border/50 space-y-2">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
                 <LabelWithInfo label={t("preferment_loc")} info={t("info_preferment_loc")} />
@@ -403,12 +480,10 @@ function NewRecipePage() {
               <p className="text-[11px] text-muted-foreground leading-relaxed">
                 {t(prefermentProfile(prefermentLoc, preFerment).descKey)}
               </p>
-              <p className="text-[10px] text-muted-foreground tabular">
-                {t("preferment_loc_hydr").replace("{pct}", String(preFermentProfileVal.bigaHydrPct))}
-              </p>
             </div>
           </Card>
         )}
+
 
         {/* Ingredients */}
         <Card className="p-4 space-y-4">
@@ -637,7 +712,7 @@ function NewRecipePage() {
           {bt.gearKey && <p className="text-[11px] text-muted-foreground italic">{t(bt.gearKey)}</p>}
         </Card>
 
-        {/* Scale by available flour */}
+        {/* Strict sync: available flour ⇄ balls ⇄ ball weight */}
         <Card className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <Label className="text-sm">
@@ -648,32 +723,49 @@ function NewRecipePage() {
           {useFlourAvailable && (
             <div className="space-y-2 pl-2 border-l-2 border-primary/30">
               <NumField label={t("flour_available_label")} value={flourAvailable} onChange={setFlourAvailable} min={100} step={50} suffix="g" />
-              {flourScale && (
-                <p className="text-xs text-muted-foreground tabular">
-                  {t(isTeglia ? "flour_available_result_trays" : "flour_available_result")
-                    .replace("{dough}", `${flourScale.totalDough.toFixed(0)}${t("grams")}`)
-                    .replace("{balls}", String(flourScale.ballsCount))
-                    .replace("{exact}", flourScale.ballsExact.toFixed(2))}
-                </p>
+              <p className="text-xs text-muted-foreground tabular">
+                {t(isTeglia ? "flour_available_result_trays" : "flour_available_result")
+                  .replace("{dough}", `${calc.totalDough.toFixed(0)}${t("grams")}`)
+                  .replace("{balls}", String(Math.round(calc.ballsExact)))
+                  .replace("{exact}", calc.ballsExact.toFixed(2))}
+              </p>
+              {!isTeglia && (
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setBalls(Math.max(1, Math.round(calc.ballsExact)))}
+                  >
+                    {t("sync_round_balls").replace("{balls}", String(Math.max(1, Math.round(calc.ballsExact))))}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setBallW(Math.round(calc.totalDough / Math.max(1, ballsCount)))}
+                  >
+                    {t("sync_adjust_weight").replace("{weight}", String(Math.round(calc.totalDough / Math.max(1, ballsCount))))}
+                  </Button>
+                </div>
               )}
+              <p className="text-[10px] text-muted-foreground">{t("sync_help")}</p>
             </div>
           )}
         </Card>
 
         <MaturationAdvisor flourW={effectiveFlourW} />
 
-        <WaterTempPro
-          defaultRoom={cellarTemp}
-          defaultFlour={flourTemp}
-          defaultTarget={targetDoughTemp}
-          autolysePenalty={autolyse.enabled ? autolyseResult.waterTempPenalty : 0}
-          onResult={(temp, opts) => {
-            if (temp !== waterTempSuggested) setWaterTempSuggested(temp);
-            if (opts.mixer !== mixer) setMixer(opts.mixer);
-            if (opts.flour !== flourTemp) setFlourTemp(opts.flour);
-            if (opts.target !== targetDoughTemp) setTargetDoughTemp(opts.target);
-          }}
+        <WaterTempSplit
+          ambient={ambientTemp}
+          onAmbient={setAmbientTemp}
+          flourTemp={flourTemp}
+          onFlourTemp={setFlourTemp}
+          mixer={mixer}
+          onMixer={setMixer}
+          bigaTemp={engine === "biga" ? calc.bigaWaterTemp : undefined}
+          refreshTemp={calc.refreshWaterTemp}
+          autolysePenalty={autolysePenalty}
         />
+
 
 
         {/* Live preview */}
@@ -691,19 +783,27 @@ function NewRecipePage() {
               <MiniHeader>{preLabels.phase} · {bigaPct}%</MiniHeader>
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <Stat label={`${preLabels.flour} (${bigaPct}%)`} value={`${calc.bigaFlour.toFixed(1)}${t("grams")}`} />
-                <Stat label={preLabels.water} value={`${calc.bigaWater.toFixed(1)}${t("grams")}`} />
+                <Stat label={`${preLabels.water} (${preFermentHydrPct}%)`} value={`${calc.bigaWater.toFixed(1)}${t("grams")}`} />
                 <Stat label={preLabels.yeast} value={`${yeastShown.toFixed(2)}${t("grams")}`} highlight />
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <Stat label={t("water_temp_biga_label")} value={`${calc.bigaWaterTemp.toFixed(1)}°C`} />
+                <Stat label={t("water_temp_refresh_label")} value={`${calc.refreshWaterTemp.toFixed(1)}°C`} />
               </div>
               <MiniHeader>{t("refresh_phase")}</MiniHeader>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <Stat label={`${t("refresh_flour_dyn")} (${(100 - bigaPct)}%)`} value={`${calc.refreshFlour.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("refresh_water")} value={`${calc.refreshWater.toFixed(1)}${t("grams")}`} />
                 <Stat label={t("refresh_salt")} value={`${calc.totalSalt.toFixed(1)}${t("grams")}`} />
+                {useRefreshYeast && refreshYeastPct > 0 && (
+                  <Stat label={t("refresh_yeast_label")} value={`${calc.refreshYeastShown.toFixed(2)}${t("grams")}`} highlight />
+                )}
                 {useMalt && <Stat label={t("refresh_malt")} value={`${calc.totalMalt.toFixed(2)}${t("grams")}`} />}
                 {useOil && <Stat label={t("refresh_oil")} value={`${calc.totalOil.toFixed(1)}${t("grams")}`} />}
               </div>
             </>
           ) : (
+
             <>
               <MiniHeader>{t("engine_direct")}</MiniHeader>
               <div className="grid grid-cols-2 gap-2 text-sm">

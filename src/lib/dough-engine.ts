@@ -107,16 +107,28 @@ export interface RecipeCalc {
   totalSalt: number;
   totalMalt: number;
   totalOil: number;
+  /** Exact (fractional) number of balls implied by the flour/dough weights. */
+  ballsExact: number;
   // Pre-ferment breakdown (biga or poolish)
   preFerment: PreFermentType; // which kind of pre-ferment was used
   bigaPct: number; // 20-100 — share of total flour in the pre-ferment
+  /** Actual pre-ferment hydration used (%) — 44–50 for biga, 100 for poolish. */
+  preFermentHydrPct: number;
   bigaFlour: number; // pre-ferment flour weight
-  bigaWater: number; // pre-ferment water weight (50% for biga, 100% for poolish)
+  bigaWater: number; // pre-ferment water weight = bigaFlour × preFermentHydrPct
   bigaYeastFresh: number; // grams fresh yeast in pre-ferment
   bigaYeastShown: number; // grams shown (fresh or dry)
   refreshFlour: number;
   refreshWater: number;
+  /** Optional yeast added at refreshment. */
+  refreshYeastPct: number;
+  refreshYeastFresh: number;
+  refreshYeastShown: number;
   bassinageWater: number; // 15% of total water
+  /** Water temperature (°C) for the pre-ferment mix (target dough 19–20°C). */
+  bigaWaterTemp: number;
+  /** Water temperature (°C) for the refreshment / main mix (target dough 23–24°C). */
+  refreshWaterTemp: number;
   // Direct breakdown
   directYeastFresh: number;
   directYeastShown: number;
@@ -130,6 +142,7 @@ export interface RecipeCalc {
   flourWarning: boolean;
   cellarWarning: boolean;
 }
+
 
 
 /**

@@ -117,10 +117,14 @@ function NewRecipePage() {
   const [trays, setTrays] = useState<TrayConfig>({ count: 2, lengthCm: 40, widthCm: 30, coef: 0.6 });
   const [mixer, setMixer] = useState<MixerType>("hand");
   const [flourTemp, setFlourTemp] = useState(20);
-  const [targetDoughTemp, setTargetDoughTemp] = useState(23);
-  const [waterTempSuggested, setWaterTempSuggested] = useState<number | undefined>(undefined);
+  const [ambientTemp, setAmbientTemp] = useState(22);
   const [useFlourAvailable, setUseFlourAvailable] = useState(false);
   const [flourAvailable, setFlourAvailable] = useState(1000);
+  /** Biga hydration, 44–50% (45% standard). Poolish stays at 100%. */
+  const [bigaHydr, setBigaHydr] = useState(BIGA_HYDR_DEFAULT);
+  const [useRefreshYeast, setUseRefreshYeast] = useState(false);
+  const [refreshYeastPct, setRefreshYeastPct] = useState(0.1);
+
 
   const cfg = STYLE_CONFIG[style];
   const isTeglia = style === "teglia";

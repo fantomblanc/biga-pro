@@ -3,6 +3,14 @@
 // Poolish: user-selectable % of total flour (20–100) at 100% hydration, yeast via room-temp curve.
 // Direct 72h: 0.15% fresh yeast equivalent, cold-blocked at 4°C; room temp only drives bulk & final proof.
 
+import {
+  REFRESH_FRICTION,
+  bigaWaterTemp as bigaWaterTempThermo,
+  refreshWaterTemp as refreshWaterTempThermo,
+  directWaterTemp as directWaterTempThermo,
+  type KneadMode,
+} from "./dough-thermo";
+
 export type EngineType = "biga" | "direct";
 export type YeastType = "fresh" | "dry";
 export type PreFermentType = "biga" | "poolish";
@@ -95,7 +103,34 @@ export interface RecipeInputs {
   flourAvailable?: number;
   /** Autolyse water-temperature penalty already applied upstream. */
   autolyseTempPenalty?: number;
+
+  /* --- Thermal modules (two separate calculators) --- */
+  /** Kneading equipment: hand, planetary (Kenwood spiral hook) or pro spiral. */
+  kneadMode?: import("./dough-thermo").KneadMode;
+  /** Cellar / storage temperature used for the Biga water calculation. */
+  storageTemp?: number;
+  /** Measured temperature of the mature pre-ferment. */
+  bigaRealTemp?: number;
+  /** Temperature of the flour added at refreshment (Biga < 100%). */
+  refreshFlourTemp?: number;
+  /** Friction of the full knead (°C), user adjustable. */
+  refreshFriction?: number;
+  /** Real maximum temperature of the user's oven. */
+  ovenMaxTempC?: number;
+  /** Simplified oven family. */
+  simpleOven?: import("./dough-thermo").SimpleOven;
+  /** Target ball weight used by the informational preview. */
+  targetBallWeight?: number;
+  /** Split maturation plan. */
+  maturation?: {
+    prefermentLoc: import("./dough-pro").PrefermentLocation;
+    prefermentHours: number;
+    bulkFridgeH: number;
+    bulkRoomH: number;
+    proofRoomH: number;
+  };
 }
+
 
 
 
@@ -257,16 +292,28 @@ export function calculateRecipe(inp: RecipeInputs): RecipeCalc {
   const bulkFermentMin = Math.round(inp.bulkOverrideMin ?? calcBulkFermentMin(inp.cellarTemp));
   const bulkTooHot = inp.engine === "direct" && inp.cellarTemp > 25;
 
-  // Two distinct water temperatures (see dough-pro for the formulas).
+  // Two distinct, explicit water temperatures (see dough-thermo).
   const ambient = inp.ambientTemp ?? (inp.engine === "direct" ? inp.cellarTemp : 22);
   const flourT = inp.flourTemp ?? 20;
-  const bigaWaterTemp = bigaWaterTempPro(ambient, flourT);
-  const refreshWaterTemp = refreshWaterTempPro(
-    ambient,
-    flourT,
-    inp.mixer ?? "hand",
-    inp.autolyseTempPenalty ?? 0,
-  );
+  const mode: KneadMode = inp.kneadMode ?? (inp.mixer === "spiral" ? "spiral" : "hand");
+  const friction = inp.refreshFriction ?? REFRESH_FRICTION[mode];
+
+  const bigaWaterTemp = bigaWaterTempThermo({
+    storageTemp: inp.storageTemp ?? inp.cellarTemp,
+    flourTemp: flourT,
+    mode,
+  }).waterTemp;
+
+  const refreshWaterTemp = inp.engine === "biga"
+    ? refreshWaterTempThermo({
+        bigaTemp: inp.bigaRealTemp ?? inp.storageTemp ?? inp.cellarTemp,
+        ambientTemp: ambient,
+        friction,
+        flourTemp: bigaPct < 100 ? (inp.refreshFlourTemp ?? flourT) : undefined,
+        autolysePenalty: inp.autolyseTempPenalty ?? 0,
+      }).waterTemp
+    : directWaterTempThermo({ ambientTemp: ambient, flourTemp: flourT, friction }).waterTemp;
+
 
   const bt = calcBakingTemps(inp.engine, inp.hydration);
 

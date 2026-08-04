@@ -2386,4 +2386,14 @@ const de: Dict = {
 
 
 
-export const TRANSLATIONS: Record<Lang, Dict> = { en, fr, it, es, pt, de };
+import { EXTRA_TRANSLATIONS } from "./translations-extra";
+
+export const TRANSLATIONS: Record<Lang, Dict> = {
+  en: { ...en, ...EXTRA_TRANSLATIONS.en },
+  fr: { ...fr, ...EXTRA_TRANSLATIONS.fr },
+  it: { ...it, ...EXTRA_TRANSLATIONS.it },
+  es: { ...es, ...EXTRA_TRANSLATIONS.es },
+  pt: { ...pt, ...EXTRA_TRANSLATIONS.pt },
+  de: { ...de, ...EXTRA_TRANSLATIONS.de },
+};
+

@@ -296,13 +296,15 @@ export function calculateRecipe(inp: RecipeInputs): RecipeCalc {
   const ambient = inp.ambientTemp ?? (inp.engine === "direct" ? inp.cellarTemp : 22);
   const flourT = inp.flourTemp ?? 20;
   const mode: KneadMode = inp.kneadMode ?? (inp.mixer === "spiral" ? "spiral" : "hand");
+  const bigaMode: KneadMode = inp.bigaKneadMode ?? mode;
   const friction = inp.refreshFriction ?? REFRESH_FRICTION[mode];
 
   const bigaWaterTemp = bigaWaterTempThermo({
     storageTemp: inp.storageTemp ?? inp.cellarTemp,
     flourTemp: flourT,
-    mode,
+    mode: bigaMode,
   }).waterTemp;
+
 
   const refreshWaterTemp = inp.engine === "biga"
     ? refreshWaterTempThermo({

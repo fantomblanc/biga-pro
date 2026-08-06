@@ -46,7 +46,9 @@ export function MaturationPlanner({ plan, onChange, showPreferment, preFerment, 
   const set = (patch: Partial<MaturationPlan>) => onChange({ ...plan, ...patch });
 
   const prefH = showPreferment ? Math.max(0, plan.prefermentHours) : 0;
-  const total = prefH + Math.max(0, plan.bulkFridgeH) + Math.max(0, plan.bulkRoomH) + Math.max(0, plan.proofRoomH);
+  const total = prefH + Math.max(0, plan.bulkFridgeH) + Math.max(0, plan.bulkRoomH)
+    + Math.max(0, plan.ballsFridgeH ?? 0) + Math.max(0, plan.proofRoomH);
+
   const [lo, hi] = useMemo(() => maturationRange(flourW), [flourW]);
   const verdict = maturationVerdict(total, flourW);
 

@@ -16,12 +16,15 @@ import { Snowflake, Thermometer, CheckCircle2, AlertTriangle } from "lucide-reac
 export interface MaturationPlan {
   prefermentLoc: PrefermentLocation;
   prefermentHours: number;
-  /** Bulk rest of the final dough. */
+  /** Step 1 — optional bulk rest of the whole dough mass. */
   bulkFridgeH: number;
   bulkRoomH: number;
-  /** Final proof of the shaped balls, at room temperature. */
+  /** Step 3 — cold maturation of the shaped balls (fridge 4°C). */
+  ballsFridgeH: number;
+  /** Step 4 — final temper / proof of the balls at room temperature. */
   proofRoomH: number;
 }
+
 
 interface Props {
   plan: MaturationPlan;

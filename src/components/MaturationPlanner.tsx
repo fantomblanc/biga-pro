@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/NumberInput";
 import { useI18n } from "@/lib/i18n";
 import { maturationRange, maturationVerdict } from "@/lib/flours";
 import {

@@ -39,7 +39,10 @@ export const REFRESH_FRICTION_RANGE: Record<KneadMode, [number, number]> = {
 };
 
 export const BIGA_TARGET_TEMP = 19;
-export const REFRESH_TARGET_TEMP = 23.5;
+export const REFRESH_TARGET_TEMP = 23;
+/** At or below this temperature ice water is mandatory. */
+export const ICE_WATER_THRESHOLD = 4;
+
 
 export interface WaterTempResult {
   /** Water temperature to use (°C), already clamped to a physical range. */

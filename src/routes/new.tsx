@@ -162,6 +162,8 @@ function NewRecipePage() {
   });
 
   const [wizardOpen, setWizardOpen] = useState(false);
+  /** Hydration chosen in the wizard, applied instead of the style midpoint. */
+  const pendingHydr = useRef<number | null>(null);
   const [saving, setSaving] = useState(false);
   const hydrated = useRef(false);
 
@@ -240,7 +242,12 @@ function NewRecipePage() {
 
   /* ---------------- derived ---------------- */
   useEffect(() => {
-    setHydr(styleMidpoint(style));
+    if (pendingHydr.current !== null) {
+      setHydr(pendingHydr.current);
+      pendingHydr.current = null;
+    } else {
+      setHydr(styleMidpoint(style));
+    }
     if (!cfg.allowIndirect && method !== "direct") setMethod("direct");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [style]);
@@ -444,6 +451,7 @@ function NewRecipePage() {
   const sumMat = `${totalMatH} h ${t("maturation_hours")}`;
   /** Injects the guided-assistant answers into the calculator state. */
   function applyWizard(r: WizardResult) {
+    pendingHydr.current = r.hydration;
     setStyle(r.style);
     setMethod(r.engine === "biga" ? "indirect" : "direct");
     setPreFerment(r.preFerment);

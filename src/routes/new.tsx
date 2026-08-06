@@ -897,15 +897,15 @@ function NumField({
       <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</Label>
       <div className="relative mt-1">
         {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">{prefix}</span>}
-        <Input
-          type="number"
+        <NumberInput
           value={value}
+          onChange={onChange}
           min={min} max={max} step={step}
-          onChange={(e) => onChange(Number(e.target.value))}
           className={`tabular ${prefix ? "pl-8" : ""} ${suffix ? "pr-9" : ""}`}
         />
         {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">{suffix}</span>}
       </div>
+
     </div>
   );
 }

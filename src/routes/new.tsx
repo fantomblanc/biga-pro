@@ -68,7 +68,10 @@ import { setActiveId } from "@/lib/storage";
 import { saveRecipe } from "@/lib/cloud";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { AlertTriangle, Save, Pizza, Wheat, Gauge, Thermometer, ChefHat, Sprout, Droplets, Snowflake, RefreshCw, Trash2 } from "lucide-react";
+import { NumberInput } from "@/components/NumberInput";
+import { SosDough } from "@/components/SosDough";
+import { RecipeWizard, type WizardResult } from "@/components/RecipeWizard";
+import { AlertTriangle, Save, Pizza, Wheat, Gauge, Thermometer, ChefHat, Sprout, Droplets, Snowflake, RefreshCw, Trash2, Wand2 } from "lucide-react";
 
 export const Route = createFileRoute("/new")({
   head: () => ({
@@ -135,6 +138,8 @@ function NewRecipePage() {
 
   // Thermal modules
   const [kneadMode, setKneadMode] = useState<KneadMode>("hand");
+  // Independent equipment for the Biga / pre-ferment mix.
+  const [bigaKneadMode, setBigaKneadMode] = useState<KneadMode>("hand");
   const [storageTemp, setStorageTemp] = useState(18);
   const [bigaFlourTemp, setBigaFlourTemp] = useState(20);
   const [bigaRealTemp, setBigaRealTemp] = useState(18);
@@ -152,9 +157,13 @@ function NewRecipePage() {
     prefermentHours: 18,
     bulkFridgeH: 24,
     bulkRoomH: 1,
+    ballsFridgeH: 0,
     proofRoomH: 4,
   });
 
+  const [wizardOpen, setWizardOpen] = useState(false);
+  /** Hydration chosen in the wizard, applied instead of the style midpoint. */
+  const pendingHydr = useRef<number | null>(null);
   const [saving, setSaving] = useState(false);
   const hydrated = useRef(false);
 
@@ -195,6 +204,7 @@ function NewRecipePage() {
         if (typeof d.useRefreshYeast === "boolean") setUseRefreshYeast(d.useRefreshYeast);
         if (typeof d.refreshYeastPct === "number") setRefreshYeastPct(d.refreshYeastPct);
         if (d.kneadMode) setKneadMode(d.kneadMode);
+        if (d.bigaKneadMode) setBigaKneadMode(d.bigaKneadMode);
         if (typeof d.storageTemp === "number") setStorageTemp(d.storageTemp);
         if (typeof d.bigaFlourTemp === "number") setBigaFlourTemp(d.bigaFlourTemp);
         if (typeof d.bigaRealTemp === "number") setBigaRealTemp(d.bigaRealTemp);
@@ -203,7 +213,7 @@ function NewRecipePage() {
         if (typeof d.refreshFriction === "number") setRefreshFriction(d.refreshFriction);
         if (d.simpleOven) setSimpleOven(d.simpleOven);
         if (typeof d.ovenMaxTemp === "number") setOvenMaxTemp(d.ovenMaxTemp);
-        if (d.maturation) setMaturation(d.maturation);
+        if (d.maturation) setMaturation({ ballsFridgeH: 0, ...d.maturation });
         toast.success(t("draft_restored"));
       }
     } catch {
@@ -216,7 +226,7 @@ function NewRecipePage() {
   const draft = {
     style, method, preFerment, name, nameEdited, flourGrams, targetBallWeight, hydration, saltPct,
     yeastType, flourW, flourId, useMalt, maltPct, useOil, oilPct, bigaPct, targetBake, tenacity,
-    blend, autolyse, trays, bigaHydr, useRefreshYeast, refreshYeastPct, kneadMode, storageTemp,
+    blend, autolyse, trays, bigaHydr, useRefreshYeast, refreshYeastPct, kneadMode, bigaKneadMode, storageTemp,
     bigaFlourTemp, bigaRealTemp, refreshFlourTemp, ambientTemp, refreshFriction, simpleOven,
     ovenMaxTemp, maturation,
   };
@@ -232,7 +242,12 @@ function NewRecipePage() {
 
   /* ---------------- derived ---------------- */
   useEffect(() => {
-    setHydr(styleMidpoint(style));
+    if (pendingHydr.current !== null) {
+      setHydr(pendingHydr.current);
+      pendingHydr.current = null;
+    } else {
+      setHydr(styleMidpoint(style));
+    }
     if (!cfg.allowIndirect && method !== "direct") setMethod("direct");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [style]);
@@ -321,6 +336,7 @@ function NewRecipePage() {
     refreshYeastPct: engine === "biga" && useRefreshYeast ? refreshYeastPct : 0,
     trays: isTeglia ? trays : undefined,
     kneadMode,
+    bigaKneadMode,
     mixer: kneadMode === "hand" ? "hand" : "spiral",
     storageTemp,
     bigaRealTemp,
@@ -336,7 +352,7 @@ function NewRecipePage() {
   }), [engine, preview.ballsCount, unitWeight, clampedHydration, effectiveSalt, yeastType, effectiveFlourW,
     useMalt, maltPct, useOil, oilPct, storageTemp, ambientTemp, bigaPct, style, preFerment, targetBake,
     simpleOven, ovenMaxTemp, tenacity, autolyse, blend, maturation, preFermentHydrPct, isTeglia, trays,
-    kneadMode, bigaRealTemp, refreshFlourTemp, refreshFriction, bigaFlourTemp, autolysePenalty,
+    kneadMode, bigaKneadMode, bigaRealTemp, refreshFlourTemp, refreshFriction, bigaFlourTemp, autolysePenalty,
     useRefreshYeast, refreshYeastPct, bulkFactorMin, flourGrams, avpn.banOilAndMalt]);
 
   const calc = useMemo(() => calculateRecipe(inputs), [inputs]);
@@ -431,14 +447,52 @@ function NewRecipePage() {
     ? `${t("thermo_biga_result")} ${calc.bigaWaterTemp.toFixed(1)}°C · ${t("thermo_refresh_result")} ${calc.refreshWaterTemp.toFixed(1)}°C`
     : `${t("thermo_refresh_result")} ${calc.refreshWaterTemp.toFixed(1)}°C`;
   const totalMatH = (engine === "biga" ? maturation.prefermentHours : 0)
-    + maturation.bulkFridgeH + maturation.bulkRoomH + maturation.proofRoomH;
+    + maturation.bulkFridgeH + maturation.bulkRoomH + (maturation.ballsFridgeH ?? 0) + maturation.proofRoomH;
   const sumMat = `${totalMatH} h ${t("maturation_hours")}`;
+  /** Injects the guided-assistant answers into the calculator state. */
+  function applyWizard(r: WizardResult) {
+    pendingHydr.current = r.hydration;
+    setStyle(r.style);
+    setMethod(r.engine === "biga" ? "indirect" : "direct");
+    setPreFerment(r.preFerment);
+    setHydr(r.hydration);
+    if (r.flourId) setFlourId(r.flourId);
+    setFlourW(r.flourW);
+    setBigaKneadMode(r.bigaKneadMode);
+    setKneadMode(r.kneadMode);
+    setSimpleOven(r.simpleOven);
+    setOvenMaxTemp(r.ovenMaxTempC);
+    setTargetBake(r.targetBakeISO);
+    setFlourGrams(r.flourAvailable);
+    setTargetBallWeight(r.ballWeight);
+    setNameEdited(false);
+    toast.success(t("wiz_applied"));
+  }
+
   const sumOven = `${t(SIMPLE_OVEN_LABEL_KEY[simpleOven])} · ${bt.voute[0]}–${bt.voute[1]}°C`;
 
   return (
     <AppShell>
-      <h1 className="font-display text-2xl font-bold mb-1">{t("new_recipe_title")}</h1>
-      <p className="text-sm text-muted-foreground mb-4">{t("draft_autosave")}</p>
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold mb-1">{t("new_recipe_title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("draft_autosave")}</p>
+        </div>
+        <div className="flex flex-col items-end gap-2 shrink-0">
+          <Button type="button" size="sm" variant="secondary" onClick={() => setWizardOpen(true)}>
+            <Wand2 className="size-4" />
+            {t("wiz_open")}
+          </Button>
+          <SosDough />
+        </div>
+      </div>
+
+      <RecipeWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        onApply={applyWizard}
+      />
+
 
       <Accordion type="multiple" defaultValue={["style", "dough"]} className="space-y-3">
         {/* ---------------- STYLE & METHOD ---------------- */}
@@ -668,8 +722,8 @@ function NewRecipePage() {
                 onStorageTemp={setStorageTemp}
                 flourTemp={bigaFlourTemp}
                 onFlourTemp={setBigaFlourTemp}
-                mode={kneadMode}
-                onMode={setKneadMode}
+                mode={bigaKneadMode}
+                onMode={setBigaKneadMode}
               />
             </div>
           )}
@@ -680,7 +734,6 @@ function NewRecipePage() {
               onBigaTemp={setBigaRealTemp}
               flourTemp={refreshFlourTemp}
               onFlourTemp={setRefreshFlourTemp}
-              showFlourTemp={engine === "direct" || bigaPct < 100}
               ambientTemp={ambientTemp}
               onAmbientTemp={setAmbientTemp}
               mode={kneadMode}
@@ -893,15 +946,15 @@ function NumField({
       <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</Label>
       <div className="relative mt-1">
         {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">{prefix}</span>}
-        <Input
-          type="number"
+        <NumberInput
           value={value}
+          onChange={onChange}
           min={min} max={max} step={step}
-          onChange={(e) => onChange(Number(e.target.value))}
           className={`tabular ${prefix ? "pl-8" : ""} ${suffix ? "pr-9" : ""}`}
         />
         {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">{suffix}</span>}
       </div>
+
     </div>
   );
 }

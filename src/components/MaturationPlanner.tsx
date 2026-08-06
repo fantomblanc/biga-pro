@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { NumberInput } from "@/components/NumberInput";
 import { useI18n } from "@/lib/i18n";
 import { maturationRange, maturationVerdict } from "@/lib/flours";
 import {
@@ -16,12 +16,15 @@ import { Snowflake, Thermometer, CheckCircle2, AlertTriangle } from "lucide-reac
 export interface MaturationPlan {
   prefermentLoc: PrefermentLocation;
   prefermentHours: number;
-  /** Bulk rest of the final dough. */
+  /** Step 1 — optional bulk rest of the whole dough mass. */
   bulkFridgeH: number;
   bulkRoomH: number;
-  /** Final proof of the shaped balls, at room temperature. */
+  /** Step 3 — cold maturation of the shaped balls (fridge 4°C). */
+  ballsFridgeH: number;
+  /** Step 4 — final temper / proof of the balls at room temperature. */
   proofRoomH: number;
 }
+
 
 interface Props {
   plan: MaturationPlan;
@@ -43,7 +46,9 @@ export function MaturationPlanner({ plan, onChange, showPreferment, preFerment, 
   const set = (patch: Partial<MaturationPlan>) => onChange({ ...plan, ...patch });
 
   const prefH = showPreferment ? Math.max(0, plan.prefermentHours) : 0;
-  const total = prefH + Math.max(0, plan.bulkFridgeH) + Math.max(0, plan.bulkRoomH) + Math.max(0, plan.proofRoomH);
+  const total = prefH + Math.max(0, plan.bulkFridgeH) + Math.max(0, plan.bulkRoomH)
+    + Math.max(0, plan.ballsFridgeH ?? 0) + Math.max(0, plan.proofRoomH);
+
   const [lo, hi] = useMemo(() => maturationRange(flourW), [flourW]);
   const verdict = maturationVerdict(total, flourW);
 
@@ -107,7 +112,8 @@ export function MaturationPlanner({ plan, onChange, showPreferment, preFerment, 
         </div>
 
         <div className="rounded-lg border border-border/60 p-3 space-y-2">
-          <div className="text-[11px] font-semibold">{t("mat_bulk_step")}</div>
+          <div className="text-[11px] font-semibold">{t("mat_s1_bulk")}</div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">{t("mat_s1_bulk_desc")}</p>
           <div className="grid grid-cols-2 gap-2">
             <HField
               icon={<Snowflake className="size-3.5 text-[color:var(--fridge)]" />}
@@ -124,8 +130,25 @@ export function MaturationPlanner({ plan, onChange, showPreferment, preFerment, 
           </div>
         </div>
 
+        <div className="rounded-lg border border-border/60 p-3">
+          <div className="text-[11px] font-semibold">{t("mat_s2_balling")}</div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed mt-1">{t("mat_s2_balling_desc")}</p>
+        </div>
+
+        <div className="rounded-lg border border-[color:var(--fridge)]/40 p-3 space-y-2">
+          <div className="text-[11px] font-semibold">{t("mat_s3_cold_balls")}</div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">{t("mat_s3_cold_balls_desc")}</p>
+          <HField
+            icon={<Snowflake className="size-3.5 text-[color:var(--fridge)]" />}
+            label={t("mat_s3_field")}
+            value={plan.ballsFridgeH ?? 0}
+            onChange={(v) => set({ ballsFridgeH: v })}
+          />
+        </div>
+
         <div className="rounded-lg border border-border/60 p-3 space-y-2">
-          <div className="text-[11px] font-semibold">{t("mat_proof_step")}</div>
+          <div className="text-[11px] font-semibold">{t("mat_s4_temper")}</div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">{t("mat_s4_temper_desc")}</p>
           <HField
             icon={<Thermometer className="size-3.5 text-[color:var(--final)]" />}
             label={t("mat_proof_room")}
@@ -133,6 +156,7 @@ export function MaturationPlanner({ plan, onChange, showPreferment, preFerment, 
             onChange={(v) => set({ proofRoomH: v })}
           />
         </div>
+
       </div>
 
       <div
@@ -171,16 +195,17 @@ function HField({
         {icon}{label}
       </Label>
       <div className="relative mt-1">
-        <Input
-          type="number"
+        <NumberInput
           min={0}
           step={0.5}
+          fallback={0}
           value={value}
-          onChange={(e) => onChange(Math.max(0, Number(e.target.value)))}
+          onChange={(v) => onChange(Math.max(0, v))}
           className="tabular pr-8 h-9"
         />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">h</span>
       </div>
+
     </div>
   );
 }

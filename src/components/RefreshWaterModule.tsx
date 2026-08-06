@@ -18,12 +18,12 @@ interface Props {
   /** Mature pre-ferment temperature; undefined for the direct method. */
   bigaTemp?: number;
   onBigaTemp?: (v: number) => void;
-  /** Added flour temperature — only when the pre-ferment is below 100%. */
+  /** Flour temperature — only used by the direct method. */
   flourTemp: number;
   onFlourTemp: (v: number) => void;
-  showFlourTemp: boolean;
   ambientTemp: number;
   onAmbientTemp: (v: number) => void;
+  /** Equipment used for THIS stage only — fully independent of the Biga mix. */
   mode: KneadMode;
   onMode: (m: KneadMode) => void;
   friction: number;
@@ -32,9 +32,9 @@ interface Props {
   bare?: boolean;
 }
 
-/** Module B — refreshment / full-mix water temperature (target dough 23–24°C). */
+/** Module B — refreshment / full-mix water temperature (target dough 23°C). */
 export function RefreshWaterModule({
-  bigaTemp, onBigaTemp, flourTemp, onFlourTemp, showFlourTemp,
+  bigaTemp, onBigaTemp, flourTemp, onFlourTemp,
   ambientTemp, onAmbientTemp, mode, onMode, friction, onFriction,
   autolysePenalty = 0, bare,
 }: Props) {
@@ -42,13 +42,7 @@ export function RefreshWaterModule({
   const [fMin, fMax] = REFRESH_FRICTION_RANGE[mode];
 
   const res = bigaTemp !== undefined
-    ? refreshWaterTemp({
-        bigaTemp,
-        ambientTemp,
-        friction,
-        flourTemp: showFlourTemp ? flourTemp : undefined,
-        autolysePenalty,
-      })
+    ? refreshWaterTemp({ bigaTemp, ambientTemp, friction, autolysePenalty })
     : directWaterTemp({ ambientTemp, flourTemp, friction });
 
   const body = (
@@ -67,14 +61,17 @@ export function RefreshWaterModule({
         {bigaTemp !== undefined && onBigaTemp && (
           <NumF label={t("thermo_biga_real_temp")} value={bigaTemp} onChange={onBigaTemp} />
         )}
-        {showFlourTemp && (
+        {bigaTemp === undefined && (
           <NumF label={t("thermo_refresh_flour_temp")} value={flourTemp} onChange={onFlourTemp} />
         )}
         <NumF label={t("thermo_ambient_temp")} value={ambientTemp} onChange={onAmbientTemp} />
       </div>
 
       <div>
-        <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("thermo_equipment")}</Label>
+        <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+          {t("thermo_equipment_refresh")}
+        </Label>
+        <p className="text-[10px] text-muted-foreground mt-1">{t("thermo_equipment_independent")}</p>
         <div className="grid grid-cols-3 gap-2 mt-1.5">
           {KNEAD_MODES.map((m) => (
             <button
@@ -118,7 +115,9 @@ export function RefreshWaterModule({
         <p className="text-[10px] text-muted-foreground mt-1">{t("thermo_refresh_target")}</p>
         <p className="text-[10px] text-muted-foreground tabular mt-1">{res.formula}</p>
         {res.needsIce && (
-          <p className="text-[11px] mt-2 rounded-md border border-warning/40 bg-warning/10 p-2">{t("thermo_ice")}</p>
+          <p className="text-[11px] mt-2 rounded-md border border-warning/40 bg-warning/10 p-2 font-medium">
+            {t("thermo_ice_4")}
+          </p>
         )}
         {res.clamped && <p className="text-[11px] mt-2 text-muted-foreground">{t("thermo_clamped")}</p>}
       </div>

@@ -39,7 +39,10 @@ export const REFRESH_FRICTION_RANGE: Record<KneadMode, [number, number]> = {
 };
 
 export const BIGA_TARGET_TEMP = 19;
-export const REFRESH_TARGET_TEMP = 23.5;
+export const REFRESH_TARGET_TEMP = 23;
+/** At or below this temperature ice water is mandatory. */
+export const ICE_WATER_THRESHOLD = 4;
+
 
 export interface WaterTempResult {
   /** Water temperature to use (°C), already clamped to a physical range. */
@@ -60,7 +63,7 @@ function finish(raw: number, min: number, max: number, formula: string): WaterTe
     waterTemp: Number(value.toFixed(1)),
     raw: Number(raw.toFixed(1)),
     clamped: Math.abs(value - raw) > 0.05,
-    needsIce: value <= 6,
+    needsIce: value <= ICE_WATER_THRESHOLD,
     formula,
   };
 }
@@ -85,32 +88,30 @@ export function bigaWaterTemp(opts: {
 }
 
 /**
- * B. Refreshment water: n × target − (biga + [added flour] + room + friction).
- * `flourTemp` is only counted when flour is actually added (Biga < 100%).
+ * B. Refreshment water — rigorous 3-term rule:
+ *   T°water = (3 × target final dough) − (room T° + mature pre-ferment T° + mixer heating)
+ * The friction of the selected equipment is always SUBTRACTED, so the water can
+ * never come out warm; it is what cools the long knead down.
  */
 export function refreshWaterTemp(opts: {
   bigaTemp: number;
   ambientTemp: number;
   friction: number;
-  /** Undefined when the pre-ferment is 100% of the flour. */
-  flourTemp?: number;
   target?: number;
   autolysePenalty?: number;
 }): WaterTempResult {
   const target = opts.target ?? REFRESH_TARGET_TEMP;
-  const terms = [opts.bigaTemp, opts.ambientTemp];
-  if (opts.flourTemp !== undefined) terms.splice(1, 0, opts.flourTemp);
-  const n = terms.length + 1; // + the water itself
-  const sum = terms.reduce((a, b) => a + b, 0);
-  const raw = n * target - (sum + opts.friction) - (opts.autolysePenalty ?? 0);
+  const raw =
+    3 * target - (opts.ambientTemp + opts.bigaTemp + opts.friction) - (opts.autolysePenalty ?? 0);
   return finish(
     raw,
     -5,
     // Never tepid: refreshment water must cool the long knead down.
     20,
-    `(${n} × ${target}) − (${terms.join(" + ")} + ${opts.friction}) = ${raw.toFixed(1)}°C`,
+    `(3 × ${target}) − (${opts.ambientTemp} + ${opts.bigaTemp} + ${opts.friction}) = ${raw.toFixed(1)}°C`,
   );
 }
+
 
 /** Direct method: same physics, no pre-ferment term. */
 export function directWaterTemp(opts: {

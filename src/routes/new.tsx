@@ -135,6 +135,8 @@ function NewRecipePage() {
 
   // Thermal modules
   const [kneadMode, setKneadMode] = useState<KneadMode>("hand");
+  // Independent equipment for the Biga / pre-ferment mix.
+  const [bigaKneadMode, setBigaKneadMode] = useState<KneadMode>("hand");
   const [storageTemp, setStorageTemp] = useState(18);
   const [bigaFlourTemp, setBigaFlourTemp] = useState(20);
   const [bigaRealTemp, setBigaRealTemp] = useState(18);
@@ -152,6 +154,7 @@ function NewRecipePage() {
     prefermentHours: 18,
     bulkFridgeH: 24,
     bulkRoomH: 1,
+    ballsFridgeH: 0,
     proofRoomH: 4,
   });
 
@@ -195,6 +198,7 @@ function NewRecipePage() {
         if (typeof d.useRefreshYeast === "boolean") setUseRefreshYeast(d.useRefreshYeast);
         if (typeof d.refreshYeastPct === "number") setRefreshYeastPct(d.refreshYeastPct);
         if (d.kneadMode) setKneadMode(d.kneadMode);
+        if (d.bigaKneadMode) setBigaKneadMode(d.bigaKneadMode);
         if (typeof d.storageTemp === "number") setStorageTemp(d.storageTemp);
         if (typeof d.bigaFlourTemp === "number") setBigaFlourTemp(d.bigaFlourTemp);
         if (typeof d.bigaRealTemp === "number") setBigaRealTemp(d.bigaRealTemp);
@@ -203,7 +207,7 @@ function NewRecipePage() {
         if (typeof d.refreshFriction === "number") setRefreshFriction(d.refreshFriction);
         if (d.simpleOven) setSimpleOven(d.simpleOven);
         if (typeof d.ovenMaxTemp === "number") setOvenMaxTemp(d.ovenMaxTemp);
-        if (d.maturation) setMaturation(d.maturation);
+        if (d.maturation) setMaturation({ ballsFridgeH: 0, ...d.maturation });
         toast.success(t("draft_restored"));
       }
     } catch {
@@ -216,7 +220,7 @@ function NewRecipePage() {
   const draft = {
     style, method, preFerment, name, nameEdited, flourGrams, targetBallWeight, hydration, saltPct,
     yeastType, flourW, flourId, useMalt, maltPct, useOil, oilPct, bigaPct, targetBake, tenacity,
-    blend, autolyse, trays, bigaHydr, useRefreshYeast, refreshYeastPct, kneadMode, storageTemp,
+    blend, autolyse, trays, bigaHydr, useRefreshYeast, refreshYeastPct, kneadMode, bigaKneadMode, storageTemp,
     bigaFlourTemp, bigaRealTemp, refreshFlourTemp, ambientTemp, refreshFriction, simpleOven,
     ovenMaxTemp, maturation,
   };
@@ -321,6 +325,7 @@ function NewRecipePage() {
     refreshYeastPct: engine === "biga" && useRefreshYeast ? refreshYeastPct : 0,
     trays: isTeglia ? trays : undefined,
     kneadMode,
+    bigaKneadMode,
     mixer: kneadMode === "hand" ? "hand" : "spiral",
     storageTemp,
     bigaRealTemp,
@@ -336,7 +341,7 @@ function NewRecipePage() {
   }), [engine, preview.ballsCount, unitWeight, clampedHydration, effectiveSalt, yeastType, effectiveFlourW,
     useMalt, maltPct, useOil, oilPct, storageTemp, ambientTemp, bigaPct, style, preFerment, targetBake,
     simpleOven, ovenMaxTemp, tenacity, autolyse, blend, maturation, preFermentHydrPct, isTeglia, trays,
-    kneadMode, bigaRealTemp, refreshFlourTemp, refreshFriction, bigaFlourTemp, autolysePenalty,
+    kneadMode, bigaKneadMode, bigaRealTemp, refreshFlourTemp, refreshFriction, bigaFlourTemp, autolysePenalty,
     useRefreshYeast, refreshYeastPct, bulkFactorMin, flourGrams, avpn.banOilAndMalt]);
 
   const calc = useMemo(() => calculateRecipe(inputs), [inputs]);
@@ -431,7 +436,7 @@ function NewRecipePage() {
     ? `${t("thermo_biga_result")} ${calc.bigaWaterTemp.toFixed(1)}°C · ${t("thermo_refresh_result")} ${calc.refreshWaterTemp.toFixed(1)}°C`
     : `${t("thermo_refresh_result")} ${calc.refreshWaterTemp.toFixed(1)}°C`;
   const totalMatH = (engine === "biga" ? maturation.prefermentHours : 0)
-    + maturation.bulkFridgeH + maturation.bulkRoomH + maturation.proofRoomH;
+    + maturation.bulkFridgeH + maturation.bulkRoomH + (maturation.ballsFridgeH ?? 0) + maturation.proofRoomH;
   const sumMat = `${totalMatH} h ${t("maturation_hours")}`;
   const sumOven = `${t(SIMPLE_OVEN_LABEL_KEY[simpleOven])} · ${bt.voute[0]}–${bt.voute[1]}°C`;
 
@@ -668,8 +673,8 @@ function NewRecipePage() {
                 onStorageTemp={setStorageTemp}
                 flourTemp={bigaFlourTemp}
                 onFlourTemp={setBigaFlourTemp}
-                mode={kneadMode}
-                onMode={setKneadMode}
+                mode={bigaKneadMode}
+                onMode={setBigaKneadMode}
               />
             </div>
           )}
@@ -680,7 +685,6 @@ function NewRecipePage() {
               onBigaTemp={setBigaRealTemp}
               flourTemp={refreshFlourTemp}
               onFlourTemp={setRefreshFlourTemp}
-              showFlourTemp={engine === "direct" || bigaPct < 100}
               ambientTemp={ambientTemp}
               onAmbientTemp={setAmbientTemp}
               mode={kneadMode}

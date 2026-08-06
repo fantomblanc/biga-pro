@@ -442,8 +442,26 @@ function NewRecipePage() {
 
   return (
     <AppShell>
-      <h1 className="font-display text-2xl font-bold mb-1">{t("new_recipe_title")}</h1>
-      <p className="text-sm text-muted-foreground mb-4">{t("draft_autosave")}</p>
+      <div className="flex items-start justify-between gap-3 mb-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold mb-1">{t("new_recipe_title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("draft_autosave")}</p>
+        </div>
+        <div className="flex flex-col items-end gap-2 shrink-0">
+          <Button type="button" size="sm" variant="secondary" onClick={() => setWizardOpen(true)}>
+            <Wand2 className="size-4" />
+            {t("wiz_open")}
+          </Button>
+          <SosDough />
+        </div>
+      </div>
+
+      <RecipeWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        onApply={applyWizard}
+      />
+
 
       <Accordion type="multiple" defaultValue={["style", "dough"]} className="space-y-3">
         {/* ---------------- STYLE & METHOD ---------------- */}

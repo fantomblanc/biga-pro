@@ -112,7 +112,8 @@ export function MaturationPlanner({ plan, onChange, showPreferment, preFerment, 
         </div>
 
         <div className="rounded-lg border border-border/60 p-3 space-y-2">
-          <div className="text-[11px] font-semibold">{t("mat_bulk_step")}</div>
+          <div className="text-[11px] font-semibold">{t("mat_s1_bulk")}</div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">{t("mat_s1_bulk_desc")}</p>
           <div className="grid grid-cols-2 gap-2">
             <HField
               icon={<Snowflake className="size-3.5 text-[color:var(--fridge)]" />}
@@ -129,8 +130,25 @@ export function MaturationPlanner({ plan, onChange, showPreferment, preFerment, 
           </div>
         </div>
 
+        <div className="rounded-lg border border-border/60 p-3">
+          <div className="text-[11px] font-semibold">{t("mat_s2_balling")}</div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed mt-1">{t("mat_s2_balling_desc")}</p>
+        </div>
+
+        <div className="rounded-lg border border-[color:var(--fridge)]/40 p-3 space-y-2">
+          <div className="text-[11px] font-semibold">{t("mat_s3_cold_balls")}</div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">{t("mat_s3_cold_balls_desc")}</p>
+          <HField
+            icon={<Snowflake className="size-3.5 text-[color:var(--fridge)]" />}
+            label={t("mat_s3_field")}
+            value={plan.ballsFridgeH ?? 0}
+            onChange={(v) => set({ ballsFridgeH: v })}
+          />
+        </div>
+
         <div className="rounded-lg border border-border/60 p-3 space-y-2">
-          <div className="text-[11px] font-semibold">{t("mat_proof_step")}</div>
+          <div className="text-[11px] font-semibold">{t("mat_s4_temper")}</div>
+          <p className="text-[10px] text-muted-foreground leading-relaxed">{t("mat_s4_temper_desc")}</p>
           <HField
             icon={<Thermometer className="size-3.5 text-[color:var(--final)]" />}
             label={t("mat_proof_room")}
@@ -138,6 +156,7 @@ export function MaturationPlanner({ plan, onChange, showPreferment, preFerment, 
             onChange={(v) => set({ proofRoomH: v })}
           />
         </div>
+
       </div>
 
       <div

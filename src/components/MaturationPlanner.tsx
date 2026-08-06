@@ -195,16 +195,17 @@ function HField({
         {icon}{label}
       </Label>
       <div className="relative mt-1">
-        <Input
-          type="number"
+        <NumberInput
           min={0}
           step={0.5}
+          fallback={0}
           value={value}
-          onChange={(e) => onChange(Math.max(0, Number(e.target.value)))}
+          onChange={(v) => onChange(Math.max(0, v))}
           className="tabular pr-8 h-9"
         />
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">h</span>
       </div>
+
     </div>
   );
 }

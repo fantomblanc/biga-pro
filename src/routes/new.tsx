@@ -68,7 +68,10 @@ import { setActiveId } from "@/lib/storage";
 import { saveRecipe } from "@/lib/cloud";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { AlertTriangle, Save, Pizza, Wheat, Gauge, Thermometer, ChefHat, Sprout, Droplets, Snowflake, RefreshCw, Trash2 } from "lucide-react";
+import { NumberInput } from "@/components/NumberInput";
+import { SosDough } from "@/components/SosDough";
+import { RecipeWizard, type WizardResult } from "@/components/RecipeWizard";
+import { AlertTriangle, Save, Pizza, Wheat, Gauge, Thermometer, ChefHat, Sprout, Droplets, Snowflake, RefreshCw, Trash2, Wand2 } from "lucide-react";
 
 export const Route = createFileRoute("/new")({
   head: () => ({
@@ -158,6 +161,7 @@ function NewRecipePage() {
     proofRoomH: 4,
   });
 
+  const [wizardOpen, setWizardOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const hydrated = useRef(false);
 
@@ -438,6 +442,25 @@ function NewRecipePage() {
   const totalMatH = (engine === "biga" ? maturation.prefermentHours : 0)
     + maturation.bulkFridgeH + maturation.bulkRoomH + (maturation.ballsFridgeH ?? 0) + maturation.proofRoomH;
   const sumMat = `${totalMatH} h ${t("maturation_hours")}`;
+  /** Injects the guided-assistant answers into the calculator state. */
+  function applyWizard(r: WizardResult) {
+    setStyle(r.style);
+    setMethod(r.engine === "biga" ? "indirect" : "direct");
+    setPreFerment(r.preFerment);
+    setHydr(r.hydration);
+    if (r.flourId) setFlourId(r.flourId);
+    setFlourW(r.flourW);
+    setBigaKneadMode(r.bigaKneadMode);
+    setKneadMode(r.kneadMode);
+    setSimpleOven(r.simpleOven);
+    setOvenMaxTemp(r.ovenMaxTempC);
+    setTargetBake(r.targetBakeISO);
+    setFlourGrams(r.flourAvailable);
+    setTargetBallWeight(r.ballWeight);
+    setNameEdited(false);
+    toast.success(t("wiz_applied"));
+  }
+
   const sumOven = `${t(SIMPLE_OVEN_LABEL_KEY[simpleOven])} · ${bt.voute[0]}–${bt.voute[1]}°C`;
 
   return (

@@ -309,10 +309,10 @@ export function calculateRecipe(inp: RecipeInputs): RecipeCalc {
         bigaTemp: inp.bigaRealTemp ?? inp.storageTemp ?? inp.cellarTemp,
         ambientTemp: ambient,
         friction,
-        flourTemp: bigaPct < 100 ? (inp.refreshFlourTemp ?? flourT) : undefined,
         autolysePenalty: inp.autolyseTempPenalty ?? 0,
       }).waterTemp
     : directWaterTempThermo({ ambientTemp: ambient, flourTemp: flourT, friction }).waterTemp;
+
 
 
   const bt = calcBakingTemps(inp.engine, inp.hydration);

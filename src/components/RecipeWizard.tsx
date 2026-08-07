@@ -192,7 +192,7 @@ export function RecipeWizard({
                         preFerment === p ? "border-primary bg-primary/10 text-primary" : "border-border hover:border-primary/40"
                       }`}
                     >
-                      {p === "biga" ? t("pf_biga") : t("pf_poolish")}
+                      {p === "biga" ? t("preferment_biga") : t("preferment_poolish")}
                     </button>
                   ))}
                 </div>

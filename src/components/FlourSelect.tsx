@@ -94,12 +94,16 @@ export function FlourSelect({ value, onChange, label }: Props) {
                     </CommandItem>
                   ))}
                 </CommandGroup>
-                <CommandGroup>
-                  <CommandItem value={MANUAL} onSelect={() => pick(MANUAL)}>
-                    <Search className="mr-2 size-3.5 opacity-60" />
-                    <span className="text-xs">{t("flour_manual")}</span>
-                  </CommandItem>
-                </CommandGroup>
+              </CommandList>
+              <button
+                type="button"
+                onClick={() => pick(MANUAL)}
+                className="flex w-full items-center gap-2 border-t border-border/60 px-3 py-2.5 text-left text-xs hover:bg-accent"
+              >
+                <Search className="size-3.5 opacity-60" />
+                {t("flour_manual")}
+              </button>
+            </Command>
               </CommandList>
             </Command>
           </PopoverContent>

@@ -78,12 +78,6 @@ export function FlourSelect({ value, onChange, label }: Props) {
               />
               <CommandList className="max-h-72">
                 <CommandEmpty>{t("flour_search_empty")}</CommandEmpty>
-                <CommandGroup>
-                  <CommandItem value={MANUAL} onSelect={() => pick(MANUAL)}>
-                    <Search className="mr-2 size-3.5 opacity-60" />
-                    <span className="text-xs">{t("flour_manual")}</span>
-                  </CommandItem>
-                </CommandGroup>
                 <CommandGroup heading={`${results.length} ${t("flour_results")}`}>
                   {results.map((f) => (
                     <CommandItem key={f.id} value={f.id} onSelect={() => pick(f.id)}>
@@ -99,6 +93,12 @@ export function FlourSelect({ value, onChange, label }: Props) {
                       </div>
                     </CommandItem>
                   ))}
+                </CommandGroup>
+                <CommandGroup>
+                  <CommandItem value={MANUAL} onSelect={() => pick(MANUAL)}>
+                    <Search className="mr-2 size-3.5 opacity-60" />
+                    <span className="text-xs">{t("flour_manual")}</span>
+                  </CommandItem>
                 </CommandGroup>
               </CommandList>
             </Command>

@@ -104,8 +104,6 @@ export function FlourSelect({ value, onChange, label }: Props) {
                 {t("flour_manual")}
               </button>
             </Command>
-              </CommandList>
-            </Command>
           </PopoverContent>
         </Popover>
 

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/NumberInput";
 import { useI18n } from "@/lib/i18n";
 import { FLOURS } from "@/lib/flours";
+import { FlourSelect } from "@/components/FlourSelect";
 import {
   PIZZA_STYLES, STYLE_CONFIG, styleMidpoint, clampHydrationToStyle,
   type PizzaStyle, type EngineType, type PreFermentType,
@@ -140,7 +141,7 @@ export function RecipeWizard({
 
           {step === 1 && (
             <div className="space-y-3">
-              <FlourSelect value={flourId} onChange={(id) => setFlourId(id)} />
+              <FlourSelect value={flourId} onChange={(id: string) => setFlourId(id)} />
               {flour && (
                 <div className="rounded-lg border border-primary/40 bg-primary/5 p-3">
                   <div className="text-xs">
@@ -221,7 +222,7 @@ export function RecipeWizard({
               </div>
               {flour && (
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  {flour.name} · W {flour.w}
+                  {flour.brand} - {flour.name} · W {flour.w} | {flour.protein}g prot
                 </p>
               )}
             </div>

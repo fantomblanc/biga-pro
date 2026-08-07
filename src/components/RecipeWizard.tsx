@@ -60,7 +60,7 @@ export function RecipeWizard({
   const [step, setStep] = useState(0);
 
   const [style, setStyle] = useState<PizzaStyle>("contemporanea");
-  const [flourId, setFlourId] = useState<string>(FLOURS[0]?.id ?? "");
+  const [flourId, setFlourId] = useState<string>("caputo_cuoco");
   const [engine, setEngine] = useState<EngineType>("biga");
   const [preFerment, setPreFerment] = useState<PreFermentType>("biga");
   const [hydration, setHydration] = useState<number>(styleMidpoint("contemporanea"));

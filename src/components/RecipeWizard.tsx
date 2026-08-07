@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/NumberInput";
 import { useI18n } from "@/lib/i18n";
 import { FLOURS } from "@/lib/flours";
+import { FlourSelect } from "@/components/FlourSelect";
 import {
   PIZZA_STYLES, STYLE_CONFIG, styleMidpoint, clampHydrationToStyle,
   type PizzaStyle, type EngineType, type PreFermentType,
@@ -59,7 +60,7 @@ export function RecipeWizard({
   const [step, setStep] = useState(0);
 
   const [style, setStyle] = useState<PizzaStyle>("contemporanea");
-  const [flourId, setFlourId] = useState<string>(FLOURS[0]?.id ?? "");
+  const [flourId, setFlourId] = useState<string>("caputo_cuoco");
   const [engine, setEngine] = useState<EngineType>("biga");
   const [preFerment, setPreFerment] = useState<PreFermentType>("biga");
   const [hydration, setHydration] = useState<number>(styleMidpoint("contemporanea"));
@@ -139,22 +140,19 @@ export function RecipeWizard({
           )}
 
           {step === 1 && (
-            <div className="space-y-2">
-              {FLOURS.slice(0, 12).map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setFlourId(f.id)}
-                  className={`w-full rounded-lg border p-2.5 text-left transition-colors ${
-                    flourId === f.id ? "border-primary bg-primary/10" : "border-border hover:border-primary/40"
-                  }`}
-                >
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-xs font-semibold">{f.name}</span>
-                    <span className="tabular text-[11px] text-primary">W {f.w}</span>
+            <div className="space-y-3">
+              <FlourSelect value={flourId} onChange={(id: string) => setFlourId(id)} />
+              {flour && (
+                <div className="rounded-lg border border-primary/40 bg-primary/5 p-3">
+                  <div className="text-xs">
+                    <span className="font-semibold uppercase">{flour.brand}</span>
+                    <span className="text-muted-foreground"> - {flour.name}</span>
                   </div>
-                </button>
-              ))}
+                  <div className="tabular mt-1 text-[11px] text-muted-foreground">
+                    W{flour.w} | {flour.protein}g prot · {t(flour.useKey)}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -194,7 +192,7 @@ export function RecipeWizard({
                         preFerment === p ? "border-primary bg-primary/10 text-primary" : "border-border hover:border-primary/40"
                       }`}
                     >
-                      {p === "biga" ? t("pf_biga") : t("pf_poolish")}
+                      {p === "biga" ? t("preferment_biga") : t("preferment_poolish")}
                     </button>
                   ))}
                 </div>
@@ -224,7 +222,7 @@ export function RecipeWizard({
               </div>
               {flour && (
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  {flour.name} · W {flour.w}
+                  {flour.brand} - {flour.name} · W {flour.w} | {flour.protein}g prot
                 </p>
               )}
             </div>

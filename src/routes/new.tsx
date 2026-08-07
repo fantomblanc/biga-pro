@@ -171,6 +171,7 @@ function NewRecipePage() {
   const isTeglia = style === "teglia";
   const avpn = avpnRules(style);
   const engine: EngineType = method === "indirect" ? "biga" : "direct";
+  const bigaPctEdited = useRef(false);
 
   /* ---------------- draft autosave ---------------- */
   useEffect(() => {
@@ -252,8 +253,10 @@ function NewRecipePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [style]);
 
+  // Default pre-ferment share follows the pre-ferment type only while the user
+  // has not moved the slider — no silent reset of a manual choice.
   useEffect(() => {
-    if (method !== "indirect") return;
+    if (method !== "indirect" || bigaPctEdited.current) return;
     setBigaPct(preFerment === "poolish" ? 30 : 80);
   }, [preFerment, method]);
 
@@ -553,7 +556,7 @@ function NewRecipePage() {
                   <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{preLabels.pct}</Label>
                   <span className="tabular text-sm font-semibold text-primary">{bigaPct}%</span>
                 </div>
-                <Slider value={[bigaPct]} min={20} max={100} step={1} onValueChange={(v) => setBigaPct(v[0])} />
+                <Slider value={[bigaPct]} min={20} max={100} step={1} onValueChange={(v) => { bigaPctEdited.current = true; setBigaPct(v[0]); }} />
                 <p className="text-[11px] text-muted-foreground leading-tight">{preLabels.pctHelp}</p>
               </div>
 

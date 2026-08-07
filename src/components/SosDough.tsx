@@ -45,17 +45,18 @@ export function SosDough({ trigger }: { trigger?: React.ReactNode }) {
         {trigger ?? (
           <button
             type="button"
-            className="flex items-center gap-1 text-xs font-medium text-destructive hover:text-destructive/80 transition-colors"
-            aria-label={t("sos_title")}
+            className="flex items-center gap-1.5 rounded-lg border border-destructive/50 bg-destructive/10 px-2.5 py-1.5 text-xs font-bold text-destructive transition-colors hover:bg-destructive/20"
+            aria-label={t("sos_button")}
           >
-            <LifeBuoy className="size-4" />
-            <span className="hidden sm:inline">{t("sos_short")}</span>
+            <LifeBuoy className="size-4 shrink-0" />
+            <span className="hidden sm:inline">🆘 {t("sos_button")}</span>
+            <span className="sm:hidden">🆘 {t("sos_short")}</span>
           </button>
         )}
       </DialogTrigger>
       <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display">🆘 {t("sos_title")}</DialogTitle>
+          <DialogTitle className="font-display">🆘 {t("sos_button")}</DialogTitle>
           <DialogDescription>{t("sos_desc")}</DialogDescription>
         </DialogHeader>
         <Accordion type="single" collapsible className="space-y-2">

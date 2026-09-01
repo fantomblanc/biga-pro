@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { NumberInput } from "@/components/NumberInput";
+import { Slider } from "@/components/ui/slider";
 import { useI18n } from "@/lib/i18n";
 import { maturationRange, maturationVerdict } from "@/lib/flours";
 import {
@@ -16,6 +17,8 @@ import { Snowflake, Thermometer, CheckCircle2, AlertTriangle } from "lucide-reac
 export interface MaturationPlan {
   prefermentLoc: PrefermentLocation;
   prefermentHours: number;
+  /** Hybrid maturation: hours spent at room temperature (rest goes to the fridge). */
+  prefermentRoomH?: number;
   /** Step 1 — optional bulk rest of the whole dough mass. */
   bulkFridgeH: number;
   bulkRoomH: number;

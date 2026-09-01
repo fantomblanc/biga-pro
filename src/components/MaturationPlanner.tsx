@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { NumberInput } from "@/components/NumberInput";
+import { Slider } from "@/components/ui/slider";
 import { useI18n } from "@/lib/i18n";
 import { maturationRange, maturationVerdict } from "@/lib/flours";
 import {
@@ -16,6 +17,8 @@ import { Snowflake, Thermometer, CheckCircle2, AlertTriangle } from "lucide-reac
 export interface MaturationPlan {
   prefermentLoc: PrefermentLocation;
   prefermentHours: number;
+  /** Hybrid maturation: hours spent at room temperature (rest goes to the fridge). */
+  prefermentRoomH?: number;
   /** Step 1 — optional bulk rest of the whole dough mass. */
   bulkFridgeH: number;
   bulkRoomH: number;
@@ -100,6 +103,32 @@ export function MaturationPlanner({ plan, onChange, showPreferment, preFerment, 
             value={plan.prefermentHours}
             onChange={(v) => set({ prefermentHours: v })}
           />
+          {plan.prefermentLoc === "hybrid" && (
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  {t("mat_hybrid_split")}
+                </Label>
+                <span className="tabular text-[11px] font-semibold text-primary">
+                  {(plan.prefermentRoomH ?? 0)} h TA / {Math.max(0, plan.prefermentHours - (plan.prefermentRoomH ?? 0))} h {t("preferment_loc_fridge")}
+                </span>
+              </div>
+              <Slider
+                value={[Math.min(plan.prefermentHours, plan.prefermentRoomH ?? 0)]}
+                min={0}
+                max={Math.max(1, plan.prefermentHours)}
+                step={0.5}
+                onValueChange={(v) => set({ prefermentRoomH: v[0] })}
+              />
+              <p className="text-[10px] text-muted-foreground">{t("mat_hybrid_hint")}</p>
+            </div>
+          )}
+          {(plan.prefermentLoc === "fridge"
+            || (plan.prefermentLoc === "hybrid" && (plan.prefermentRoomH ?? 0) === 0)) && (
+            <p className="text-[11px] rounded-md border border-warning/40 bg-warning/10 p-2 leading-relaxed">
+              {t("mat_all_cold_warning")}
+            </p>
+          )}
           <p className="text-[11px] text-muted-foreground leading-relaxed">
             {t(prefermentProfile(plan.prefermentLoc, preFerment).descKey)}
           </p>

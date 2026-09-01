@@ -147,3 +147,49 @@ export function maturationVerdict(totalH: number, w: number): MaturationVerdict 
   if (totalH > hi) return "over";
   return "optimal";
 }
+
+/* ------------------------------------------------------------------ */
+/* Compatibility: flour strength vs style and vs mixing method         */
+/* ------------------------------------------------------------------ */
+
+/** Minimum reasonable W index per pizza style id. */
+export const STYLE_MIN_W: Record<string, number> = {
+  napoletana: 240,
+  contemporanea: 280,
+  canotto: 300,
+  teglia: 300,
+  focaccia: 300,
+  romana: 220,
+  pala: 300,
+  detroit: 260,
+  nyc: 250,
+};
+
+export function styleMinW(style: string): number {
+  return STYLE_MIN_W[style] ?? 250;
+}
+
+/** True when the flour is too weak for the requested style. */
+export function isFlourTooWeak(w: number, style: string): boolean {
+  return w < styleMinW(style);
+}
+
+export type WizardMethod = "direct_short" | "direct_long" | "biga" | "poolish" | "unsure";
+
+export type MethodVerdict = "good" | "bad";
+
+/** Green / red badge for a mixing method given the flour strength. */
+export function methodVerdict(w: number, method: WizardMethod): MethodVerdict {
+  switch (method) {
+    case "direct_short":
+      return w <= 300 ? "good" : "bad";
+    case "direct_long":
+      return w >= 260 ? "good" : "bad";
+    case "biga":
+      return w >= 300 ? "good" : "bad";
+    case "poolish":
+      return w >= 260 ? "good" : "bad";
+    default:
+      return "good";
+  }
+}

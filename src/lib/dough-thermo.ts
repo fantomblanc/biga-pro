@@ -44,6 +44,9 @@ export const REFRESH_TARGET_TEMP = 23;
 export const ICE_WATER_THRESHOLD = 4;
 
 
+/** Refreshment water is never allowed above this value (ambient water max). */
+export const REFRESH_WATER_MAX = 20;
+
 export interface WaterTempResult {
   /** Water temperature to use (°C), already clamped to a physical range. */
   waterTemp: number;
@@ -53,6 +56,8 @@ export interface WaterTempResult {
   clamped: boolean;
   /** Ice water strongly recommended. */
   needsIce: boolean;
+  /** Theoretical value exceeded the ambient-water ceiling (biga far too cold). */
+  tooWarm: boolean;
   /** Human formula, already numeric, for display. */
   formula: string;
 }
@@ -64,9 +69,18 @@ function finish(raw: number, min: number, max: number, formula: string): WaterTe
     raw: Number(raw.toFixed(1)),
     clamped: Math.abs(value - raw) > 0.05,
     needsIce: value <= ICE_WATER_THRESHOLD,
+    tooWarm: raw > max + 0.05 && max <= REFRESH_WATER_MAX,
     formula,
   };
 }
+
+/** Suggested measured biga temperature depending on where it matured. */
+export const SUGGESTED_BIGA_TEMP: Record<string, number> = {
+  fridge: 6,
+  hybrid: 12,
+  cellar: 17,
+  ambient: 20,
+};
 
 /** A. Biga water: 3 × target − (storage + flour + short-mix heating). */
 export function bigaWaterTemp(opts: {

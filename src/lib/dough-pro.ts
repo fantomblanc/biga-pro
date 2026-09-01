@@ -326,12 +326,13 @@ export function needsIceWater(waterTempC: number): boolean {
 /* Pre-ferment maturation location                                     */
 /* ------------------------------------------------------------------ */
 
-export type PrefermentLocation = "fridge" | "cellar" | "ambient";
+export type PrefermentLocation = "fridge" | "hybrid" | "cellar" | "ambient";
 
-export const PREFERMENT_LOCATIONS: PrefermentLocation[] = ["fridge", "cellar", "ambient"];
+export const PREFERMENT_LOCATIONS: PrefermentLocation[] = ["fridge", "hybrid", "cellar", "ambient"];
 
 export const PREFERMENT_LOCATION_LABEL_KEY: Record<PrefermentLocation, string> = {
   fridge: "preferment_loc_fridge",
+  hybrid: "preferment_loc_hybrid",
   cellar: "preferment_loc_cellar",
   ambient: "preferment_loc_ambient",
 };
@@ -355,6 +356,8 @@ export function prefermentProfile(
     switch (loc) {
       case "fridge":
         return { tempC: 4, bigaHydrPct: 100, refreshYeastFactor: 1.4, hours: 24, descKey: "preferment_loc_fridge_desc" };
+      case "hybrid":
+        return { tempC: 12, bigaHydrPct: 100, refreshYeastFactor: 1.2, hours: 20, descKey: "preferment_loc_hybrid_desc" };
       case "cellar":
         return { tempC: 17, bigaHydrPct: 100, refreshYeastFactor: 1, hours: 16, descKey: "preferment_loc_cellar_desc" };
       default:
@@ -364,6 +367,8 @@ export function prefermentProfile(
   switch (loc) {
     case "fridge":
       return { tempC: 4, bigaHydrPct: 50, refreshYeastFactor: 1.5, hours: 24, descKey: "preferment_loc_fridge_desc" };
+    case "hybrid":
+      return { tempC: 12, bigaHydrPct: 47, refreshYeastFactor: 1.2, hours: 20, descKey: "preferment_loc_hybrid_desc" };
     case "cellar":
       return { tempC: 17, bigaHydrPct: 44.5, refreshYeastFactor: 1, hours: 18, descKey: "preferment_loc_cellar_desc" };
     default:

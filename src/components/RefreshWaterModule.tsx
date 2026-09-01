@@ -119,6 +119,11 @@ export function RefreshWaterModule({
             {t("thermo_ice_4")}
           </p>
         )}
+        {res.tooWarm && (
+          <p className="text-[11px] mt-2 rounded-md border border-destructive/50 bg-destructive/10 p-2 font-medium text-destructive">
+            {t("thermo_no_warm_water")}
+          </p>
+        )}
         {res.clamped && <p className="text-[11px] mt-2 text-muted-foreground">{t("thermo_clamped")}</p>}
       </div>
     </div>

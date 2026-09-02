@@ -540,7 +540,7 @@ function OptionRow({
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 text-xs font-semibold">
           {label}
-          <InfoTip content={info} />
+          <InfoTip>{info}</InfoTip>
         </div>
         <Switch checked={enabled} onCheckedChange={onToggle} />
       </div>

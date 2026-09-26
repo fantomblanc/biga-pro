@@ -89,6 +89,10 @@ export interface RecipeInputs {
   preFermentHydrPct?: number;
   /** Optional yeast added at refreshment, % of refreshment flour (0–0.3). */
   refreshYeastPct?: number;
+  /** Biga fermentation conditions (drives Biga yeast dosage). */
+  bigaFermMode?: BigaFermMode;
+  bigaRoomTemp?: number;
+  bigaHours?: number;
   /** Ambient (kitchen) temperature where mixing happens — drives water temperatures. */
   ambientTemp?: number;
   trays?: TrayConfig;
@@ -212,6 +216,27 @@ function bigaYeastPctByTemp(tempC: number): number {
  * Poolish yeast curve for ~12–16h maturity.
  * Approx % fresh yeast relative to POOLISH FLOUR by room temperature.
  */
+export type BigaFermMode = "ambient" | "fridge" | "mixed";
+
+/**
+ * Biga fresh-yeast % on BIGA FLOUR from fermentation conditions.
+ * Ambient: 0.3% @16h → 0.2% @24h at 18–20°C, −0.05%/°C above 20°C (+0.05%/°C below 18°C).
+ * Fridge (4–6°C): 0.7% @12h → 0.5% @24h (max 0.7%).
+ * Mixed: midway between both.
+ */
+export function bigaYeastPctPro(mode: BigaFermMode, roomTemp: number, hours: number): number {
+  const h = Math.max(12, Math.min(24, hours));
+  const r = (h - 12) / 12; // 0 at 12h, 1 at 24h
+  const ambientBase = h <= 16 ? 0.35 - 0.05 * ((h - 12) / 4) : 0.3 - 0.1 * ((h - 16) / 8);
+  let tempAdj = 0;
+  if (roomTemp > 20) tempAdj = -0.05 * (roomTemp - 20);
+  else if (roomTemp < 18) tempAdj = 0.05 * (18 - roomTemp);
+  const ambient = Math.max(0.05, ambientBase + tempAdj);
+  const fridge = 0.7 - 0.2 * r;
+  const pct = mode === "ambient" ? ambient : mode === "fridge" ? fridge : Math.max(0.1, (ambientBase + tempAdj / 2 + fridge) / 2);
+  return Number(Math.min(0.7, pct).toFixed(3));
+}
+
 function poolishYeastPctByTemp(tempC: number): number {
   const t = Math.max(12, Math.min(26, tempC));
   const anchors: [number, number][] = [
@@ -279,7 +304,9 @@ export function calculateRecipe(inp: RecipeInputs): RecipeCalc {
 
   const preYeastPct = preFerment === "poolish"
     ? poolishYeastPctByTemp(inp.cellarTemp)
-    : bigaYeastPctByTemp(inp.cellarTemp);
+    : inp.bigaFermMode
+      ? bigaYeastPctPro(inp.bigaFermMode, inp.bigaRoomTemp ?? 20, inp.bigaHours ?? 18)
+      : bigaYeastPctByTemp(inp.cellarTemp);
   const bigaYeastFresh = bigaFlour * (preYeastPct / 100);
   const bigaYeastShown = inp.yeastType === "dry" ? bigaYeastFresh / 3 : bigaYeastFresh;
 

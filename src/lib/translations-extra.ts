@@ -3,6 +3,19 @@ import type { Lang } from "./translations";
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  bferm_title: "Biga fermentation conditions",
+  bferm_mode: "Fermentation mode",
+  bferm_ambient: "Room temperature (16°C – 22°C)",
+  bferm_fridge: "Fridge / cold room (4°C – 6°C)",
+  bferm_mixed: "Mixed (room then fridge)",
+  bferm_room: "Estimated room temperature (°C)",
+  bferm_hours: "Desired fermentation time",
+  bferm_dose: "Biga yeast dosage",
+  bferm_per_kg: "per kg of Biga flour",
+  bferm_warn: "Too much yeast in a 100% Biga weakens the gluten network and makes the dough sticky when shaping.",
+  bferm_8020_toggle: "Advise an 80/20 refreshment",
+  bferm_8020_desc: "Hydration above 70%: use 80% Biga / 20% fresh flour to keep structure.",
+  bferm_8020_apply: "Apply 80/20",
   thermo_biga_title: "Module A — Biga water temperature",
   thermo_biga_desc: "Short mix of 2–3 min. Formula: (3 × 19°C target) − (storage T° + flour T° + short-mix heating).",
   thermo_storage_temp: "Cellar / storage T° (°C)",
@@ -61,6 +74,19 @@ const en: Dict = {
 };
 
 const fr: Dict = {
+  bferm_title: "Conditions de pousse de la Biga",
+  bferm_mode: "Mode de fermentation",
+  bferm_ambient: "Température Ambiante (16°C - 22°C)",
+  bferm_fridge: "Réfrigérateur / Chambre froide (4°C - 6°C)",
+  bferm_mixed: "Mixte (Ambiant puis Frigo)",
+  bferm_room: "Température estimée de la pièce (°C)",
+  bferm_hours: "Durée de pousse souhaitée",
+  bferm_dose: "Dosage levure de la Biga",
+  bferm_per_kg: "par kg de farine de Biga",
+  bferm_warn: "Un excès de levure sur une Biga 100% fragilise le réseau glutineux et rend la pâte collante au façonnage.",
+  bferm_8020_toggle: "Conseiller un rafraîchissement 80/20",
+  bferm_8020_desc: "Hydratation > 70 % : utilisez 80 % Biga / 20 % farine fraîche pour conserver de la tenue.",
+  bferm_8020_apply: "Appliquer 80/20",
   thermo_biga_title: "Module A — Température d'eau de la Biga",
   thermo_biga_desc: "Mélange court de 2 à 3 min. Formule : (3 × 19°C cible) − (T° cave + T° farine + échauffement du mélange court).",
   thermo_storage_temp: "T° cave / stockage (°C)",

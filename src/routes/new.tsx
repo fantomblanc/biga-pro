@@ -135,6 +135,10 @@ function NewRecipePage() {
   const [bigaHydr, setBigaHydr] = useState(BIGA_HYDR_DEFAULT);
   const [useRefreshYeast, setUseRefreshYeast] = useState(false);
   const [refreshYeastPct, setRefreshYeastPct] = useState(0.1);
+  const [bigaFermMode, setBigaFermMode] = useState<BigaFermMode>("ambient");
+  const [bigaRoomTemp, setBigaRoomTemp] = useState(20);
+  const [bigaHours, setBigaHours] = useState(18);
+  const [advise8020, setAdvise8020] = useState(true);
 
   // Thermal modules
   const [kneadMode, setKneadMode] = useState<KneadMode>("hand");
@@ -337,6 +341,9 @@ function NewRecipePage() {
     prefermentLoc: engine === "biga" ? maturation.prefermentLoc : undefined,
     preFermentHydrPct: engine === "biga" ? preFermentHydrPct : undefined,
     refreshYeastPct: engine === "biga" && useRefreshYeast ? refreshYeastPct : 0,
+    bigaFermMode: engine === "biga" && preFerment === "biga" ? bigaFermMode : undefined,
+    bigaRoomTemp,
+    bigaHours,
     trays: isTeglia ? trays : undefined,
     kneadMode,
     bigaKneadMode,
@@ -356,7 +363,7 @@ function NewRecipePage() {
     useMalt, maltPct, useOil, oilPct, storageTemp, ambientTemp, bigaPct, style, preFerment, targetBake,
     simpleOven, ovenMaxTemp, tenacity, autolyse, blend, maturation, preFermentHydrPct, isTeglia, trays,
     kneadMode, bigaKneadMode, bigaRealTemp, refreshFlourTemp, refreshFriction, bigaFlourTemp, autolysePenalty,
-    useRefreshYeast, refreshYeastPct, bulkFactorMin, flourGrams, avpn.banOilAndMalt]);
+    useRefreshYeast, refreshYeastPct, bigaFermMode, bigaRoomTemp, bigaHours, bulkFactorMin, flourGrams, avpn.banOilAndMalt]);
 
   const calc = useMemo(() => calculateRecipe(inputs), [inputs]);
   const finalProofH = Math.max(0.5, maturation.proofRoomH);
@@ -559,6 +566,65 @@ function NewRecipePage() {
                 <Slider value={[bigaPct]} min={20} max={100} step={1} onValueChange={(v) => { bigaPctEdited.current = true; setBigaPct(v[0]); }} />
                 <p className="text-[11px] text-muted-foreground leading-tight">{preLabels.pctHelp}</p>
               </div>
+
+              {preFerment === "biga" && (
+                <div className="space-y-3 pt-2 border-t border-border/50">
+                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("bferm_title")}</Label>
+                  <div className="grid gap-2">
+                    {(["ambient", "fridge", "mixed"] as BigaFermMode[]).map((m) => (
+                      <ToggleBtn key={m} active={bigaFermMode === m} onClick={() => setBigaFermMode(m)}>{t(`bferm_${m}`)}</ToggleBtn>
+                    ))}
+                  </div>
+                  {bigaFermMode !== "fridge" && (
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-[11px] text-muted-foreground">{t("bferm_room")}</Label>
+                        <span className="tabular text-sm font-semibold text-primary">{bigaRoomTemp}°C</span>
+                      </div>
+                      <Slider value={[bigaRoomTemp]} min={14} max={26} step={0.5} onValueChange={(v) => setBigaRoomTemp(v[0])} />
+                    </div>
+                  )}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[11px] text-muted-foreground">{t("bferm_hours")}</Label>
+                      <span className="tabular text-sm font-semibold text-primary">{bigaHours}h</span>
+                    </div>
+                    <Slider value={[bigaHours]} min={12} max={24} step={1} onValueChange={(v) => setBigaHours(v[0])} />
+                  </div>
+                  {(() => {
+                    const pct = bigaYeastPctPro(bigaFermMode, bigaRoomTemp, bigaHours);
+                    const perKg = (pct * 10) / (yeastType === "dry" ? 3 : 1);
+                    return (
+                      <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("bferm_dose")} · {yeastType === "dry" ? t("yeast_dry") : t("yeast_fresh")}</div>
+                        <div className="tabular text-2xl font-bold text-primary mt-1">
+                          {calc.bigaYeastShown.toFixed(1)}{t("grams")}
+                          <span className="text-xs text-muted-foreground font-normal ml-2">
+                            {(pct / (yeastType === "dry" ? 3 : 1)).toFixed(2)}% · {perKg.toFixed(1)}{t("grams")} {t("bferm_per_kg")}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-warning mt-2 leading-snug">⚠️ {t("bferm_warn")}</p>
+                      </div>
+                    );
+                  })()}
+                  {clampedHydration > 70 && (
+                    <div className="rounded-lg border border-border p-3 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <Label className="text-sm">{t("bferm_8020_toggle")}</Label>
+                        <Switch checked={advise8020} onCheckedChange={setAdvise8020} />
+                      </div>
+                      {advise8020 && (
+                        <>
+                          <p className="text-[11px] text-muted-foreground">{t("bferm_8020_desc")}</p>
+                          {bigaPct !== 80 && (
+                            <ToggleBtn active={false} onClick={() => { bigaPctEdited.current = true; setBigaPct(80); }}>{t("bferm_8020_apply")}</ToggleBtn>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="space-y-2 pt-2 border-t border-border/50">
                 <div className="flex items-center justify-between">

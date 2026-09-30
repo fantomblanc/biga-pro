@@ -57,7 +57,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#221912" },
+      { name: "theme-color", content: "#F2F2F7" },
       { title: "CarpiBiga Pro — Precision Dough Engineering" },
       { name: "description", content: "Professional dough calculator and fermentation timeline for advanced pizza-makers. Biga and Direct 72h engines, water temp calculator, wake-lock timer." },
       { name: "author", content: "CarpiBiga" },

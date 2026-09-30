@@ -35,7 +35,19 @@ export function NumberInput({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, focused]);
 
+  const bump = (dir: 1 | -1) => {
+    let v = Math.round((value + dir * step) * 100) / 100;
+    if (min !== undefined) v = Math.max(min, v);
+    if (max !== undefined) v = Math.min(max, v);
+    setText(String(v));
+    onChange(v);
+  };
+  const stepBtn =
+    "grid place-items-center size-8 shrink-0 rounded-full bg-secondary text-primary text-lg font-semibold active:scale-90 transition-transform no-print";
+
   return (
+    <div className="flex items-center gap-2">
+    <button type="button" aria-label="−" className={stepBtn} onClick={() => bump(-1)}>−</button>
     <Input
       {...rest}
       type="text"
@@ -69,5 +81,7 @@ export function NumberInput({
         if (v !== value) onChange(v);
       }}
     />
+    <button type="button" aria-label="+" className={stepBtn} onClick={() => bump(1)}>+</button>
+    </div>
   );
 }

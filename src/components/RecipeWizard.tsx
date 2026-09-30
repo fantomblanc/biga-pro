@@ -190,7 +190,7 @@ export function RecipeWizard({
           ))}
         </div>
 
-        <div className="min-h-[240px] space-y-3 py-1">
+        <div key={step} className="min-h-[240px] space-y-3 py-1 animate-in slide-in-from-right-8 fade-in duration-300">
           {step === 0 && (
             <div className="grid grid-cols-2 gap-2">
               {PIZZA_STYLES.map((s) => (

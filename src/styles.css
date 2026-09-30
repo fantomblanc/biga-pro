@@ -37,70 +37,55 @@
   --color-fridge: var(--fridge);
   --color-final: var(--final);
   --color-bake: var(--bake);
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
-/* Dark-first: default variables ARE the dark theme. */
 :root {
-  --radius: 0.75rem;
+  --radius: 1rem;
+  --background: #F2F2F7;
+  --foreground: #000000;
+  --card: #FFFFFF;
+  --card-foreground: #000000;
+  --popover: #FFFFFF;
+  --popover-foreground: #000000;
+  --primary: #FF9500;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F2F2F7;
+  --secondary-foreground: #000000;
+  --muted: #E5E5EA;
+  --muted-foreground: #8E8E93;
+  --accent: #E5E5EA;
+  --accent-foreground: #000000;
+  --destructive: #FF3B30;
+  --destructive-foreground: #FFFFFF;
+  --warning: #FFCC00;
+  --warning-foreground: #000000;
+  --success: #34C759;
+  --success-foreground: #FFFFFF;
+  --border: rgb(60 60 67 / 0.14);
+  --input: #E5E5EA;
+  --ring: #FF9500;
+  --cellar: #FF9500; --fridge: #007AFF; --final: #34C759; --bake: #FF3B30;
+  --chart-1: #FF9500; --chart-2: #007AFF; --chart-3: #34C759; --chart-4: #FF3B30; --chart-5: #AF52DE;
+  --sidebar: #FFFFFF; --sidebar-foreground: #000000; --sidebar-primary: #FF9500;
+  --sidebar-primary-foreground: #FFFFFF; --sidebar-accent: #F2F2F7; --sidebar-accent-foreground: #000000;
+  --sidebar-border: rgb(60 60 67 / 0.14); --sidebar-ring: #FF9500;
+}
 
-  --background: oklch(0.16 0.015 60);
-  --foreground: oklch(0.97 0.01 80);
-
-  --card: oklch(0.21 0.018 60);
-  --card-foreground: oklch(0.97 0.01 80);
-
-  --popover: oklch(0.21 0.018 60);
-  --popover-foreground: oklch(0.97 0.01 80);
-
-  /* Warm amber/ember - fire, oven, crust */
-  --primary: oklch(0.78 0.16 55);
-  --primary-foreground: oklch(0.18 0.02 60);
-
-  --secondary: oklch(0.28 0.02 60);
-  --secondary-foreground: oklch(0.97 0.01 80);
-
-  --muted: oklch(0.26 0.015 60);
-  --muted-foreground: oklch(0.72 0.02 80);
-
-  --accent: oklch(0.32 0.03 60);
-  --accent-foreground: oklch(0.97 0.01 80);
-
-  --destructive: oklch(0.65 0.22 25);
-  --destructive-foreground: oklch(0.98 0.01 80);
-
-  --warning: oklch(0.80 0.18 75);
-  --warning-foreground: oklch(0.18 0.02 60);
-
-  --success: oklch(0.72 0.16 155);
-  --success-foreground: oklch(0.15 0.02 155);
-
-  --border: oklch(0.30 0.015 60);
-  --input: oklch(0.26 0.015 60);
-  --ring: oklch(0.78 0.16 55);
-
-  /* Zone accents for timeline */
-  --cellar: oklch(0.75 0.14 55);   /* warm ember */
-  --fridge: oklch(0.72 0.14 230);  /* cool blue */
-  --final:  oklch(0.78 0.15 130);  /* green */
-  --bake:   oklch(0.68 0.22 25);   /* red hot */
-
-  --chart-1: oklch(0.78 0.16 55);
-  --chart-2: oklch(0.72 0.14 230);
-  --chart-3: oklch(0.78 0.15 130);
-  --chart-4: oklch(0.68 0.22 25);
-  --chart-5: oklch(0.75 0.12 300);
-
-  --sidebar: oklch(0.19 0.018 60);
-  --sidebar-foreground: oklch(0.97 0.01 80);
-  --sidebar-primary: oklch(0.78 0.16 55);
-  --sidebar-primary-foreground: oklch(0.18 0.02 60);
-  --sidebar-accent: oklch(0.28 0.02 60);
-  --sidebar-accent-foreground: oklch(0.97 0.01 80);
-  --sidebar-border: oklch(0.30 0.015 60);
-  --sidebar-ring: oklch(0.78 0.16 55);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000; --foreground: #FFFFFF;
+    --card: #1C1C1E; --card-foreground: #FFFFFF;
+    --popover: #1C1C1E; --popover-foreground: #FFFFFF;
+    --primary: #FF9F0A; --primary-foreground: #000000;
+    --secondary: #2C2C2E; --secondary-foreground: #FFFFFF;
+    --muted: #2C2C2E; --muted-foreground: #8E8E93;
+    --accent: #3A3A3C; --accent-foreground: #FFFFFF;
+    --border: rgb(84 84 88 / 0.6); --input: #2C2C2E;
+    --sidebar: #1C1C1E; --sidebar-foreground: #FFFFFF; --sidebar-accent: #2C2C2E; --sidebar-accent-foreground: #FFFFFF;
+  }
 }
 
 @layer base {
@@ -115,6 +100,9 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  [data-slot="card"] { border-radius: 1rem; box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.04); }
+  button[data-slot="button"] { border-radius: 9999px; }
+  button[data-slot="button"]:active { transform: scale(0.95); }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     letter-spacing: -0.01em;
@@ -129,14 +117,14 @@
 
 @utility grain-bg {
   background-image:
-    radial-gradient(oklch(0.22 0.02 60 / 0.6) 1px, transparent 1px),
-    radial-gradient(oklch(0.14 0.01 60 / 0.4) 1px, transparent 1px);
+    radial-gradient(transparent 1px, transparent 1px),
+    radial-gradient(transparent 1px, transparent 1px);
   background-size: 24px 24px, 32px 32px;
   background-position: 0 0, 12px 12px;
 }
 
 @utility ember-gradient {
-  background: linear-gradient(135deg, oklch(0.78 0.16 55), oklch(0.62 0.20 30));
+  background: linear-gradient(135deg, #FF9F0A, #FF6B00);
 }
 
 /* ------------------------------------------------------------------ */

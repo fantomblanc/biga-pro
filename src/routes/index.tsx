@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { useI18n } from "@/lib/i18n";
@@ -8,7 +8,7 @@ import { loadActiveId, type SavedRecipe } from "@/lib/storage";
 import { listRecipes, removeRecipe } from "@/lib/cloud";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Flame, Plus, Trash2, ArrowRight, Clock, Scale, BookOpen } from "lucide-react";
+import { Flame, Plus, ArrowRight, Clock, Scale, BookOpen, ChevronRight, Droplets, Layers } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Dashboard,
@@ -250,7 +250,7 @@ function RecipeCard({ r, isActive, onDelete }: { r: SavedRecipe; isActive: boole
               </span>
               <span aria-hidden>•</span>
               <span className="flex items-center gap-1">
-                <Clock className="size-3" /> {r.finalProofH}{t("hours_short")}
+                <Clock className="size-3" /> {r.finalProofH}{t("hours")}
               </span>
             </div>
             {/* Footer: date + chevron */}

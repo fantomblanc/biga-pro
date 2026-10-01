@@ -114,7 +114,7 @@ function Dashboard() {
           {recipes.length === 0 ? (
             <p className="text-sm text-muted-foreground py-8 text-center">{t("no_saved")}</p>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="flex flex-col gap-3">
               {recipes.map((r) => (
                 <RecipeCard
                   key={r.id}

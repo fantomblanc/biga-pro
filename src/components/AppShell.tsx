@@ -1,7 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { LanguageSelector } from "./LanguageSelector";
 import { useI18n } from "@/lib/i18n";
-import { Flame, Home, Plus, Settings, BookOpen, HeartHandshake, LogOut, LogIn } from "lucide-react";
+import { Flame, Home, Plus, Settings, BookOpen, HeartHandshake, LogOut, LogIn, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { useAppSettings } from "@/lib/app-settings";
@@ -11,6 +13,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { user, signOut } = useAuth();
   const appSettings = useAppSettings();
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    (supabase as any).rpc("has_role", { _user_id: user.id, _role: "admin" }).then(({ data }: any) => setIsAdmin(!!data));
+  }, [user]);
 
   const navItems = [
     { to: "/", label: t("nav_dashboard"), Icon: Home },
@@ -33,6 +40,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
           <div className="flex items-center gap-2">
             <LanguageSelector />
+            {isAdmin && (
+              <Link to="/admin" className="flex items-center gap-1 text-[15px] text-primary font-medium active:opacity-50" title="Admin">
+                <Shield className="size-5" />
+                <span className="hidden sm:inline">Admin</span>
+              </Link>
+            )}
             {user ? (
               <button
                 onClick={() => signOut()}

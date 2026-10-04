@@ -16,32 +16,71 @@ export type Database = {
     Tables: {
       app_settings: {
         Row: {
+          allow_signups: boolean
           app_name: string
+          app_version: string
           banner_active: boolean
           banner_message: string
+          banner_type: string
+          banner_url: string
           buy_me_a_coffee_username: string
+          changelog: string
           contact_email: string
+          default_ball_weight: number
+          default_biga_pct: number
+          default_dough_temp: number
+          default_hydration: number
+          ga_enabled: boolean
+          ga_measurement_id: string
           id: number
+          maintenance_mode: boolean
+          max_recipes_per_user: number
           paypal_email: string
           updated_at: string
         }
         Insert: {
+          allow_signups?: boolean
           app_name?: string
+          app_version?: string
           banner_active?: boolean
           banner_message?: string
+          banner_type?: string
+          banner_url?: string
           buy_me_a_coffee_username?: string
+          changelog?: string
           contact_email?: string
+          default_ball_weight?: number
+          default_biga_pct?: number
+          default_dough_temp?: number
+          default_hydration?: number
+          ga_enabled?: boolean
+          ga_measurement_id?: string
           id?: number
+          maintenance_mode?: boolean
+          max_recipes_per_user?: number
           paypal_email?: string
           updated_at?: string
         }
         Update: {
+          allow_signups?: boolean
           app_name?: string
+          app_version?: string
           banner_active?: boolean
           banner_message?: string
+          banner_type?: string
+          banner_url?: string
           buy_me_a_coffee_username?: string
+          changelog?: string
           contact_email?: string
+          default_ball_weight?: number
+          default_biga_pct?: number
+          default_dough_temp?: number
+          default_hydration?: number
+          ga_enabled?: boolean
+          ga_measurement_id?: string
           id?: number
+          maintenance_mode?: boolean
+          max_recipes_per_user?: number
           paypal_email?: string
           updated_at?: string
         }
@@ -108,6 +147,7 @@ export type Database = {
           created_at: string
           id: string
           message: string
+          status: string
           type: string
           user_email: string | null
         }
@@ -115,6 +155,7 @@ export type Database = {
           created_at?: string
           id?: string
           message: string
+          status?: string
           type?: string
           user_email?: string | null
         }
@@ -122,6 +163,7 @@ export type Database = {
           created_at?: string
           id?: string
           message?: string
+          status?: string
           type?: string
           user_email?: string | null
         }

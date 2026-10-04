@@ -13,6 +13,7 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as NewRouteImport } from './routes/new'
+import { Route as MaintenanceRouteImport } from './routes/maintenance'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -38,6 +39,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const NewRoute = NewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaintenanceRoute = MaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JournalRoute = JournalRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/journal': typeof JournalRoute
+  '/maintenance': typeof MaintenanceRoute
   '/new': typeof NewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/journal': typeof JournalRoute
+  '/maintenance': typeof MaintenanceRoute
   '/new': typeof NewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/journal': typeof JournalRoute
+  '/maintenance': typeof MaintenanceRoute
   '/new': typeof NewRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/journal'
+    | '/maintenance'
     | '/new'
     | '/settings'
     | '/sitemap.xml'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/journal'
+    | '/maintenance'
     | '/new'
     | '/settings'
     | '/sitemap.xml'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/journal'
+    | '/maintenance'
     | '/new'
     | '/settings'
     | '/sitemap.xml'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   JournalRoute: typeof JournalRoute
+  MaintenanceRoute: typeof MaintenanceRoute
   NewRoute: typeof NewRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/new'
       preLoaderRoute: typeof NewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maintenance': {
+      id: '/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof MaintenanceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/journal': {
@@ -240,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   JournalRoute: JournalRoute,
+  MaintenanceRoute: MaintenanceRoute,
   NewRoute: NewRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

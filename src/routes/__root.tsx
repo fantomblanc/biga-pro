@@ -3,6 +3,7 @@ import {
   Outlet,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -11,8 +12,10 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { I18nProvider } from "@/lib/i18n";
-import { AuthProvider } from "@/lib/auth";
+import { AuthProvider, useAuth } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
+import { fetchAppSettings } from "@/lib/app-settings";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -100,6 +103,46 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function MaintenanceGate({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const pathname = useRouterState({ select: (st) => st.location.pathname });
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (loading) return;
+    if (pathname === "/maintenance" || pathname === "/admin" || pathname === "/auth") return;
+    fetchAppSettings().then(async (s) => {
+      if (!s.maintenance_mode) return;
+      if (user) {
+        const { data } = await (supabase as any).rpc("has_role", { _user_id: user.id, _role: "admin" });
+        if (data) return; // admins pass through
+      }
+      router.navigate({ to: "/maintenance" });
+    }).catch(() => {});
+  }, [pathname, user, loading, router]);
+
+  return <>{children}</>;
+}
+
+function AnalyticsLoader() {
+  useEffect(() => {
+    fetchAppSettings().then((s) => {
+      if (!s.ga_enabled || !s.ga_measurement_id) return;
+      if (document.getElementById("ga-gtag")) return;
+      const script = document.createElement("script");
+      script.id = "ga-gtag";
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${s.ga_measurement_id}`;
+      document.head.appendChild(script);
+      (window as any).dataLayer = (window as any).dataLayer || [];
+      const gtag = (...args: unknown[]) => (window as any).dataLayer.push(args);
+      gtag("js", new Date());
+      gtag("config", s.ga_measurement_id);
+    }).catch(() => {});
+  }, []);
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -107,7 +150,10 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <AuthProvider>
-          <Outlet />
+          <MaintenanceGate>
+            <Outlet />
+          </MaintenanceGate>
+          <AnalyticsLoader />
           <Toaster position="top-center" theme="dark" richColors />
         </AuthProvider>
       </I18nProvider>

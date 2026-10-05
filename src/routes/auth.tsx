@@ -44,6 +44,11 @@ function AuthPage() {
     setError(null);
     try {
       if (mode === "signup") {
+        const settings = await fetchAppSettings();
+        if (!settings.allow_signups) {
+          setError("Les inscriptions sont temporairement fermées. Réessayez plus tard.");
+          return;
+        }
         const { error: err } = await supabase.auth.signUp({
           email,
           password,

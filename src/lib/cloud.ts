@@ -70,6 +70,18 @@ export async function getRecipe(id: string): Promise<SavedRecipe | null> {
 
 export async function saveRecipe(r: SavedRecipe): Promise<SavedRecipe> {
   const userId = await requireUserId();
+  // Enforce per-user recipe limit (0 = unlimited)
+  const { data: settingsRow } = await (supabase as any)
+    .from("app_settings").select("max_recipes_per_user").eq("id", 1).maybeSingle();
+  const limit = settingsRow?.max_recipes_per_user ?? 0;
+  if (limit > 0) {
+    const { count } = await supabase
+      .from("recipes").select("id", { count: "exact", head: true })
+      .eq("user_id", userId).neq("id", r.id);
+    if ((count ?? 0) >= limit) {
+      throw new Error(`Limite de ${limit} recettes atteinte. Supprimez une recette pour en créer une nouvelle.`);
+    }
+  }
   const payload = {
     id: r.id,
     user_id: userId,

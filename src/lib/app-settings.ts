@@ -50,10 +50,33 @@ export async function fetchAppSettings(): Promise<PublicAppSettings> {
   return { ...DEFAULT_APP_SETTINGS, ...(data ?? {}) };
 }
 
+let current: PublicAppSettings = DEFAULT_APP_SETTINGS;
+let loaded = false;
+let inflight: Promise<void> | null = null;
+const listeners = new Set<(s: PublicAppSettings) => void>();
+
+export function setAppSettings(next: Partial<PublicAppSettings>) {
+  current = { ...current, ...next };
+  loaded = true;
+  listeners.forEach((l) => l(current));
+}
+
+export function refreshAppSettings() {
+  inflight = fetchAppSettings().then(setAppSettings).catch(() => {}).finally(() => { inflight = null; });
+  return inflight;
+}
+
 export function useAppSettings() {
-  const [s, setS] = useState<PublicAppSettings>(DEFAULT_APP_SETTINGS);
+  const [s, setS] = useState<PublicAppSettings>(current);
   useEffect(() => {
-    fetchAppSettings().then(setS).catch(() => {});
+    listeners.add(setS);
+    setS(current);
+    if (!loaded && !inflight) refreshAppSettings();
+    return () => { listeners.delete(setS); };
   }, []);
   return s;
+}
+
+export function useAppName() {
+  return useAppSettings().app_name || DEFAULT_APP_SETTINGS.app_name;
 }

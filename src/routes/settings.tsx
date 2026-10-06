@@ -1,3 +1,4 @@
+import { useAppName } from "@/lib/app-settings";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
@@ -113,7 +114,7 @@ function SettingsPage() {
             <h3 className="font-display font-semibold text-sm">About</h3>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            CarpiBiga Pro · Precision dough engineering. 100% local — all data stored on your device.
+            {appName} · Precision dough engineering. 100% local — all data stored on your device.
             No account, no server, no tracking. Yeast curves inspired by Giorilli's constants.
           </p>
         </Card>

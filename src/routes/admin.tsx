@@ -99,6 +99,7 @@ function AdminPage() {
       ga_measurement_id: s.ga_measurement_id, ga_enabled: s.ga_enabled,
     }).eq("id", 1);
     setSaving(false);
+    if (!error) setAppSettings(s);
     error ? toast.error("Échec de l'enregistrement") : toast.success("Paramètres enregistrés");
   };
 

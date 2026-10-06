@@ -26,6 +26,7 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsPage() {
+  const appName = useAppName();
   const { t, lang, setLang } = useI18n();
   const { user } = useAuth();
   const [notifEnabled, setNotifEnabled] = useState(false);

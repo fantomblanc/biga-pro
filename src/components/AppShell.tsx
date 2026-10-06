@@ -28,6 +28,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { to: "/settings", label: t("nav_settings"), Icon: Settings },
   ];
   const appName = useAppName();
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (document.title.includes("CarpiBiga Pro") && appName !== "CarpiBiga Pro") {
+      document.title = document.title.replace("CarpiBiga Pro", appName);
+    }
+  }, [appName, pathname]);
   const currentTitle = navItems.find((n) => (n.to === "/" ? pathname === "/" : pathname.startsWith(n.to)))?.label;
 
   return (

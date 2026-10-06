@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchAppSettings, type PublicAppSettings, DEFAULT_APP_SETTINGS } from "@/lib/app-settings";
+import { setAppSettings, fetchAppSettings, type PublicAppSettings, DEFAULT_APP_SETTINGS } from "@/lib/app-settings";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 
@@ -99,6 +99,7 @@ function AdminPage() {
       ga_measurement_id: s.ga_measurement_id, ga_enabled: s.ga_enabled,
     }).eq("id", 1);
     setSaving(false);
+    if (!error) setAppSettings(s);
     error ? toast.error("Échec de l'enregistrement") : toast.success("Paramètres enregistrés");
   };
 

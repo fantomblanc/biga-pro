@@ -1,3 +1,4 @@
+import { useAppName } from "@/lib/app-settings";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +27,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { to: "/support", label: "Soutenir", Icon: HeartHandshake },
     { to: "/settings", label: t("nav_settings"), Icon: Settings },
   ];
+  const appName = useAppName();
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (document.title.includes("CarpiBiga Pro") && appName !== "CarpiBiga Pro") {
+      document.title = document.title.replace("CarpiBiga Pro", appName);
+    }
+  }, [appName, pathname]);
   const currentTitle = navItems.find((n) => (n.to === "/" ? pathname === "/" : pathname.startsWith(n.to)))?.label;
 
   return (
@@ -36,7 +44,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="grid place-items-center size-7 rounded-lg bg-primary">
               <Flame className="size-4 text-primary-foreground" />
             </span>
-            <span className="text-[17px] font-semibold tracking-tight">CarpiBiga Pro</span>
+            <span className="text-[17px] font-semibold tracking-tight">{appName}</span>
           </Link>
           <div className="flex items-center gap-2">
             <LanguageSelector />

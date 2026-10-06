@@ -54,16 +54,24 @@ function rowToRecipe(row: {
 }
 
 export async function listRecipes(): Promise<SavedRecipe[]> {
+  const userId = await requireUserId();
   const { data, error } = await supabase
     .from("recipes")
     .select("*")
+    .eq("user_id", userId)
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []).map(rowToRecipe);
 }
 
 export async function getRecipe(id: string): Promise<SavedRecipe | null> {
-  const { data, error } = await supabase.from("recipes").select("*").eq("id", id).maybeSingle();
+  const userId = await requireUserId();
+  const { data, error } = await supabase
+    .from("recipes")
+    .select("*")
+    .eq("id", id)
+    .eq("user_id", userId)
+    .maybeSingle();
   if (error) throw error;
   return data ? rowToRecipe(data) : null;
 }
@@ -186,9 +194,11 @@ function rowToBakeLog(row: {
 }
 
 export async function listBakeLogs(): Promise<BakeLog[]> {
+  const userId = await requireUserId();
   const { data, error } = await supabase
     .from("bake_logs")
     .select("*")
+    .eq("user_id", userId)
     .order("baked_at", { ascending: false });
   if (error) throw error;
   return (data ?? []).map(rowToBakeLog);

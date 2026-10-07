@@ -39,6 +39,7 @@ export function RefreshWaterModule({
   autolysePenalty = 0, bare,
 }: Props) {
   const { t } = useI18n();
+  const isRefreshment = bigaTemp !== undefined;
   const [fMin, fMax] = REFRESH_FRICTION_RANGE[mode];
 
   const res = bigaTemp !== undefined
@@ -51,7 +52,10 @@ export function RefreshWaterModule({
         <div className="flex items-center gap-2">
           <Snowflake className="size-4 text-[color:var(--fridge)]" />
           <h3 className="font-display font-semibold text-sm">
-            <LabelWithInfo label={t("thermo_refresh_title")} info={t("info_water_temp")} />
+            <LabelWithInfo
+              label={t(isRefreshment ? "thermo_refresh_title" : "thermo_direct_title")}
+              info={t("info_water_temp")}
+            />
           </h3>
         </div>
       )}
@@ -107,7 +111,9 @@ export function RefreshWaterModule({
 
       <div className="rounded-lg border border-[color:var(--fridge)]/40 bg-[color:var(--fridge)]/5 p-3">
         <div className="flex items-baseline justify-between gap-2">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("thermo_refresh_result")}</div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            {t(isRefreshment ? "thermo_refresh_result" : "thermo_direct_result")}
+          </div>
           <div className="tabular text-2xl font-bold" style={{ color: "var(--fridge)" }}>
             {res.waterTemp.toFixed(1)}<span className="text-sm ml-0.5">°C</span>
           </div>

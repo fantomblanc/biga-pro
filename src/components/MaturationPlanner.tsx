@@ -137,7 +137,7 @@ export function MaturationPlanner({ plan, onChange, showPreferment, preFerment, 
 
       <div className="space-y-2 pt-1 border-t border-border/50">
         <div className="text-[10px] uppercase tracking-widest font-bold text-primary/80 pt-2">
-          {showPreferment ? "2 · " : "1 · "}{t("mat_final_section")}
+          {showPreferment ? "2 · " : "1 · "}{t(showPreferment ? "mat_final_section" : "mat_dough_section")}
         </div>
 
         <div className="rounded-lg border border-border/60 p-3 space-y-2">

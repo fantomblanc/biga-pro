@@ -927,7 +927,7 @@ function NewRecipePage() {
             </div>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <Stat label={t("thermo_biga_result")} value={`${calc.bigaWaterTemp.toFixed(1)}°C`} />
-              <Stat label={t("thermo_direct_result")} value={`${calc.refreshWaterTemp.toFixed(1)}°C`} />
+              <Stat label={t("thermo_refresh_result")} value={`${calc.refreshWaterTemp.toFixed(1)}°C`} />
             </div>
             <MiniHeader>{t("refresh_phase")}</MiniHeader>
             <div className="grid grid-cols-2 gap-2 text-sm">
@@ -944,7 +944,7 @@ function NewRecipePage() {
             <MiniHeader>{t("engine_direct")}</MiniHeader>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <Stat label={t("biga_yeast")} value={`${yeastShown.toFixed(3)}${t("grams")}`} highlight />
-              <Stat label={t("thermo_refresh_result")} value={`${calc.refreshWaterTemp.toFixed(1)}°C`} />
+              <Stat label={t("thermo_direct_result")} value={`${calc.refreshWaterTemp.toFixed(1)}°C`} />
             </div>
           </>
         )}

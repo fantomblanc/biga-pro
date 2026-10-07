@@ -24,7 +24,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 interface Report { id: string; type: string; message: string; user_email: string | null; created_at: string; status: string }
-interface UserRow { id: string; email: string | null; created_at: string; role: string }
+interface UserRow { id: string; email: string | null; created_at: string; role: string; plan_type?: string }
 
 const card = "rounded-2xl border border-border/60 bg-card p-4 space-y-3";
 
@@ -51,7 +51,7 @@ function AdminPage() {
       .then(({ data }: any) => setRecipes(data ?? []));
     // Users: profiles + roles
     Promise.all([
-      (supabase as any).from("profiles").select("id, email, created_at"),
+      (supabase as any).from("profiles").select("id, email, created_at, plan_type"),
       (supabase as any).from("user_roles").select("user_id, role"),
     ]).then(([p, r]: any[]) => {
       const roleByUser = new Map<string, string>();
@@ -97,6 +97,7 @@ function AdminPage() {
       default_biga_pct: s.default_biga_pct, default_dough_temp: s.default_dough_temp,
       app_version: s.app_version, changelog: s.changelog,
       ga_measurement_id: s.ga_measurement_id, ga_enabled: s.ga_enabled,
+      enable_monetization: s.enable_monetization, default_plan_type: s.default_plan_type,
     }).eq("id", 1);
     setSaving(false);
     if (!error) setAppSettings(s);
@@ -111,6 +112,13 @@ function AdminPage() {
     await (supabase as any).from("feedback_reports").update({ status }).eq("id", id);
     setReports((r) => r.map((x) => (x.id === id ? { ...x, status } : x)));
   };
+  const setPlan = async (userId: string, plan_type: string) => {
+    const { error } = await (supabase as any).from("profiles").update({ plan_type }).eq("id", userId);
+    if (error) return toast.error("Échec de la mise à jour");
+    setUsers((u) => u.map((x) => (x.id === userId ? { ...x, plan_type } : x)));
+    toast.success("Statut mis à jour");
+  };
+
   const setRole = async (userId: string, role: string) => {
     if (role === "user") {
       await (supabase as any).from("user_roles").delete().eq("user_id", userId).eq("role", "admin");
@@ -202,6 +210,20 @@ function AdminPage() {
         </section>
 
         {/* Gestion des utilisateurs */}
+        {/* Monétisation */}
+        <section className={card}>
+          <h2 className="text-lg font-semibold">Modèle d'affaires / Monétisation</h2>
+          {toggle("enable_monetization", "Activer le modèle payant (Freemium)", "Désactivé : tout est gratuit et aucune mention payante n'apparaît. Activé : Mode Pro, Biga/Poolish et Journal réservés aux comptes Pro.")}
+          <label className="flex items-center justify-between gap-3">
+            <span className="text-sm">Statut par défaut des nouveaux inscrits</span>
+            <select value={s.default_plan_type} onChange={(e) => setS({ ...s, default_plan_type: e.target.value })}
+              className="rounded-lg border border-input bg-background px-2 py-1 text-sm">
+              <option value="free">Gratuit</option>
+              <option value="pro">Pro</option>
+            </select>
+          </label>
+        </section>
+
         <section className={card}>
           <h2 className="text-lg font-semibold">Utilisateurs ({users.length})</h2>
           {users.length === 0 && <p className="text-sm text-muted-foreground">Aucun utilisateur.</p>}
@@ -212,11 +234,18 @@ function AdminPage() {
                   <p className="truncate font-medium">{u.email ?? u.id}</p>
                   <p className="text-xs text-muted-foreground">Inscrit le {new Date(u.created_at).toLocaleDateString("fr-FR")}</p>
                 </div>
-                <select value={u.role} onChange={(e) => setRole(u.id, e.target.value)}
-                  className="rounded-lg border border-input bg-background px-2 py-1 text-xs">
-                  <option value="user">Utilisateur</option>
-                  <option value="admin">Admin</option>
-                </select>
+                <div className="flex gap-1.5 shrink-0">
+                  <select value={u.plan_type ?? "free"} onChange={(e) => setPlan(u.id, e.target.value)}
+                    className="rounded-lg border border-input bg-background px-2 py-1 text-xs">
+                    <option value="free">Gratuit</option>
+                    <option value="pro">Pro</option>
+                  </select>
+                  <select value={u.role} onChange={(e) => setRole(u.id, e.target.value)}
+                    className="rounded-lg border border-input bg-background px-2 py-1 text-xs">
+                    <option value="user">Utilisateur</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
               </div>
             ))}
           </div>

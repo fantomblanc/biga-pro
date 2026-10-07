@@ -21,6 +21,8 @@ export interface PublicAppSettings {
   changelog: string;
   ga_measurement_id: string;
   ga_enabled: boolean;
+  enable_monetization: boolean;
+  default_plan_type: string; // free | pro
 }
 
 export const DEFAULT_APP_SETTINGS: PublicAppSettings = {
@@ -43,6 +45,8 @@ export const DEFAULT_APP_SETTINGS: PublicAppSettings = {
   changelog: "",
   ga_measurement_id: "",
   ga_enabled: false,
+  enable_monetization: false,
+  default_plan_type: "free",
 };
 
 export async function fetchAppSettings(): Promise<PublicAppSettings> {

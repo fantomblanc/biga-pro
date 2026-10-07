@@ -30,6 +30,8 @@ export type Database = {
           default_biga_pct: number
           default_dough_temp: number
           default_hydration: number
+          default_plan_type: string
+          enable_monetization: boolean
           ga_enabled: boolean
           ga_measurement_id: string
           id: number
@@ -53,6 +55,8 @@ export type Database = {
           default_biga_pct?: number
           default_dough_temp?: number
           default_hydration?: number
+          default_plan_type?: string
+          enable_monetization?: boolean
           ga_enabled?: boolean
           ga_measurement_id?: string
           id?: number
@@ -76,6 +80,8 @@ export type Database = {
           default_biga_pct?: number
           default_dough_temp?: number
           default_hydration?: number
+          default_plan_type?: string
+          enable_monetization?: boolean
           ga_enabled?: boolean
           ga_measurement_id?: string
           id?: number
@@ -175,18 +181,21 @@ export type Database = {
           display_name: string | null
           email: string | null
           id: string
+          plan_type: string
         }
         Insert: {
           created_at?: string
           display_name?: string | null
           email?: string | null
           id: string
+          plan_type?: string
         }
         Update: {
           created_at?: string
           display_name?: string | null
           email?: string | null
           id?: string
+          plan_type?: string
         }
         Relationships: []
       }

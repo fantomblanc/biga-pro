@@ -19,7 +19,7 @@ import { BigaWaterModule } from "@/components/BigaWaterModule";
 import { RefreshWaterModule } from "@/components/RefreshWaterModule";
 import { MaturationPlanner, type MaturationPlan } from "@/components/MaturationPlanner";
 import { LabelWithInfo } from "@/components/InfoTip";
-import { FLOURS } from "@/lib/flours";
+import { FLOURS, maturationRange } from "@/lib/flours";
 import {
   calculateRecipe,
   buildTimeline,
@@ -291,7 +291,16 @@ function NewRecipePage() {
   const hydrCeiling = hydrationCeiling(style, engine === "biga", bigaPct);
   const clampedHydration = clampHydrationPro(hydration, style, engine === "biga", bigaPct);
   const effectiveFlourW = blend.enabled ? blendW(blend, flourW) : flourW;
-  const compat = wCompat(effectiveFlourW, engine === "biga", clampedHydration, style);
+  const totalMaturationHours = (engine === "biga" ? maturation.prefermentHours : 0)
+    + maturation.bulkFridgeH + maturation.bulkRoomH + (maturation.ballsFridgeH ?? 0) + maturation.proofRoomH;
+  const [, maximumMaturationHours] = maturationRange(effectiveFlourW);
+  const compat = wCompat(
+    effectiveFlourW,
+    engine === "biga",
+    clampedHydration,
+    style,
+    totalMaturationHours,
+  );
 
   const tenacityResult = tenacityAdjust(tenacity, saltPct, clampedHydration);
   const effectiveSalt = avpn.active
@@ -456,10 +465,8 @@ function NewRecipePage() {
   const sumDough = `${flourGrams} g · ${clampedHydration}% · ${t("salt")} ${effectiveSalt.toFixed(1)}% · ${preview.ballsCount} × ${unitWeight} g`;
   const sumThermo = engine === "biga"
     ? `${t("thermo_biga_result")} ${calc.bigaWaterTemp.toFixed(1)}°C · ${t("thermo_refresh_result")} ${calc.refreshWaterTemp.toFixed(1)}°C`
-    : `${t("thermo_refresh_result")} ${calc.refreshWaterTemp.toFixed(1)}°C`;
-  const totalMatH = (engine === "biga" ? maturation.prefermentHours : 0)
-    + maturation.bulkFridgeH + maturation.bulkRoomH + (maturation.ballsFridgeH ?? 0) + maturation.proofRoomH;
-  const sumMat = `${totalMatH} h ${t("maturation_hours")}`;
+    : `${t("thermo_direct_result")} ${calc.refreshWaterTemp.toFixed(1)}°C`;
+  const sumMat = `${totalMaturationHours} h ${t("maturation_hours")}`;
   /** Injects the guided-assistant answers into the calculator state. */
   function applyWizard(r: WizardResult) {
     pendingHydr.current = r.hydration;
@@ -691,7 +698,9 @@ function NewRecipePage() {
                   <Warning>{t("flour_hydration_warn").replace("{min}", String(f.hydrMin)).replace("{max}", String(f.hydrMax))}</Warning>
                 ) : null;
               })()}
-              {flourW < 220 && <Warning>{t("flour_long_ferm_warning")}</Warning>}
+              {effectiveFlourW < 220 && totalMaturationHours > maximumMaturationHours && (
+                <Warning>{t("flour_long_ferm_warning")}</Warning>
+              )}
             </div>
           )}
 
@@ -918,7 +927,7 @@ function NewRecipePage() {
             </div>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <Stat label={t("thermo_biga_result")} value={`${calc.bigaWaterTemp.toFixed(1)}°C`} />
-              <Stat label={t("thermo_refresh_result")} value={`${calc.refreshWaterTemp.toFixed(1)}°C`} />
+              <Stat label={t("thermo_direct_result")} value={`${calc.refreshWaterTemp.toFixed(1)}°C`} />
             </div>
             <MiniHeader>{t("refresh_phase")}</MiniHeader>
             <div className="grid grid-cols-2 gap-2 text-sm">

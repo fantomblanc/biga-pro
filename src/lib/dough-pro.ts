@@ -4,7 +4,7 @@
 
 import type { EngineType, PizzaStyle, PreFermentType } from "./dough-engine";
 import { STYLE_CONFIG } from "./dough-engine";
-import { FLOURS, type FlourRef } from "./flours";
+import { FLOURS, maturationRange, type FlourRef } from "./flours";
 
 /* ------------------------------------------------------------------ */
 /* Oven                                                                */
@@ -133,7 +133,20 @@ export function blendW(blend: FlourBlend, manualW: number): number {
 export type WCompat = "ideal" | "caution" | "avoid";
 
 /** Green / orange / red guidance for a W value against the chosen protocol. */
-export function wCompat(w: number, isBiga: boolean, hydration: number, style?: PizzaStyle): WCompat {
+export function wCompat(
+  w: number,
+  isBiga: boolean,
+  hydration: number,
+  style?: PizzaStyle,
+  totalMaturationHours?: number,
+): WCompat {
+  if (totalMaturationHours !== undefined) {
+    const [minimumHours, maximumHours] = maturationRange(w);
+    if (totalMaturationHours >= minimumHours && totalMaturationHours <= maximumHours) return "ideal";
+    if (totalMaturationHours > maximumHours) return "avoid";
+    return "caution";
+  }
+
   const wantsStrong = isBiga || hydration >= 70 || style === "teglia" || style === "canotto" || style === "focaccia";
   if (wantsStrong) {
     if (w >= 300 && w <= 400) return "ideal";

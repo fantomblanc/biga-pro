@@ -72,6 +72,9 @@ import { toast } from "sonner";
 import { NumberInput } from "@/components/NumberInput";
 import { SosDough } from "@/components/SosDough";
 import { RecipeWizard, type WizardResult } from "@/components/RecipeWizard";
+import { BeginnerCalculator } from "@/components/BeginnerCalculator";
+import { usePlanAccess, UpgradeProModal } from "@/lib/plan";
+import type React from "react";
 import { AlertTriangle, Save, Pizza, Wheat, Gauge, Thermometer, ChefHat, Sprout, Droplets, Snowflake, RefreshCw, Trash2, Wand2 } from "lucide-react";
 
 export const Route = createFileRoute("/new")({
@@ -85,8 +88,32 @@ export const Route = createFileRoute("/new")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: NewRecipePage,
+  component: CalculatorPage,
 });
+
+function CalculatorPage() {
+  const [mode, setMode] = useState<"beginner" | "pro">(() => (typeof window !== "undefined" && localStorage.getItem("calc_mode") === "beginner" ? "beginner" : "pro"));
+  const { canUsePro } = usePlanAccess();
+  const [upgrade, setUpgrade] = useState(false);
+  const pick = (m: "beginner" | "pro") => {
+    if (m === "pro" && !canUsePro) return setUpgrade(true);
+    setMode(m); localStorage.setItem("calc_mode", m);
+  };
+  const effective = mode === "pro" && !canUsePro ? "beginner" : mode;
+  const switcher = (
+    <div className="grid grid-cols-2 gap-1 rounded-2xl bg-muted p-1 mb-4">
+      {([["beginner", "🟢 Mode Débutant"], ["pro", "🔥 Mode Pro"]] as const).map(([m, l]) => (
+        <button key={m} type="button" onClick={() => pick(m)} className={`rounded-xl py-2 text-sm font-semibold transition ${effective === m ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>{l}</button>
+      ))}
+    </div>
+  );
+  return (
+    <>
+      <UpgradeProModal open={upgrade} onOpenChange={setUpgrade} />
+      {effective === "pro" ? <NewRecipePage switcher={switcher} /> : <AppShell>{switcher}<BeginnerCalculator /></AppShell>}
+    </>
+  );
+}
 
 const DRAFT_KEY = "carpibiga_draft_new";
 
@@ -99,7 +126,7 @@ function defaultBakeISO(): string {
   return local.toISOString().slice(0, 16);
 }
 
-function NewRecipePage() {
+function NewRecipePage({ switcher }: { switcher?: React.ReactNode }) {
   const { t } = useI18n();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -491,6 +518,7 @@ function NewRecipePage() {
 
   return (
     <AppShell>
+      {switcher}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div>
           <h1 className="font-display text-2xl font-bold mb-1">{t("new_recipe_title")}</h1>

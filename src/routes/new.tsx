@@ -92,7 +92,8 @@ export const Route = createFileRoute("/new")({
 });
 
 function CalculatorPage() {
-  const [mode, setMode] = useState<"beginner" | "pro">(() => (typeof window !== "undefined" && localStorage.getItem("calc_mode") === "beginner" ? "beginner" : "pro"));
+  const [mode, setMode] = useState<"beginner" | "pro">("pro");
+  useEffect(() => { if (localStorage.getItem("calc_mode") === "beginner") setMode("beginner"); }, []);
   const { canUsePro } = usePlanAccess();
   const [upgrade, setUpgrade] = useState(false);
   const pick = (m: "beginner" | "pro") => {

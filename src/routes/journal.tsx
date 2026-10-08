@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { usePlanAccess, UpgradeProModal } from "@/lib/plan";
 import { AppShell } from "@/components/AppShell";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
@@ -25,8 +26,13 @@ export const Route = createFileRoute("/journal")({
 function JournalPage() {
   const { t } = useI18n();
   const { user, loading } = useAuth();
+  const { canUsePro } = usePlanAccess();
 
   if (loading) return <AppShell><p className="text-sm text-muted-foreground text-center py-8">…</p></AppShell>;
+
+  if (!canUsePro) {
+    return <AppShell><UpgradeProModal open onOpenChange={() => history.back()} /></AppShell>;
+  }
 
   if (!user) {
     return (

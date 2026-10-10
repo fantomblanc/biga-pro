@@ -30,6 +30,18 @@ export function beginnerRecipe(balls: number, weight: number, hydra: number, sal
   return { flour, water: (flour * hydra) / 100, salt: (flour * salt) / 100, yeast: (flour * yeast) / 100 };
 }
 
+/** Dough density per pan thickness (g per cm² of pan surface). */
+export const PAN_DENSITY = { fine: 0.5, standard: 0.55, epaisse: 0.6 } as const;
+export type PanThickness = keyof typeof PAN_DENSITY;
+export const PAN_LABEL: Record<PanThickness, string> = {
+  fine: "Fine", standard: "Standard", epaisse: "Épaisse / Alvéolée",
+};
+
+/** Dough weight (g) needed for one pan of length × width cm at the given thickness. */
+export function panDoughWeight(length: number, width: number, thickness: PanThickness) {
+  return length * width * PAN_DENSITY[thickness];
+}
+
 function Stepper({ label, value, onChange, step, min, max, unit }: { label: string; value: number; onChange: (v: number) => void; step: number; min: number; max: number; unit?: string }) {
   return (
     <div className="flex items-center justify-between rounded-2xl border border-border/60 bg-card p-4">

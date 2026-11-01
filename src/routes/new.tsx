@@ -203,6 +203,10 @@ function NewRecipePage({ switcher }: { switcher?: React.ReactNode }) {
   const [saving, setSaving] = useState(false);
   const hydrated = useRef(false);
 
+  /* ---------------- edit mode (?edit=<recipeId>) ---------------- */
+  const { edit: editId } = Route.useSearch();
+  const [editingRecipe, setEditingRecipe] = useState<SavedRecipe | null>(null);
+
   const cfg = STYLE_CONFIG[style];
   const isTeglia = style === "teglia";
   const avpn = avpnRules(style);
@@ -211,6 +215,19 @@ function NewRecipePage({ switcher }: { switcher?: React.ReactNode }) {
 
   /* ---------------- draft autosave ---------------- */
   useEffect(() => {
+    if (editId) {
+      // Editing an existing recipe: pre-fill from the cloud, ignore any draft.
+      hydrated.current = true;
+      let cancelled = false;
+      getRecipe(editId)
+        .then((r) => {
+          if (cancelled || !r) return;
+          prefillFromRecipe(r);
+          setEditingRecipe(r);
+        })
+        .catch(() => toast.error(t("cloud_error")));
+      return () => { cancelled = true; };
+    }
     try {
       const raw = localStorage.getItem(DRAFT_KEY);
       if (raw) {

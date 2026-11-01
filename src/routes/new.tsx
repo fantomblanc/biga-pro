@@ -232,7 +232,7 @@ function NewRecipePage({ switcher }: { switcher?: React.ReactNode }) {
     setMalt(inp.maltPct);
     setUseOil(inp.useOil);
     setOil(inp.oilPct);
-    setBigaPct(inp.bigaPct);
+    setBigaPct(inp.bigaPct ?? 80);
     bigaPctEdited.current = true;
     const d = new Date(inp.targetBakeISO);
     const local = new Date(d.getTime() - d.getTimezoneOffset() * 60_000);

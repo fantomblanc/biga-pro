@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   RotateCcw, Printer, Camera, Trash2, Wrench, Play, ChevronLeft, MonitorUp,
-  MonitorOff, Save, LifeBuoy, Share2, Copy, Ban,
+  MonitorOff, Save, LifeBuoy, Share2, Copy, Ban, Pencil,
 } from "lucide-react";
 import { useWakeLock } from "@/lib/wake-lock";
 import { toast } from "sonner";
@@ -468,6 +468,11 @@ function RecipePage() {
             title={wakeOn ? t("wake_lock_on") : t("wake_lock_off")}
           >
             {wakeOn ? <MonitorUp className="size-4" /> : <MonitorOff className="size-4" />}
+          </Button>
+          <Button variant="outline" size="sm" asChild title={t("edit")}>
+            <Link to="/new" search={{ edit: recipe.id }}>
+              <Pencil className="size-4 mr-1" /> {t("edit")}
+            </Link>
           </Button>
           <Button variant="outline" size="sm" onClick={printRecipe} title={t("print_hint")}>
             <Printer className="size-4 mr-1" /> {t("print_recipe")}

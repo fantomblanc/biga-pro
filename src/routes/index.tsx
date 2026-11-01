@@ -268,6 +268,7 @@ function RecipeCard({ r, isActive, onDelete }: { r: SavedRecipe; isActive: boole
           onClose={() => setMenuOpen(false)}
           actions={[
             { label: t("open"), onSelect: () => { setMenuOpen(false); window.location.assign(`/recipe/${r.id}`); } },
+            { label: t("edit"), onSelect: () => { setMenuOpen(false); window.location.assign(`/new?edit=${r.id}`); } },
             { label: t("delete"), destructive: true, onSelect: () => { setMenuOpen(false); onDelete(); } },
           ]}
         />

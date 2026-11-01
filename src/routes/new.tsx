@@ -65,8 +65,8 @@ import {
   type SimpleOven,
   type KneadMode,
 } from "@/lib/dough-thermo";
-import { setActiveId } from "@/lib/storage";
-import { saveRecipe } from "@/lib/cloud";
+import { setActiveId, type SavedRecipe } from "@/lib/storage";
+import { saveRecipe, getRecipe } from "@/lib/cloud";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { NumberInput } from "@/components/NumberInput";
@@ -78,6 +78,9 @@ import type React from "react";
 import { AlertTriangle, Save, Pizza, Wheat, Gauge, Thermometer, ChefHat, Sprout, Droplets, Snowflake, RefreshCw, Trash2, Wand2 } from "lucide-react";
 
 export const Route = createFileRoute("/new")({
+  validateSearch: (search: Record<string, unknown>): { edit?: string } => ({
+    edit: typeof search.edit === "string" && search.edit ? search.edit : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "New Recipe · CarpiBiga Pro" },
@@ -200,14 +203,86 @@ function NewRecipePage({ switcher }: { switcher?: React.ReactNode }) {
   const [saving, setSaving] = useState(false);
   const hydrated = useRef(false);
 
+  /* ---------------- edit mode (?edit=<recipeId>) ---------------- */
+  const { edit: editId } = Route.useSearch();
+  const [editingRecipe, setEditingRecipe] = useState<SavedRecipe | null>(null);
+
   const cfg = STYLE_CONFIG[style];
   const isTeglia = style === "teglia";
   const avpn = avpnRules(style);
   const engine: EngineType = method === "indirect" ? "biga" : "direct";
   const bigaPctEdited = useRef(false);
 
+  /** Loads an existing recipe's values into every form field (edit mode). */
+  function prefillFromRecipe(r: SavedRecipe) {
+    const inp = r.inputs;
+    pendingHydr.current = inp.hydration;
+    if (inp.style) setStyle(inp.style);
+    setMethod(inp.engine === "biga" ? "indirect" : "direct");
+    if (inp.preFerment) setPreFerment(inp.preFerment);
+    setName(r.name);
+    setNameEdited(true);
+    setFlourGrams(inp.flourAvailable ?? Math.round(r.calc.totalFlour));
+    setTargetBallWeight(inp.targetBallWeight ?? inp.ballWeight);
+    setHydr(inp.hydration);
+    setSalt(inp.saltPct ?? 2.5);
+    setYeast(inp.yeastType);
+    setFlourW(inp.flourW);
+    setUseMalt(inp.useMalt);
+    setMalt(inp.maltPct);
+    setUseOil(inp.useOil);
+    setOil(inp.oilPct);
+    setBigaPct(inp.bigaPct ?? 80);
+    bigaPctEdited.current = true;
+    const d = new Date(inp.targetBakeISO);
+    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60_000);
+    setTargetBake(local.toISOString().slice(0, 16));
+    setTenacity(inp.tenacity ?? 0);
+    if (inp.blend) setBlend(inp.blend);
+    if (inp.autolyse) setAutolyse(inp.autolyse);
+    if (inp.trays) setTrays(inp.trays);
+    if (inp.preFermentHydrPct) setBigaHydr(inp.preFermentHydrPct);
+    setUseRefreshYeast((inp.refreshYeastPct ?? 0) > 0);
+    if (inp.refreshYeastPct) setRefreshYeastPct(inp.refreshYeastPct);
+    if (inp.bigaFermMode) setBigaFermMode(inp.bigaFermMode);
+    if (inp.bigaRoomTemp) setBigaRoomTemp(inp.bigaRoomTemp);
+    if (inp.bigaHours) setBigaHours(inp.bigaHours);
+    setKneadMode(inp.kneadMode ?? "hand");
+    setBigaKneadMode(inp.bigaKneadMode ?? "hand");
+    setAmbientTemp(inp.ambientTemp ?? 22);
+    setBigaFlourTemp(inp.flourTemp ?? 20);
+    setRefreshFlourTemp(inp.refreshFlourTemp ?? 20);
+    if (inp.simpleOven) setSimpleOven(inp.simpleOven);
+    if (inp.maturation) setMaturation({ ballsFridgeH: 0, ...inp.maturation });
+    // Reactive effects (style / knead mode / oven / pre-ferment location) fire
+    // after this render and would clobber these values — re-apply on next tick.
+    const storageT = inp.storageTemp ?? inp.cellarTemp;
+    const realT = inp.bigaRealTemp ?? storageT;
+    const friction = inp.refreshFriction ?? REFRESH_FRICTION[inp.kneadMode ?? "hand"];
+    const ovenMax = inp.ovenMaxTempC ?? SIMPLE_OVEN_DEFAULT_MAX[inp.simpleOven ?? "pro"];
+    window.setTimeout(() => {
+      setStorageTemp(storageT);
+      setBigaRealTemp(realT);
+      setRefreshFriction(friction);
+      setOvenMaxTemp(ovenMax);
+    }, 0);
+  }
+
   /* ---------------- draft autosave ---------------- */
   useEffect(() => {
+    if (editId) {
+      // Editing an existing recipe: pre-fill from the cloud, ignore any draft.
+      hydrated.current = true;
+      let cancelled = false;
+      getRecipe(editId)
+        .then((r) => {
+          if (cancelled || !r) return;
+          prefillFromRecipe(r);
+          setEditingRecipe(r);
+        })
+        .catch(() => toast.error(t("cloud_error")));
+      return () => { cancelled = true; };
+    }
     try {
       const raw = localStorage.getItem(DRAFT_KEY);
       if (raw) {
@@ -454,19 +529,19 @@ function NewRecipePage({ switcher }: { switcher?: React.ReactNode }) {
     setSaving(true);
     try {
       const saved = await saveRecipe({
-        id: crypto.randomUUID(),
+        id: editingRecipe?.id ?? crypto.randomUUID(),
         name: name.trim() || autoName,
-        createdAt: new Date().toISOString(),
+        createdAt: editingRecipe?.createdAt ?? new Date().toISOString(),
         inputs,
         calc: adjustedCalc,
         timeline,
         finalProofH,
-        notes: "",
-        photos: [],
+        notes: editingRecipe?.notes ?? "",
+        photos: editingRecipe?.photos ?? [],
       });
       setActiveId(saved.id);
       localStorage.removeItem(DRAFT_KEY);
-      toast.success(t("recipe_saved"));
+      toast.success(t(editingRecipe ? "recipe_updated" : "recipe_saved"));
       navigate({ to: "/recipe/$id", params: { id: saved.id } });
     } catch (e) {
       console.error(e);

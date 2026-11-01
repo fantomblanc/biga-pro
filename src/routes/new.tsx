@@ -65,8 +65,8 @@ import {
   type SimpleOven,
   type KneadMode,
 } from "@/lib/dough-thermo";
-import { setActiveId } from "@/lib/storage";
-import { saveRecipe } from "@/lib/cloud";
+import { setActiveId, type SavedRecipe } from "@/lib/storage";
+import { saveRecipe, getRecipe } from "@/lib/cloud";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { NumberInput } from "@/components/NumberInput";
@@ -78,6 +78,9 @@ import type React from "react";
 import { AlertTriangle, Save, Pizza, Wheat, Gauge, Thermometer, ChefHat, Sprout, Droplets, Snowflake, RefreshCw, Trash2, Wand2 } from "lucide-react";
 
 export const Route = createFileRoute("/new")({
+  validateSearch: (search: Record<string, unknown>): { edit?: string } => ({
+    edit: typeof search.edit === "string" && search.edit ? search.edit : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "New Recipe · CarpiBiga Pro" },

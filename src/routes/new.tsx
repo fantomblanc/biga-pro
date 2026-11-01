@@ -217,7 +217,7 @@ function NewRecipePage({ switcher }: { switcher?: React.ReactNode }) {
   function prefillFromRecipe(r: SavedRecipe) {
     const inp = r.inputs;
     pendingHydr.current = inp.hydration;
-    setStyle(inp.style);
+    if (inp.style) setStyle(inp.style);
     setMethod(inp.engine === "biga" ? "indirect" : "direct");
     if (inp.preFerment) setPreFerment(inp.preFerment);
     setName(r.name);
@@ -225,7 +225,7 @@ function NewRecipePage({ switcher }: { switcher?: React.ReactNode }) {
     setFlourGrams(inp.flourAvailable ?? Math.round(r.calc.totalFlour));
     setTargetBallWeight(inp.targetBallWeight ?? inp.ballWeight);
     setHydr(inp.hydration);
-    setSalt(inp.saltPct);
+    setSalt(inp.saltPct ?? 2.5);
     setYeast(inp.yeastType);
     setFlourW(inp.flourW);
     setUseMalt(inp.useMalt);

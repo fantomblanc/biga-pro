@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { setAppSettings, fetchAppSettings, type PublicAppSettings, DEFAULT_APP_SETTINGS } from "@/lib/app-settings";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { ChangelogAdmin } from "@/components/ChangelogAdmin";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -155,6 +156,7 @@ function AdminPage() {
     <AppShell>
       <h1 className="text-3xl font-bold tracking-tight mt-2 mb-4">Administration</h1>
       <div className="space-y-4">
+        <ChangelogAdmin />
 
         {/* KPIs */}
         <section className="grid grid-cols-3 gap-3">

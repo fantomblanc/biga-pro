@@ -16,6 +16,10 @@ import { flourById } from "@/lib/dough-pro";
 
 
 import { Timeline } from "@/components/Timeline";
+import { SessionCountdown } from "@/components/SessionCountdown";
+import { RelaunchRecipeDialog } from "@/components/RelaunchRecipeDialog";
+import { sessionTimeline } from "@/lib/session";
+import { updatesCopy } from "@/lib/updates-copy";
 import { CookTimer } from "@/components/CookTimer";
 import { WaterTempCalculator } from "@/components/WaterTempCalculator";
 import { PrintableRecipe } from "@/components/PrintableRecipe";
@@ -47,6 +51,10 @@ export const Route = createFileRoute("/recipe/$id")({
     meta: [
       { title: `Recipe · CarpiBiga Pro` },
       { name: "description", content: `Active dough recipe protocol with timeline, cook timer, water temp and journal.` },
+      { property: "og:title", content: "Protocole de cuisson · CarpiBiga Pro" },
+      { property: "og:description", content: "Rétroplanning précis, ingrédients et suivi de votre recette de pizza." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: RecipePage,
@@ -316,8 +324,8 @@ function RecipePage() {
       toast.error(t(deniedKey));
       return;
     }
-    recipe.timeline.forEach((s) => {
-      scheduleNotification(recipe.id, s.id, s.timeISO, `🍕 ${recipe.name}`, t(s.labelKey));
+    sessionTimeline(recipe).forEach((s) => {
+      scheduleNotification(recipe.id, s.id, s.timeISO, `🍕 ${recipe.name}`, s.id === "preheat" ? updatesCopy("fr").preheat : t(s.labelKey));
     });
     return () => clearScheduled(recipe.id);
   }, [recipe, isActive, t]);
@@ -507,11 +515,7 @@ function RecipePage() {
             <span>W{recipe.inputs.flourW}</span>
             <span>{recipe.inputs.cellarTemp}°C cellar</span>
           </div>
-          {!isActive && (
-            <Button size="sm" className="mt-4" onClick={loadAsActive}>
-              <Play className="size-4 mr-1" /> {t("load_recipe")}
-            </Button>
-          )}
+          <div className="mt-4"><RelaunchRecipeDialog recipe={recipe} onLaunched={(r) => { setRecipe(r); setIsActive(true); }} /></div>
         </div>
       </Card>
 
@@ -525,7 +529,8 @@ function RecipePage() {
 
         {/* PROTOCOL */}
         <TabsContent value="protocol" className="space-y-4 pt-4">
-          <Timeline steps={recipe.timeline} extras={timelineExtras} />
+          <SessionCountdown steps={sessionTimeline(recipe)} />
+          <Timeline steps={sessionTimeline(recipe)} extras={timelineExtras} />
 
           <BakingTempsCard
             recipe={recipe}

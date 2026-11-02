@@ -1,4 +1,5 @@
 import { useAppName } from "@/lib/app-settings";
+import { WhatsNew } from "./WhatsNew";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,9 +45,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="grid place-items-center size-7 rounded-lg bg-primary">
               <Flame className="size-4 text-primary-foreground" />
             </span>
-            <span className="text-[17px] font-semibold tracking-tight">{appName}</span>
+            <span className="text-[17px] font-semibold truncate">{appName}</span>
           </Link>
           <div className="flex items-center gap-2">
+            <WhatsNew />
             <LanguageSelector />
             {isAdmin && (
               <Link to="/admin" className="flex items-center gap-1 text-[15px] text-primary font-medium active:opacity-50" title="Admin">

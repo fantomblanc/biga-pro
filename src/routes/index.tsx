@@ -7,10 +7,20 @@ import { useAuth } from "@/lib/auth";
 import { loadActiveId, type SavedRecipe } from "@/lib/storage";
 import { listRecipes, removeRecipe } from "@/lib/cloud";
 import { Card } from "@/components/ui/card";
+import { RelaunchRecipeDialog } from "@/components/RelaunchRecipeDialog";
+import { SessionCountdown } from "@/components/SessionCountdown";
+import { sessionTimeline } from "@/lib/session";
 import { Button } from "@/components/ui/button";
 import { Flame, Plus, ArrowRight, Clock, Scale, BookOpen, ChevronRight, Droplets, Layers } from "lucide-react";
 
 export const Route = createFileRoute("/")({
+  head: () => ({ meta: [
+    { title: "Sessions et recettes · CarpiBiga Pro" },
+    { name: "description", content: "Retrouvez vos recettes de pizza et le rétroplanning de votre session de cuisson." },
+    { property: "og:title", content: "Sessions et recettes · CarpiBiga Pro" },
+    { property: "og:description", content: "Recettes enregistrées, relance et étapes de cuisson." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
+  ] }),
   component: Dashboard,
 });
 
@@ -21,7 +31,7 @@ function Dashboard() {
   const queryClient = useQueryClient();
 
   const { data: recipes = [] } = useQuery({
-    queryKey: ["recipes"],
+    queryKey: ["recipes", user?.id],
     queryFn: listRecipes,
     enabled: !!user,
   });
@@ -175,6 +185,7 @@ function ActiveHero({ recipe }: { recipe: SavedRecipe }) {
             </Button>
           </div>
         )}
+        <div className="mt-4"><SessionCountdown steps={sessionTimeline(recipe)} /></div>
         {!next && (
           <Button asChild size="sm" className="mt-4">
             <Link to="/recipe/$id" params={{ id: recipe.id }}>Open <ArrowRight className="size-4 ml-1" /></Link>
@@ -261,6 +272,8 @@ function RecipeCard({ r, isActive, onDelete }: { r: SavedRecipe; isActive: boole
           <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
         </div>
       </Link>
+
+      <div className="-mt-2 pb-1"><RelaunchRecipeDialog recipe={r} /></div>
 
       {menuOpen && (
         <ContextSheet

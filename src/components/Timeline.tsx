@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { updatesCopy } from "@/lib/updates-copy";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import type { TimelineStep } from "@/lib/dough-engine";
@@ -25,7 +26,7 @@ function formatDelta(t: (k: string) => string, ms: number): string {
 }
 
 export function Timeline({ steps, extras }: { steps: TimelineStep[]; extras?: Record<string, string> }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
@@ -61,7 +62,7 @@ export function Timeline({ steps, extras }: { steps: TimelineStep[]; extras?: Re
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline justify-between gap-2">
-                  <div className="font-medium text-sm truncate">{t(step.labelKey)}</div>
+                  <div className="font-medium text-sm break-words">{step.id === "preheat" ? updatesCopy(lang).preheat : step.labelKey === "session_poolish_start" ? updatesCopy(lang).poolish : t(step.labelKey)}</div>
                   {isActive && (
                     <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
                       • {t("active")}
@@ -73,8 +74,8 @@ export function Timeline({ steps, extras }: { steps: TimelineStep[]; extras?: Re
                 </div>
                 <div className="flex items-baseline justify-between gap-2 mt-1.5">
                   <div className="tabular text-[13px] font-medium">
-                    {new Date(step.timeISO).toLocaleString(undefined, {
-                      weekday: "short", hour: "2-digit", minute: "2-digit",
+                    {new Date(step.timeISO).toLocaleString(lang, {
+                      weekday: "long", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
                     })}
                   </div>
                   <div className={cn(

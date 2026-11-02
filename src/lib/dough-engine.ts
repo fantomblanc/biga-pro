@@ -449,6 +449,37 @@ export function buildTimeline(inp: RecipeInputs, finalProofH: number): TimelineS
   const bake = new Date(inp.targetBakeISO).getTime();
   const h = 3600_000;
 
+  if (inp.maturation) {
+    const m = inp.maturation;
+    const steps: TimelineStep[] = [];
+    let cursor = bake;
+    const add = (id: string, labelKey: string, zone: TimelineStep["zone"]) =>
+      steps.push({ id, labelKey, zone, timeISO: new Date(cursor).toISOString() });
+    add("bake", "step_bake", "bake");
+    cursor -= finalProofH * h;
+    add("proof_start", "step_proof_start", "final");
+    if ((m.ballsFridgeH ?? 0) > 0) {
+      add("balls_fridge_end", "step_fridge_end", "final");
+      cursor -= (m.ballsFridgeH ?? 0) * h;
+      add("balls_fridge_start", "step_fridge_start", "fridge");
+    }
+    add("ball", "step_ball_title", "final");
+    cursor -= m.bulkRoomH * h;
+    if (m.bulkFridgeH > 0) {
+      add("fridge_end", "step_fridge_end", "final");
+      cursor -= m.bulkFridgeH * h;
+      add("fridge_start", "step_fridge_start", "fridge");
+    }
+    add("bulk", "step_bulk", "cellar");
+    cursor -= 0.5 * h;
+    add(inp.engine === "biga" ? "refresh" : "mix", inp.engine === "biga" ? "step_biga_end" : "step_knead", "cellar");
+    if (inp.engine === "biga") {
+      cursor -= m.prefermentHours * h;
+      add("biga_start", inp.preFerment === "poolish" ? "session_poolish_start" : "step_biga_start", m.prefermentLoc === "fridge" ? "fridge" : "cellar");
+    }
+    return steps.reverse();
+  }
+
   if (inp.engine === "biga") {
     const proofStart = bake - finalProofH * h;
     const fridgeEnd = proofStart;

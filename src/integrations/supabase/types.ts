@@ -148,6 +148,45 @@ export type Database = {
           },
         ]
       }
+      changelogs: {
+        Row: {
+          content_fr: string
+          content_nl: string
+          created_at: string
+          date: string
+          id: string
+          title_fr: string
+          title_nl: string
+          translations: Json
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          content_fr: string
+          content_nl?: string
+          created_at?: string
+          date?: string
+          id?: string
+          title_fr: string
+          title_nl?: string
+          translations?: Json
+          updated_at?: string
+          version: string
+        }
+        Update: {
+          content_fr?: string
+          content_nl?: string
+          created_at?: string
+          date?: string
+          id?: string
+          title_fr?: string
+          title_nl?: string
+          translations?: Json
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       feedback_reports: {
         Row: {
           created_at: string

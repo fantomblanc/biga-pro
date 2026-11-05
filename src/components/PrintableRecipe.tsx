@@ -72,7 +72,7 @@ export const PrintableRecipe = forwardRef<HTMLDivElement, Props>(function Printa
         <div className="uppercase tracking-widest text-[10px] font-bold text-[#b8410f]">
           {engine === "biga"
             ? (isPoolish ? t("preferment_poolish") : t("engine_biga"))
-            : t("engine_direct")}
+            : t(recipe.inputs.directYeastPct !== undefined ? "method_direct" : "engine_direct")}
         </div>
         <h1 className="text-[22px] font-bold m-0 mt-1 text-[#b8410f]">{recipe.name}</h1>
         <div className="text-[#555] text-[11px]">

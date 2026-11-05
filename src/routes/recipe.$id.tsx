@@ -271,7 +271,7 @@ function DetailedProtocol({ steps }: { steps: ProtocolStep[] }) {
 }
 
 function RecipePage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { id } = Route.useParams();
   const router = useRouter();
   const [recipe, setRecipe] = useState<SavedRecipe | null>(null);
@@ -325,10 +325,10 @@ function RecipePage() {
       return;
     }
     sessionTimeline(recipe).forEach((s) => {
-      scheduleNotification(recipe.id, s.id, s.timeISO, `🍕 ${recipe.name}`, s.id === "preheat" ? updatesCopy("fr").preheat : t(s.labelKey));
+      scheduleNotification(recipe.id, s.id, s.timeISO, `🍕 ${recipe.name}`, s.id === "preheat" ? updatesCopy(lang).preheat : s.labelKey === "session_poolish_start" ? updatesCopy(lang).poolish : t(s.labelKey));
     });
     return () => clearScheduled(recipe.id);
-  }, [recipe, isActive, t]);
+  }, [recipe, isActive, t, lang]);
 
   if (loadingRecipe) {
     return (
@@ -504,7 +504,7 @@ function RecipePage() {
           <div className="text-[10px] uppercase tracking-widest text-primary font-bold">
             {recipe.inputs.engine === "biga"
               ? ((recipe.calc.preFerment ?? recipe.inputs.preFerment) === "poolish" ? t("preferment_poolish") : t("engine_biga"))
-              : t("engine_direct")}
+              : t(recipe.inputs.directYeastPct !== undefined ? "method_direct" : "engine_direct")}
             {isActive && <span className="ml-2 px-1.5 py-0.5 rounded bg-success/20 text-[color:var(--success)]">• {t("active")}</span>}
           </div>
 

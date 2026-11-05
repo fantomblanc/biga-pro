@@ -158,7 +158,7 @@ function ActiveHero({ recipe }: { recipe: SavedRecipe }) {
       <div className="absolute -top-16 -right-16 size-40 rounded-full ember-gradient opacity-20 blur-2xl" />
       <div className="relative">
         <div className="text-[10px] uppercase tracking-widest text-primary font-bold mb-1">
-          {t(recipe.inputs.engine === "biga" ? "engine_biga" : "engine_direct")}
+          {t(recipe.inputs.engine === "biga" ? "engine_biga" : recipe.inputs.directYeastPct !== undefined ? "method_direct" : "engine_direct")}
         </div>
         <h3 className="font-display text-xl font-bold">{recipe.name}</h3>
         <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">

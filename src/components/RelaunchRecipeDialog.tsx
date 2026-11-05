@@ -42,7 +42,7 @@ export function RelaunchRecipeDialog({ recipe, onLaunched }: { recipe: SavedReci
     } catch { toast.error(c.error); } finally { setBusy(false); }
   };
   return <>
-    <Button variant="outline" size="sm" onClick={() => { const date = new Date(Date.now() + (requiredDurationHours(recipe) + 2) * 3600_000); setDay(date); setExpress(false); setOpen(true); }}><Play className="size-4" />{c.launch}</Button>
+    <Button variant="outline" size="sm" onClick={() => { const date = new Date(Date.now() + (requiredDurationHours(recipe) + 2) * 3600_000); setDay(date); setTime(`${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`); setExpress(false); setOpen(true); }}><Play className="size-4" />{c.launch}</Button>
     <Dialog open={open} onOpenChange={setOpen}><DialogContent className="max-w-md max-h-[90dvh] overflow-y-auto">
       <DialogHeader><DialogTitle>{c.launch}</DialogTitle><DialogDescription>{recipe.name}</DialogDescription></DialogHeader>
       <div className="space-y-4"><p className="font-medium text-sm">{c.bake}</p>

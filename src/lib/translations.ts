@@ -1,4 +1,4 @@
-export type Lang = "en" | "fr" | "it" | "es" | "pt" | "de";
+export type Lang = "en" | "fr" | "it" | "es" | "pt" | "de" | "nl";
 
 export const LANGS: { code: Lang; label: string; flag: string }[] = [
   { code: "en", label: "English", flag: "🇬🇧" },
@@ -7,6 +7,7 @@ export const LANGS: { code: Lang; label: string; flag: string }[] = [
   { code: "es", label: "Español", flag: "🇪🇸" },
   { code: "pt", label: "Português", flag: "🇵🇹" },
   { code: "de", label: "Deutsch", flag: "🇩🇪" },
+  { code: "nl", label: "Nederlands", flag: "🇳🇱" },
 ];
 
 type Dict = Record<string, string>;
@@ -2400,5 +2401,6 @@ export const TRANSLATIONS: Record<Lang, Dict> = {
   es: { ...es, ...EXTRA_TRANSLATIONS.es },
   pt: { ...pt, ...EXTRA_TRANSLATIONS.pt },
   de: { ...de, ...EXTRA_TRANSLATIONS.de },
+  nl: { ...en, ...EXTRA_TRANSLATIONS.nl, nav_dashboard: "Dashboard", nav_new: "Nieuw recept", nav_settings: "Instellingen", journal_history: "Geschiedenis en bakdagboek", saved_recipes: "Opgeslagen recepten", active_session: "Actieve sessie" },
 };
 

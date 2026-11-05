@@ -113,5 +113,5 @@ const fr: Dict = {
 };
 
 export const UX_TRANSLATIONS: Record<Lang, Dict> = {
-  en, fr: { ...en, ...fr }, it: en, es: en, pt: en, de: en,
+  en, fr: { ...en, ...fr }, it: en, es: en, pt: en, de: en, nl: en,
 };

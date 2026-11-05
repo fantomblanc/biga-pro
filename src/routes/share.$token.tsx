@@ -11,6 +11,9 @@ export const Route = createFileRoute("/share/$token")({
   head: () => ({
     meta: [
       { title: "Shared recipe · CarpiBiga Pro" },
+      { property: "og:title", content: "Shared recipe · CarpiBiga Pro" },
+      { property: "og:description", content: "Read a shared pizza dough recipe and its baking schedule." },
+      { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
       { name: "description", content: "A shared, read-only dough recipe from CarpiBiga Pro." },
     ],
   }),

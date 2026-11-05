@@ -16,6 +16,9 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in · CarpiBiga Pro" },
+      { property: "og:title", content: "Sign in · CarpiBiga Pro" },
+      { property: "og:description", content: "Save your pizza recipes and bake journal with your account." },
+      { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
       { name: "description", content: "Sign in or create an account to save your dough recipes and bake journal to the cloud." },
     ],
   }),

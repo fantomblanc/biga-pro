@@ -41,7 +41,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col bg-background">
       <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl no-print">
         <div className="mx-auto max-w-3xl px-4 h-12 flex items-center justify-between gap-3">
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 min-w-0">
             <span className="grid place-items-center size-7 rounded-lg bg-primary">
               <Flame className="size-4 text-primary-foreground" />
             </span>

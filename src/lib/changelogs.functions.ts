@@ -11,7 +11,8 @@ export const publishChangelog = createServerFn({ method: "POST" })
     const { translateRelease } = await import("./changelogs.server");
     const result = await translateRelease(data.title_fr, data.content_fr);
     if (!result.ok) return result;
-    const payload = { ...data, title_nl: data.title_nl || result.translations.nl.title, content_nl: data.content_nl || result.translations.nl.content, translations: result.translations };
+    const translations = { ...result.translations, nl: { title: data.title_nl || result.translations.nl.title, content: data.content_nl || result.translations.nl.content } };
+    const payload = { ...data, title_nl: translations.nl.title, content_nl: translations.nl.content, translations };
     const query = data.id ? context.supabase.from("changelogs").update(payload).eq("id", data.id) : context.supabase.from("changelogs").insert(payload);
     const { data: row, error: writeError } = await query.select("*").single();
     if (writeError) return { ok: false as const, error: "Échec de l’enregistrement de la note." };

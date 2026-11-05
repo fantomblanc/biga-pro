@@ -103,6 +103,8 @@ export interface RecipeInputs {
   waterTempSuggested?: number;
   /** Bulk rest override in minutes (tenacity arbitration). */
   bulkOverrideMin?: number;
+  /** Fresh yeast dosage of a saved short direct protocol. */
+  directYeastPct?: number;
   /** Flour actually available, when scaling in reverse. */
   flourAvailable?: number;
   /** Autolyse water-temperature penalty already applied upstream. */
@@ -320,7 +322,7 @@ export function calculateRecipe(inp: RecipeInputs): RecipeCalc {
   const refreshYeastShown = inp.yeastType === "dry" ? refreshYeastFresh / 3 : refreshYeastFresh;
 
   // Direct 72h: fixed 0.15% fresh yeast on total flour (cold-blocked, independent of room temp)
-  const directYeastFresh = totalFlour * 0.0015;
+  const directYeastFresh = totalFlour * (inp.directYeastPct ?? 0.15) / 100;
   const directYeastShown = inp.yeastType === "dry" ? directYeastFresh / 3 : directYeastFresh;
 
   const bulkFermentMin = Math.round(inp.bulkOverrideMin ?? calcBulkFermentMin(inp.cellarTemp));

@@ -70,8 +70,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "CarpiBiga Pro — Precision Dough Engineering" },
       { name: "twitter:description", content: "Professional dough calculator and fermentation timeline for advanced pizza-makers. Biga and Direct 72h engines, water temp calculator, wake-lock timer." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/7c8f6f1c-773b-488f-b864-ddeb26586328" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/7c8f6f1c-773b-488f-b864-ddeb26586328" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

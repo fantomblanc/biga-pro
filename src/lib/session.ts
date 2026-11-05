@@ -49,9 +49,11 @@ export function expressRecipe(recipe: SavedRecipe, targetISO: string, now = Date
     maturation: { prefermentLoc: "ambient", prefermentHours: 0, bulkFridgeH: 0, bulkRoomH: fermentationH / 2, ballsFridgeH: 0, proofRoomH },
   };
   const calc = calculateRecipe(inputs);
-  const temp = inputs.ambientTemp ?? inputs.cellarTemp;
+  const temp = Number.isFinite(inputs.ambientTemp ?? inputs.cellarTemp) ? (inputs.ambientTemp ?? inputs.cellarTemp) : 22;
   const yeastPct = Math.max(0.05, Math.min(2, (3.2 / fermentationH) * Math.pow(2, (22 - temp) / 6)));
   calc.directYeastFresh = calc.totalFlour * yeastPct / 100;
+  inputs.directYeastPct = yeastPct;
+  inputs.bulkOverrideMin = fermentationH / 2 * 60;
   calc.directYeastShown = inputs.yeastType === "dry" ? calc.directYeastFresh / 3 : calc.directYeastFresh;
   calc.bulkFermentMin = inputs.maturation ? inputs.maturation.bulkRoomH * 60 : 0;
   const updated = { ...recipe, inputs, calc, finalProofH: proofRoomH, timeline: buildTimeline(inputs, proofRoomH) };

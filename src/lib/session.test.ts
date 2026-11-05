@@ -28,6 +28,7 @@ describe("Session scheduling", () => {
     expect(r.inputs.maturation?.bulkFridgeH).toBe(0);
     expect(Date.parse(r.timeline[0].timeISO)).toBeGreaterThanOrEqual(now);
     expect(r.calc.directYeastFresh).toBeGreaterThan(recipe.calc.directYeastFresh);
+    expect(calculateRecipe(r.inputs).directYeastFresh).toBeCloseTo(r.calc.directYeastFresh, 8);
   });
   it("does not offer express for less than four hours", () => {
     expect(() => expressRecipe(recipe, "2026-11-02T15:00:00Z", now)).toThrow("session_express_min");

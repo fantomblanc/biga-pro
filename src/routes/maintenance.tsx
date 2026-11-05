@@ -7,6 +7,10 @@ export const Route = createFileRoute("/maintenance")({
   head: () => ({
     meta: [
       { title: "Maintenance · CarpiBiga Pro" },
+      { name: "description", content: "CarpiBiga Pro is temporarily undergoing maintenance." },
+      { property: "og:title", content: "Maintenance · CarpiBiga Pro" },
+      { property: "og:description", content: "Service status during maintenance." },
+      { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -17,6 +17,9 @@ export const Route = createFileRoute("/journal")({
   head: () => ({
     meta: [
       { title: "Bake journal · CarpiBiga Pro" },
+      { property: "og:title", content: "Bake journal · CarpiBiga Pro" },
+      { property: "og:description", content: "Your past pizza bakes, ratings and recipe history." },
+      { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
       { name: "description", content: "History and bake journal — rate your crumb, chew and cornicione, and duplicate past recipes." },
     ],
   }),

@@ -549,4 +549,5 @@ export const EXTRA_TRANSLATIONS: Record<Lang, Dict> = {
   es: { ...wizardHelpEn, ...flourSosEn, ...es },
   pt: { ...wizardHelpEn, ...flourSosEn, ...pt },
   de: { ...wizardHelpEn, ...flourSosEn, ...de },
+  nl: { ...en, ...wizardHelpEn, ...flourSosEn },
 };

@@ -19,6 +19,9 @@ export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
       { title: "Settings · CarpiBiga Pro" },
+      { property: "og:title", content: "Settings · CarpiBiga Pro" },
+      { property: "og:description", content: "Choose language and notification preferences for your pizza sessions." },
+      { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
       { name: "description", content: "Language, notifications and app preferences for CarpiBiga Pro." },
     ],
   }),
